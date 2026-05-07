@@ -10,6 +10,196 @@ Follow the full setup guide first:
 
 ---
 
+## Repository Description and Purpose
+
+The AI Engineering Platform (AIEP) repository is the engineering control plane for building and operating AI-enabled products with predictable quality, safety, and delivery speed.
+
+Its purpose is to combine:
+
+- Production application code and services for AI workflow orchestration
+- Enterprise engineering standards (security, testing, observability, and API conventions)
+- A governed AI agent operating model based on instruction hierarchy, domain skills, and persistent project memory
+- Workspace-level GitHub Copilot custom agents, prompts, skills, and hooks that enforce deterministic and auditable execution
+
+In practice, this repository ensures that both humans and AI agents implement changes under the same constraints: secure defaults, architecture boundaries, explicit risk handling, mandatory validation, and memory-aware continuity of decisions over time.
+
+---
+
+## Visual Architecture: Agents, Skills, and Memory System
+
+```mermaid
+flowchart LR
+  user([Engineer]) --> chat[VS Code Copilot Chat]
+  chat --> prompt[/Router Prompt/]
+  prompt --> router[[AIEP Senior Staff Router]]
+
+  subgraph Gov[Governance + Context Source of Truth (.ai)]
+    ih[instruction-hierarchy.md]
+    gr[global-rules.md]
+    ao[ai-agent-operating-rules.md]
+    mem1[current-architecture.md]
+    mem2[active-work.md]
+    mem3[known-issues.md]
+    skillbank[(.ai/skills/*)]
+    docs[(docs/*)]
+  end
+
+  subgraph Runtime[Runtime Layer (.github)]
+    bridge[aiep-ai-bridge.instructions.md]
+    hcfg[aiep-guardrails.json]
+    hscript[pretool-guardrails.cjs]
+    sk1[aiep-context-bootstrap]
+    sk2[aiep-safe-implementation]
+    sk3[aiep-pr-readiness]
+    sk4[aiep-memory-sync]
+  end
+
+  subgraph Agents[Agent Collaboration Mesh]
+    planner[[Context Planner]]
+    reviewer[[Code Reviewer]]
+    impl[[Implementation Guardian]]
+    fe[[Senior Frontend]]
+    be[[Senior Backend]]
+    ux[[Senior UI/UX]]
+    sre[[Senior SRE]]
+  end
+
+  bridge --> router
+  router --> planner
+  router --> reviewer
+  router --> impl
+  router --> fe
+  router --> be
+  router --> ux
+  router --> sre
+
+  planner <-. single-hop peer collaboration .-> reviewer
+  planner <-.-> impl
+  planner <-.-> fe
+  planner <-.-> be
+  planner <-.-> ux
+  planner <-.-> sre
+  reviewer <-.-> impl
+  reviewer <-.-> fe
+  reviewer <-.-> be
+  reviewer <-.-> ux
+  reviewer <-.-> sre
+  impl <-.-> fe
+  impl <-.-> be
+  impl <-.-> ux
+  impl <-.-> sre
+  fe <-.-> be
+  fe <-.-> ux
+  fe <-.-> sre
+  be <-.-> ux
+  be <-.-> sre
+  ux <-.-> sre
+
+  sre -. edit-required tasks .-> impl
+
+  subgraph Exec[Execution + Quality Path]
+    analyze[Read / Analyze]
+    change[Implement / Refactor]
+    verify[Tests + Diagnostics]
+    result[Consolidated Response]
+  end
+
+  planner --> analyze
+  reviewer --> analyze
+  sre --> analyze
+  impl --> change
+  fe --> change
+  be --> change
+  ux --> change
+  analyze --> change
+  change --> verify
+  verify --> result
+  result --> chat
+
+  subgraph Memory[Memory Lifecycle (.ai/memory)]
+    confirm{Human confirmation for memory writes}
+    m1[current-architecture.md]
+    m2[active-work.md]
+    m3[recent-decisions.md]
+    m4[known-issues.md]
+    m5[technical-debt.md]
+  end
+
+  result --> confirm
+  confirm --> m1
+  confirm --> m2
+  confirm --> m3
+  confirm --> m4
+  confirm --> m5
+
+  hcfg --> hscript
+  hscript -. blocks restricted writes .-> change
+  hscript -. confirmation gating .-> confirm
+
+  sk1 --> Gov
+  sk2 --> Exec
+  sk3 --> verify
+  sk4 --> Memory
+  skillbank --> Agents
+  docs --> Agents
+
+  classDef core fill:#eaf3ff,stroke:#3b82f6,color:#0f172a;
+  classDef guard fill:#fff7e6,stroke:#d97706,color:#1f2937;
+  class router,planner,reviewer,impl,fe,be,ux,sre core;
+  class hcfg,hscript,confirm guard;
+```
+
+### Router-First Agent Behavior (Always Start at Router)
+
+```mermaid
+flowchart TD
+  A([User Request]) --> B[VS Code Copilot Chat]
+  B --> C[/aiep-senior-staff-router.prompt.md/]
+  C --> D[[AIEP Senior Staff Router]]
+
+  D --> E{Task Intent Classification}
+  E -->|Planning / risk framing| P[[Context Planner]]
+  E -->|Review / findings| R[[Code Reviewer]]
+  E -->|Implementation / refactor| I[[Implementation Guardian]]
+  E -->|Frontend delivery| F[[Senior Frontend]]
+  E -->|Backend delivery| K[[Senior Backend]]
+  E -->|UI/UX delivery| U[[Senior UI/UX]]
+  E -->|SRE reliability / ops| S[[Senior SRE]]
+
+  S --> S1{Needs file edits?}
+  S1 -->|Yes| I
+  S1 -->|No| X[Read + Execute SRE Analysis]
+
+  P --> H{Cross-domain blocker?}
+  R --> H
+  I --> H
+  F --> H
+  K --> H
+  U --> H
+  X --> H
+
+  H -->|No| Q[Continue in Primary Specialist]
+  H -->|Yes| J[Invoke Exactly 1 Peer Specialist]
+  J --> L[Merge into 1 Consolidated Output]
+  Q --> L
+
+  L --> M[Run Tests / Diagnostics as Required]
+  M --> N[Apply Guardrails and Policy Checks]
+  N --> O{Memory update needed?}
+  O -->|No| Z([Return Final Response])
+  O -->|Yes, with human confirmation| W[Sync .ai/memory via Memory Lifecycle]
+  W --> Z
+
+  G1[Single-hop collaboration only]
+  G2[No delegation loops]
+  G3[Router is mandatory entrypoint]
+  G1 -.-> J
+  G2 -.-> J
+  G3 -.-> D
+```
+
+---
+
 ## AI Agent: Load Context in This Order
 
 If you are an AI coding agent, load context in this exact sequence before taking any action:
@@ -118,6 +308,12 @@ The repository includes workspace-level customizations under `.github/` to make 
 | [aiep-senior-staff-ui-ux.agent.md](./.github/agents/aiep-senior-staff-ui-ux.agent.md) | Senior UI/UX engineering for interaction quality, usability, and implementation detail |
 | [aiep-senior-staff-sre.agent.md](./.github/agents/aiep-senior-staff-sre.agent.md) | Senior SRE engineering for reliability, observability, and operational safety |
 | [aiep-senior-staff-router.agent.md](./.github/agents/aiep-senior-staff-router.agent.md) | Deterministic router that delegates each task to exactly one specialist agent |
+
+Router behavior note:
+For operational tasks that require file edits, the router switches from read/execute-only SRE to [aiep-implementation-guardian.agent.md](./.github/agents/aiep-implementation-guardian.agent.md) to ensure edit-capable execution while preserving SRE-driven rationale.
+
+Cross-specialist collaboration note:
+After the router selects a primary specialist, that specialist may automatically invoke exactly one peer specialist when cross-domain dependencies block completion (single-hop, no loops), and must return one consolidated result. This applies across Context Planner, Code Reviewer, Implementation Guardian, and all senior-staff specialists.
 
 #### Skills (`.github/skills/`)
 

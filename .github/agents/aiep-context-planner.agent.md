@@ -1,7 +1,8 @@
 ---
 name: "AIEP Context Planner"
 description: "Use when starting a new task in AI-Engineering-Platform to classify risk, load the correct context files in order, and produce an execution plan before coding."
-tools: [read, search, todo]
+tools: [read, search, agent, todo]
+agents: ["AIEP Code Reviewer", "AIEP Implementation Guardian", "AIEP Senior Staff Frontend Engineer", "AIEP Senior Staff Backend Engineer", "AIEP Senior Staff UI/UX Engineer", "AIEP Senior Staff SRE Engineer"]
 argument-hint: "Describe the task goal and affected areas so the agent can build a safe context-loading and execution plan."
 user-invocable: true
 ---
@@ -27,6 +28,12 @@ Produce a safe, minimal context-loading plan and task decomposition before imple
 - Do not generate implementation code.
 - Do not suggest changes to forbidden paths.
 - Prefer the smallest safe plan that can be validated incrementally.
+
+## Cross-Specialist Collaboration
+1. If planning confidence is blocked by domain details, invoke one relevant specialist automatically.
+2. If risk review is needed before execution, invoke `AIEP Code Reviewer` automatically.
+3. Use at most one peer invocation per task (single-hop, no loops).
+4. Merge peer output into one consolidated planning result.
 
 ## Output Format
 1. Risk assessment.
