@@ -11,6 +11,21 @@ AI Engineering Platform (AIEP): TypeScript/Python/React system for orchestrating
 
 **Stack:** Node.js 20 (Fastify) · Python 3.12 (FastAPI) · React 18 · PostgreSQL · Redis · Weaviate · Kafka · Kubernetes
 
+## Copilot Integration Model
+
+- `.ai/` is the source of truth for governance, memory, and domain implementation patterns.
+- `.github/` provides Copilot runtime assets (agents, skills, prompts, file instructions).
+- Always apply `.github/instructions/aiep-ai-bridge.instructions.md` as the bridge between these systems.
+
+For non-trivial tasks, use this mandatory load order:
+1. `.ai/instructions/instruction-hierarchy.md`
+2. `.ai/instructions/global-rules.md`
+3. `.ai/instructions/ai-agent-operating-rules.md`
+4. `.ai/memory/current-architecture.md`
+5. `.ai/memory/active-work.md`
+6. `.ai/memory/known-issues.md`
+7. Task-relevant `.ai/skills/*` and `docs/*`
+
 ---
 
 ## TypeScript Standards
@@ -138,3 +153,11 @@ Load these when relevant:
 - `.ai/skills/refactoring-rules.md` — refactoring work
 - `docs/ARCHITECTURE.md` — architectural questions
 - `docs/SECURITY_RULES.md` — security questions
+
+## Workspace Copilot Assets
+
+- Agents: `.github/agents/`
+- Skills: `.github/skills/`
+- Prompts: `.github/prompts/`
+- File instructions: `.github/instructions/`
+- Runtime guardrails (hooks): `.github/hooks/`
