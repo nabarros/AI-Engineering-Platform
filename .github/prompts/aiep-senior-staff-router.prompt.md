@@ -6,6 +6,9 @@ agent: "AIEP Senior Staff Router Agent"
 ---
 Run this task with the deterministic router agent and enforce single-specialist delegation.
 
+## Required Execution Controls
+- Enforce `.github/instructions/aiep-skill-orchestration.instructions.md`.
+
 ## Required Result
 - Selected specialist
 - Routing rationale

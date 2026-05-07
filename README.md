@@ -23,6 +23,11 @@ Its purpose is to combine:
 
 In practice, this repository ensures that both humans and AI agents implement changes under the same constraints: secure defaults, architecture boundaries, explicit risk handling, mandatory validation, and memory-aware continuity of decisions over time.
 
+Pitch goal:
+This repository turns AI vibe coding into an engineering system: fast iteration with deterministic agent routing, specialist execution, and built-in guardrails so teams can ship and troubleshoot with production-grade quality, security, and operational confidence.
+
+See the maturity report: [AI Vibe Coding Maturity Report](./docs/AI_VIBECODING_MATURITY_REPORT.md)
+
 ---
 
 ## Visual Architecture: Agents, Skills, and Memory System
@@ -33,7 +38,7 @@ flowchart LR
   chat --> prompt[/Router Prompt/]
   prompt --> router[[AIEP Senior Staff Router]]
 
-  subgraph Gov[Governance + Context Source of Truth (.ai)]
+  subgraph Gov["Governance and Context Source of Truth (.ai)"]
     ih[instruction-hierarchy.md]
     gr[global-rules.md]
     ao[ai-agent-operating-rules.md]
@@ -44,8 +49,9 @@ flowchart LR
     docs[(docs/*)]
   end
 
-  subgraph Runtime[Runtime Layer (.github)]
+  subgraph Runtime["Runtime Layer (.github)"]
     bridge[aiep-ai-bridge.instructions.md]
+    orchestration[aiep-skill-orchestration.instructions.md]
     hcfg[aiep-guardrails.json]
     hscript[pretool-guardrails.cjs]
     sk1[aiep-context-bootstrap]
@@ -54,7 +60,7 @@ flowchart LR
     sk4[aiep-memory-sync]
   end
 
-  subgraph Agents[Agent Collaboration Mesh]
+  subgraph Agents["Agent Collaboration Mesh"]
     planner[[Context Planner]]
     reviewer[[Code Reviewer]]
     impl[[Implementation Guardian]]
@@ -65,6 +71,7 @@ flowchart LR
   end
 
   bridge --> router
+  orchestration --> router
   router --> planner
   router --> reviewer
   router --> impl
@@ -97,7 +104,7 @@ flowchart LR
 
   sre -. edit-required tasks .-> impl
 
-  subgraph Exec[Execution + Quality Path]
+  subgraph Exec["Execution and Quality Path"]
     analyze[Read / Analyze]
     change[Implement / Refactor]
     verify[Tests + Diagnostics]
@@ -116,7 +123,7 @@ flowchart LR
   verify --> result
   result --> chat
 
-  subgraph Memory[Memory Lifecycle (.ai/memory)]
+  subgraph Memory["Memory Lifecycle (.ai/memory)"]
     confirm{Human confirmation for memory writes}
     m1[current-architecture.md]
     m2[active-work.md]
@@ -153,49 +160,49 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A([User Request]) --> B[VS Code Copilot Chat]
-  B --> C[/aiep-senior-staff-router.prompt.md/]
-  C --> D[[AIEP Senior Staff Router]]
+  user([Engineer]) --> chat[VS Code Copilot Chat]
+  chat --> prompt[/Router Prompt/]
+  prompt --> router[[AIEP Senior Staff Router]]
 
-  D --> E{Task Intent Classification}
-  E -->|Planning / risk framing| P[[Context Planner]]
-  E -->|Review / findings| R[[Code Reviewer]]
-  E -->|Implementation / refactor| I[[Implementation Guardian]]
-  E -->|Frontend delivery| F[[Senior Frontend]]
-  E -->|Backend delivery| K[[Senior Backend]]
-  E -->|UI/UX delivery| U[[Senior UI/UX]]
-  E -->|SRE reliability / ops| S[[Senior SRE]]
+  router --> intent{Task Intent Classification}
+  intent -->|Planning / risk framing| planner[[Context Planner]]
+  intent -->|Review / findings| reviewer[[Code Reviewer]]
+  intent -->|Implementation / refactor| impl[[Implementation Guardian]]
+  intent -->|Frontend delivery| fe[[Senior Frontend]]
+  intent -->|Backend delivery| be[[Senior Backend]]
+  intent -->|UI/UX delivery| ux[[Senior UI/UX]]
+  intent -->|SRE reliability / ops| sre[[Senior SRE]]
 
-  S --> S1{Needs file edits?}
-  S1 -->|Yes| I
-  S1 -->|No| X[Read + Execute SRE Analysis]
+  sre --> sreGate{Needs file edits?}
+  sreGate -->|Yes| impl
+  sreGate -->|No| sreRead[Read and Execute SRE Analysis]
 
-  P --> H{Cross-domain blocker?}
-  R --> H
-  I --> H
-  F --> H
-  K --> H
-  U --> H
-  X --> H
+  planner --> blocker{Cross-domain blocker?}
+  reviewer --> blocker
+  impl --> blocker
+  fe --> blocker
+  be --> blocker
+  ux --> blocker
+  sreRead --> blocker
 
-  H -->|No| Q[Continue in Primary Specialist]
-  H -->|Yes| J[Invoke Exactly 1 Peer Specialist]
-  J --> L[Merge into 1 Consolidated Output]
-  Q --> L
+  blocker -->|No| continue[Continue in Primary Specialist]
+  blocker -->|Yes| peer[Invoke Exactly One Peer Specialist]
+  peer --> merge[Merge into One Consolidated Response]
+  continue --> merge
 
-  L --> M[Run Tests / Diagnostics as Required]
-  M --> N[Apply Guardrails and Policy Checks]
-  N --> O{Memory update needed?}
-  O -->|No| Z([Return Final Response])
-  O -->|Yes, with human confirmation| W[Sync .ai/memory via Memory Lifecycle]
-  W --> Z
+  merge --> validate[Run Tests + Diagnostics]
+  validate --> guardrails[Apply Guardrails and Policy Checks]
+  guardrails --> memoryGate{Memory update needed?}
+  memoryGate -->|No| done([Return Final Response])
+  memoryGate -->|Yes, with human confirmation| memorySync[Sync .ai/memory via Memory Lifecycle]
+  memorySync --> done
 
-  G1[Single-hop collaboration only]
-  G2[No delegation loops]
-  G3[Router is mandatory entrypoint]
-  G1 -.-> J
-  G2 -.-> J
-  G3 -.-> D
+  rule1[Single-hop collaboration only]
+  rule2[No delegation loops]
+  rule3[Router is mandatory entrypoint]
+  rule1 -.-> peer
+  rule2 -.-> peer
+  rule3 -.-> router
 ```
 
 ---
@@ -340,6 +347,7 @@ After the router selects a primary specialist, that specialist may automatically
 |------|---------|
 | [copilot-instructions.md](./.github/copilot-instructions.md) | Global GitHub Copilot workspace behavior, standards, and integration model |
 | [aiep-ai-bridge.instructions.md](./.github/instructions/aiep-ai-bridge.instructions.md) | Enforces `.github` and `.ai` integration: context loading order, domain-skill mapping, and governance boundaries |
+| [aiep-skill-orchestration.instructions.md](./.github/instructions/aiep-skill-orchestration.instructions.md) | Centralizes deterministic skill choreography across router, specialist agents, and prompts |
 
 #### Hooks (`.github/hooks/`)
 

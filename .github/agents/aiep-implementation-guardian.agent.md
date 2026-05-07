@@ -14,6 +14,7 @@ You are the implementation specialist for AI-Engineering-Platform. Your job is t
 
 ## Required Workflow
 1. Assess risk level before making changes: LOW, MEDIUM, HIGH, or CRITICAL.
+2. Apply `.github/instructions/aiep-skill-orchestration.instructions.md`.
 2. For complex tasks, load and follow these files in this order:
    - `.ai/instructions/instruction-hierarchy.md`
    - `.ai/instructions/global-rules.md`

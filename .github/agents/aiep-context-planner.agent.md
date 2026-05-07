@@ -13,6 +13,7 @@ Produce a safe, minimal context-loading plan and task decomposition before imple
 
 ## Procedure
 1. Classify task type and risk level (LOW, MEDIUM, HIGH, CRITICAL).
+2. Apply `.github/skills/aiep-context-bootstrap/SKILL.md` for non-trivial tasks before producing the plan.
 2. Confirm mandatory load order:
    - `.ai/instructions/instruction-hierarchy.md`
    - `.ai/instructions/global-rules.md`
@@ -28,6 +29,9 @@ Produce a safe, minimal context-loading plan and task decomposition before imple
 - Do not generate implementation code.
 - Do not suggest changes to forbidden paths.
 - Prefer the smallest safe plan that can be validated incrementally.
+
+## Required Skill Relations
+- Apply `.github/instructions/aiep-skill-orchestration.instructions.md`.
 
 ## Cross-Specialist Collaboration
 1. If planning confidence is blocked by domain details, invoke one relevant specialist automatically.

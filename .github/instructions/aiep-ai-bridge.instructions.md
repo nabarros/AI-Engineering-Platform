@@ -24,6 +24,7 @@ For non-trivial tasks, load this order before implementation:
 7. Relevant files from `.ai/skills/` and `docs/`
 
 ## Relationship Mapping
+- `.github/instructions/aiep-skill-orchestration.instructions.md` -> centralizes deterministic skill choreography across router, specialists, and prompts.
 - `.github/skills/aiep-context-bootstrap/` -> enforces context sequencing from `.ai/instructions/` + `.ai/memory/`.
 - `.github/skills/aiep-safe-implementation/` -> executes implementation protocol defined by `.ai` governance.
 - `.github/skills/aiep-pr-readiness/` -> validates outcomes against `docs/` and `.ai` constraints.

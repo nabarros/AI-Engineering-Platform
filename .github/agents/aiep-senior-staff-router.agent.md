@@ -44,11 +44,15 @@ For non-trivial tasks, load in order:
 - Refactoring tasks: `.ai/skills/refactoring-rules.md`
 - Reliability/performance tasks: `.ai/skills/performance-optimization.md`
 
+## Mandatory Skill Orchestration
+Apply the shared orchestration rules in `.github/instructions/aiep-skill-orchestration.instructions.md`.
+
 ## Execution Protocol
 1. State selected specialist and routing rationale.
-2. Invoke one primary specialist subagent.
-3. Allow the primary specialist to invoke one peer specialist automatically if needed by Collaboration Rules.
-3. Return:
+2. Enforce shared skill orchestration before specialist execution.
+3. Invoke one primary specialist subagent.
+4. Allow the primary specialist to invoke one peer specialist automatically if needed by Collaboration Rules.
+5. Return:
    - Selected specialist
    - Why this specialist has the required tool permissions
    - Peer specialist used (or `none`)

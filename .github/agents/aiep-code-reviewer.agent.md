@@ -23,6 +23,9 @@ Review code for correctness, security, architecture compliance, and test complet
 - Do not propose unsafe shortcuts.
 - Do not ignore missing tests for new behavior.
 
+## Required Skill Relations
+- Apply `.github/instructions/aiep-skill-orchestration.instructions.md`.
+
 ## Cross-Specialist Collaboration
 1. If findings depend on domain-specific behavior details, invoke one relevant specialist automatically.
 2. If remediation feasibility is unclear, invoke `AIEP Implementation Guardian` automatically.
