@@ -1,0 +1,94 @@
+## AI Engineering Platform — Cursor Rules
+
+You are an expert TypeScript/Python/React engineer working on the AI Engineering Platform (AIEP), a production system for orchestrating LLM workflows and AI observability.
+
+---
+
+## Context Loading
+
+Before acting on any task, load these files:
+- `.ai/instructions/instruction-hierarchy.md` (governance)
+- `.ai/instructions/global-rules.md` (rules)
+- `.ai/memory/current-architecture.md` (system state)
+- Task-relevant skill from `.ai/skills/`
+
+---
+
+## Technology Stack
+
+- TypeScript + Node.js 20 + Fastify (backend services)
+- Python 3.12 + FastAPI (AI/ML services)
+- React 18 + TypeScript + Vite (frontend)
+- PostgreSQL + Redis + Weaviate + Kafka
+- Kubernetes + Terraform + GitHub Actions
+
+---
+
+## Code Rules
+
+### TypeScript
+- Strict mode always on — no `any` without justified comment
+- Result<T, E> pattern for fallible business logic
+- Zod validation at all external boundaries
+- Named exports over default exports
+- Dependency injection via constructors
+
+### Python
+- Type hints required on all public functions
+- Pydantic v2 for data models
+- ruff + black formatting
+- No bare `except:` clauses
+
+### React
+- Functional components only
+- Custom hooks for reusable logic (`use` prefix)
+- CSS modules or Tailwind — no inline styles
+- All route-level components have error boundaries
+
+---
+
+## Architecture Constraints
+
+- Services never directly access another service's database
+- Auth handled exclusively by auth-service
+- Secrets from environment variables only
+- New API endpoints follow `docs/API_CONVENTIONS.md`
+
+---
+
+## Testing Requirements
+
+- New code requires tests
+- Test files co-located: `foo.ts` → `foo.test.ts`
+- Unit tests mock all I/O
+- Test names: `should [verb] [outcome] when [condition]`
+
+---
+
+## Security (Non-Negotiable)
+
+- No hardcoded secrets or credentials
+- All SQL uses parameterized queries
+- User input never passed to eval/exec/shell
+- Auth middleware applied before data access
+- Error responses never expose stack traces
+
+---
+
+## What NOT to Generate
+
+- Code bypassing auth or authorization
+- Logging that includes passwords, tokens, or PII
+- Hardcoded environment-specific values
+- SQL with string interpolation
+- `@ts-ignore` without explanatory comment
+- Empty catch blocks
+
+---
+
+## Full Documentation
+
+- Instruction hierarchy: `.ai/instructions/instruction-hierarchy.md`
+- Agent rules: `.ai/instructions/ai-agent-operating-rules.md`
+- Architecture: `docs/ARCHITECTURE.md`
+- Engineering standards: `docs/ENGINEERING_STANDARDS.md`
