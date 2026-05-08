@@ -13,6 +13,45 @@ Follow the full setup guide first:
 
 - [VS Code + GitHub Copilot Setup Guide](./docs/VSCODE_COPILOT_SETUP.md)
 
+### Use the Router Agent in VS Code
+
+After setup, open GitHub Copilot Chat and ask through the router entrypoint.
+
+1. Open this workspace in VS Code.
+2. Open Copilot Chat.
+3. Use a router-first prompt (examples below).
+4. Include domain, risk, and acceptance criteria.
+5. For high-risk work, explicitly state approval in the prompt.
+
+Copy-paste prompt examples:
+
+```text
+Use AIEP Senior Staff Router to implement a backend endpoint for prompt version comparison.
+Requirements:
+- Add tests for success and failure paths
+- Apply security and API conventions
+- Run verification before final response
+High-risk changes are approved.
+```
+
+```text
+Use AIEP Senior Staff Router to build a frontend settings panel for model routing.
+Requirements:
+- Accessibility checks
+- Loading/error states
+- Unit tests
+- Findings-first validation summary
+```
+
+What happens automatically:
+
+- Router classifies intent and risk.
+- Router selects one primary specialist with deterministic scoring.
+- Router attaches fallback chain metadata.
+- Guardrails and policy checks run before execution.
+- Verification gate runs before final response.
+- Memory and tuning signals are updated for future routing quality.
+
 ---
 
 ## Repository Description and Purpose
@@ -164,6 +203,36 @@ curl -s -X POST http://127.0.0.1:8787/orchestrate \
     }
   }' | jq
 ```
+
+### Video Demo (No Extra Software)
+
+Save your demo recording at:
+
+- `docs/assets/vscode-router-demo.mp4`
+
+README embed:
+
+<video controls muted playsinline width="960" src="./docs/assets/vscode-router-demo.mp4">
+  If inline playback is not supported, open docs/assets/vscode-router-demo.mp4 directly.
+</video>
+
+Record on macOS with built-in tools (no install):
+
+1. Press `Shift + Command + 5`.
+2. Select `Record Selected Portion` (or `Record Entire Screen`).
+3. Capture this flow in VS Code:
+   - Open Copilot Chat
+   - Prompt: `Use AIEP Senior Staff Router to implement ... with tests`
+   - Show specialist routing + validation output
+   - Run `npm test` and show passing tests
+4. Stop recording and save as `vscode-router-demo.mp4`.
+5. Move it to `docs/assets/vscode-router-demo.mp4`.
+
+Recommended demo format:
+
+- 45 to 90 seconds
+- 1280x720 or 1920x1080
+- 100% editor zoom for readability
 
 ---
 
