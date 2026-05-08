@@ -1,0 +1,84 @@
+import { routeTask } from "./router.js";
+
+const COST_BY_TIER = Object.freeze({ LOW: 1200, MEDIUM: 3000, HIGH: 6500 });
+const DOMAINS = ["backend", "frontend", "ux", "sre", "review", "planning", "security", "refactor", "api"];
+const RISKS = ["LOW", "MEDIUM", "HIGH"];
+const TOKEN_BUDGETS = ["LOW", "MEDIUM", "HIGH"];
+const LATENCY_BUDGETS = ["LOW", "MEDIUM", "HIGH"];
+
+const EXPECTED_BY_DOMAIN = Object.freeze({
+  backend: "AIEP Senior Staff Backend Engineer",
+  frontend: "AIEP Senior Staff Frontend Engineer",
+  ux: "AIEP Senior Staff UI/UX Engineer",
+  sre: "AIEP Senior Staff SRE Engineer",
+  review: "AIEP Code Reviewer",
+  planning: "AIEP Context Planner",
+  security: "AIEP Implementation Guardian",
+  refactor: "AIEP Implementation Guardian",
+  api: "AIEP Senior Staff Backend Engineer"
+});
+
+export function generateScenarioCorpus() {
+  const scenarios = [];
+  let id = 1;
+
+  for (const domain of DOMAINS) {
+    for (const risk of RISKS) {
+      for (const tokenBudgetTier of TOKEN_BUDGETS) {
+        for (const latencyBudgetTier of LATENCY_BUDGETS) {
+          scenarios.push({
+            id: `scenario-${id}`,
+            task: {
+              domain,
+              risk,
+              description: `${domain} task under ${risk} risk with ${tokenBudgetTier} token budget and ${latencyBudgetTier} latency budget`
+            },
+            budget: { tokenBudgetTier, latencyBudgetTier },
+            expected: EXPECTED_BY_DOMAIN[domain]
+          });
+          id += 1;
+        }
+      }
+    }
+  }
+
+  return scenarios;
+}
+
+export function tokenCostForAgent(registry, agentId) {
+  const match = registry.find((candidate) => candidate.id === agentId);
+  if (!match) return COST_BY_TIER.MEDIUM;
+  return COST_BY_TIER[match.tokenCostTier] || COST_BY_TIER.MEDIUM;
+}
+
+export function evaluateWeights({ scenarios, registry, weights }) {
+  let correct = 0;
+  let totalTokens = 0;
+
+  for (const scenario of scenarios) {
+    const result = routeTask({
+      task: scenario.task,
+      registry,
+      budget: scenario.budget,
+      scoringWeights: weights
+    });
+
+    if (result.selected?.id === scenario.expected) {
+      correct += 1;
+    }
+
+    totalTokens += tokenCostForAgent(registry, result.selected?.id);
+  }
+
+  const accuracy = correct / scenarios.length;
+  const avgTokens = totalTokens / scenarios.length;
+  const utility = accuracy * 100 - avgTokens / 120;
+
+  return {
+    weights,
+    totalScenarios: scenarios.length,
+    accuracy: Number(accuracy.toFixed(4)),
+    avgTokens: Number(avgTokens.toFixed(2)),
+    utility: Number(utility.toFixed(2))
+  };
+}

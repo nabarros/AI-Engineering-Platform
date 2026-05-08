@@ -1,0 +1,13 @@
+{
+  "name": "ai-engineering-platform-orchestration-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/orchestration/*.test.js",
+    "benchmark:orchestration": "node scripts/benchmark-orchestration.js",
+    "demo:router-runtime": "node scripts/demo-router-runtime.js",
+    "start:orchestration-api": "node scripts/start-orchestration-api.js",
+    "start:shared-state-service": "node scripts/start-shared-state-service.js"
+  }
+}

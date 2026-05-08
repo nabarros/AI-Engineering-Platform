@@ -1,6 +1,11 @@
 # AI Engineering Platform
 
-> Enterprise-grade platform for building, orchestrating, and operating AI-powered services at scale.
+> Agent orchestration platform for building, routing, validating, and operating AI-powered engineering workflows with deterministic behavior.
+
+[![Node 20+](https://img.shields.io/badge/Node-20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Tests](https://img.shields.io/badge/Tests-19%20passing-16a34a?style=for-the-badge)](./tests/orchestration)
+[![Orchestration](https://img.shields.io/badge/Agent-Orchestration-2563eb?style=for-the-badge)](./src/orchestration)
+[![Security Guardrails](https://img.shields.io/badge/Security-Guardrails-f97316?style=for-the-badge)](./docs/SECURITY_RULES.md)
 
 ## Start Here: VS Code + GitHub Copilot Setup
 
@@ -12,66 +17,62 @@ Follow the full setup guide first:
 
 ## Repository Description and Purpose
 
-The AI Engineering Platform (AIEP) repository is the engineering control plane for building and operating AI-enabled products with predictable quality, safety, and delivery speed.
+AI Engineering Platform (AIEP) is an agent orchestration tool and engineering control plane.
 
-Its purpose is to combine:
+Its purpose is to provide one governed system where AI agents can:
 
-- Production application code and services for AI workflow orchestration
-- Enterprise engineering standards (security, testing, observability, and API conventions)
-- A governed AI agent operating model based on instruction hierarchy, domain skills, and persistent project memory
-- Workspace-level GitHub Copilot custom agents, prompts, skills, and hooks that enforce deterministic and auditable execution
+- Route work to the best specialist using deterministic scoring and fallback
+- Execute tasks with policy gates, verification, and test-first quality checks
+- Share memory across sessions and tenants with explicit safety boundaries
+- Optimize cost and latency through budget-aware routing and adaptive tuning
+- Produce auditable traces for every orchestration decision
 
-In practice, this repository ensures that both humans and AI agents implement changes under the same constraints: secure defaults, architecture boundaries, explicit risk handling, mandatory validation, and memory-aware continuity of decisions over time.
+In short, AIEP turns autonomous AI execution into a production engineering discipline: fast, measurable, secure, and reproducible.
 
-Pitch goal:
-This repository turns AI vibe coding into an engineering system: fast iteration with deterministic agent routing, specialist execution, and built-in guardrails so teams can ship and troubleshoot with production-grade quality, security, and operational confidence.
-
-See the maturity report: [AI Vibe Coding Maturity Report](./docs/AI_VIBECODING_MATURITY_REPORT.md)
+See also: [AI Vibe Coding Maturity Report](./docs/AI_VIBECODING_MATURITY_REPORT.md)
 
 ---
 
-## Visual Architecture: Agents, Skills, and Memory System
+## Why Teams Use AIEP
+
+- Faster delivery without sacrificing governance
+- Deterministic routing instead of ad-hoc agent selection
+- Built-in quality gate before response completion
+- Native cost and latency control through budget-aware orchestration
+- Explainable traces for every decision path
+
+---
+
+## What AIEP Does
+
+One runtime gives your team a governed orchestration layer where agents do not just answer, they coordinate.
+
+```text
+Engineer -> Router -> Specialist Agent -> Verification Gate -> Memory + Learning -> Metrics
+                    |                                            ^
+                    +---------------- Fallback Chain ------------+
+```
+
+---
+
+## Architecture: Automatic Agent Orchestration
 
 ```mermaid
 flowchart LR
-  user([Engineer]) --> chat[VS Code Copilot Chat]
-  chat --> prompt[/Router Prompt/]
-  prompt --> router[[AIEP Senior Staff Router]]
+  user([Engineer / API Client]) --> api[Orchestration API]
+  api --> guard{Auth + Tenant Scope + Rate Limit + Idempotency}
+  guard --> router[Deterministic Router]
 
-  subgraph Gov["Governance and Context Source of Truth (.ai)"]
-    ih[instruction-hierarchy.md]
-    gr[global-rules.md]
-    ao[ai-agent-operating-rules.md]
-    mem1[current-architecture.md]
-    mem2[active-work.md]
-    mem3[known-issues.md]
-    skillbank[(.ai/skills/*)]
-    docs[(docs/*)]
+  subgraph Specialists[Specialist Pool]
+    planner[Context Planner]
+    reviewer[Code Reviewer]
+    impl[Implementation Guardian]
+    fe[Senior Frontend]
+    be[Senior Backend]
+    ux[Senior UI/UX]
+    sre[Senior SRE]
   end
 
-  subgraph Runtime["Runtime Layer (.github)"]
-    bridge[aiep-ai-bridge.instructions.md]
-    orchestration[aiep-skill-orchestration.instructions.md]
-    hcfg[aiep-guardrails.json]
-    hscript[pretool-guardrails.cjs]
-    sk1[aiep-context-bootstrap]
-    sk2[aiep-safe-implementation]
-    sk3[aiep-pr-readiness]
-    sk4[aiep-memory-sync]
-  end
-
-  subgraph Agents["Agent Collaboration Mesh"]
-    planner[[Context Planner]]
-    reviewer[[Code Reviewer]]
-    impl[[Implementation Guardian]]
-    fe[[Senior Frontend]]
-    be[[Senior Backend]]
-    ux[[Senior UI/UX]]
-    sre[[Senior SRE]]
-  end
-
-  bridge --> router
-  orchestration --> router
   router --> planner
   router --> reviewer
   router --> impl
@@ -80,160 +81,121 @@ flowchart LR
   router --> ux
   router --> sre
 
-  planner <-. single-hop peer collaboration .-> reviewer
-  planner <-.-> impl
-  planner <-.-> fe
-  planner <-.-> be
-  planner <-.-> ux
-  planner <-.-> sre
-  reviewer <-.-> impl
-  reviewer <-.-> fe
-  reviewer <-.-> be
-  reviewer <-.-> ux
-  reviewer <-.-> sre
-  impl <-.-> fe
-  impl <-.-> be
-  impl <-.-> ux
-  impl <-.-> sre
-  fe <-.-> be
-  fe <-.-> ux
-  fe <-.-> sre
-  be <-.-> ux
-  be <-.-> sre
-  ux <-.-> sre
-
-  sre -. edit-required tasks .-> impl
-
-  subgraph Exec["Execution and Quality Path"]
-    analyze[Read / Analyze]
-    change[Implement / Refactor]
-    verify[Tests + Diagnostics]
-    result[Consolidated Response]
+  subgraph GraphExec[Concurrent Graph Engine]
+    a[Task Node A]
+    b[Task Node B]
+    c[Task Node C]
+    a --> b --> c
   end
 
-  planner --> analyze
-  reviewer --> analyze
-  sre --> analyze
-  impl --> change
-  fe --> change
-  be --> change
-  ux --> change
-  analyze --> change
-  change --> verify
-  verify --> result
-  result --> chat
+  planner --> GraphExec
+  reviewer --> GraphExec
+  impl --> GraphExec
+  fe --> GraphExec
+  be --> GraphExec
+  ux --> GraphExec
+  sre --> GraphExec
 
-  subgraph Memory["Memory Lifecycle (.ai/memory)"]
-    confirm{Human confirmation for memory writes}
-    m1[current-architecture.md]
-    m2[active-work.md]
-    m3[recent-decisions.md]
-    m4[known-issues.md]
-    m5[technical-debt.md]
-  end
+  GraphExec --> verify{Verification Gate}
+  verify --> trace[Trace + Metrics]
+  verify --> tuner[Adaptive Weight Tuner]
+  verify --> state[Shared Indexed State]
 
-  result --> confirm
-  confirm --> m1
-  confirm --> m2
-  confirm --> m3
-  confirm --> m4
-  confirm --> m5
-
-  hcfg --> hscript
-  hscript -. blocks restricted writes .-> change
-  hscript -. confirmation gating .-> confirm
-
-  sk1 --> Gov
-  sk2 --> Exec
-  sk3 --> verify
-  sk4 --> Memory
-  skillbank --> Agents
-  docs --> Agents
-
-  classDef core fill:#eaf3ff,stroke:#3b82f6,color:#0f172a;
-  classDef guard fill:#fff7e6,stroke:#d97706,color:#1f2937;
-  class router,planner,reviewer,impl,fe,be,ux,sre core;
-  class hcfg,hscript,confirm guard;
+  state --> router
+  tuner --> router
+  trace --> api
 ```
 
-### Router-First Agent Behavior (Always Start at Router)
+### Execution Model
+
+- Router-first specialist selection
+- Fallback chain when primary specialist fails or is suboptimal
+- Concurrent graph execution with dependency edges, timeout, and retry
+- Verification before response completion
+- Continuous learning loop updates routing weights
+
+---
+
+## 60-Second Live Flow Preview
 
 ```mermaid
-flowchart TD
-  user([Engineer]) --> chat[VS Code Copilot Chat]
-  chat --> prompt[/Router Prompt/]
-  prompt --> router[[AIEP Senior Staff Router]]
+sequenceDiagram
+  participant U as User/Client
+  participant API as Orchestration API
+  participant R as Router
+  participant S as Specialist
+  participant V as Verification Gate
+  participant M as Shared State + Tuner
 
-  router --> intent{Task Intent Classification}
-  intent -->|Planning / risk framing| planner[[Context Planner]]
-  intent -->|Review / findings| reviewer[[Code Reviewer]]
-  intent -->|Implementation / refactor| impl[[Implementation Guardian]]
-  intent -->|Frontend delivery| fe[[Senior Frontend]]
-  intent -->|Backend delivery| be[[Senior Backend]]
-  intent -->|UI/UX delivery| ux[[Senior UI/UX]]
-  intent -->|SRE reliability / ops| sre[[Senior SRE]]
+  U->>API: POST /orchestrate
+  API->>API: Auth + tenant + rate-limit + idempotency
+  API->>R: Route by domain/risk/budget
+  R->>S: Select specialist (+ fallback chain)
+  S->>V: Return execution evidence
+  V->>M: Persist memory + update rolling metrics
+  V-->>API: pass/fail + findings
+  API-->>U: deterministic response + trace
+```
 
-  sre --> sreGate{Needs file edits?}
-  sreGate -->|Yes| impl
-  sreGate -->|No| sreRead[Read and Execute SRE Analysis]
+### Real API Walkthrough
 
-  planner --> blocker{Cross-domain blocker?}
-  reviewer --> blocker
-  impl --> blocker
-  fe --> blocker
-  be --> blocker
-  ux --> blocker
-  sreRead --> blocker
+```bash
+# 1) Start shared state + orchestration API
+npm run start:shared-state-service
+ORCHESTRATION_SHARED_STATE_URL=http://127.0.0.1:8790 npm run start:orchestration-api
 
-  blocker -->|No| continue[Continue in Primary Specialist]
-  blocker -->|Yes| peer[Invoke Exactly One Peer Specialist]
-  peer --> merge[Merge into One Consolidated Response]
-  continue --> merge
-
-  merge --> validate[Run Tests + Diagnostics]
-  validate --> guardrails[Apply Guardrails and Policy Checks]
-  guardrails --> memoryGate{Memory update needed?}
-  memoryGate -->|No| done([Return Final Response])
-  memoryGate -->|Yes, with human confirmation| memorySync[Sync .ai/memory via Memory Lifecycle]
-  memorySync --> done
-
-  rule1[Single-hop collaboration only]
-  rule2[No delegation loops]
-  rule3[Router is mandatory entrypoint]
-  rule1 -.-> peer
-  rule2 -.-> peer
-  rule3 -.-> router
+# 2) Send one orchestration request
+curl -s -X POST http://127.0.0.1:8787/orchestrate \
+  -H "Content-Type: application/json" \
+  -H "x-tenant-id: demo-tenant" \
+  -d '{
+    "requestId": "go-to-market-001",
+    "task": {"domain": "backend", "risk": "MEDIUM", "description": "Design and validate API behavior"},
+    "budget": {"tokenBudgetTier": "LOW", "latencyBudgetTier": "MEDIUM"},
+    "confirmation": true,
+    "executionEvidence": {
+      "testsPassed": true,
+      "securityChecksPassed": true,
+      "contractChecksPassed": true,
+      "errorHandlingValidated": true,
+      "qualityScore": 0.92,
+      "tokenUsage": 1700,
+      "latencyMs": 120
+    }
+  }' | jq
 ```
 
 ---
 
-## AI Agent: Load Context in This Order
+## Without vs With AIEP
 
-If you are an AI coding agent, load context in this exact sequence before taking any action:
-
-```
-1. .ai/instructions/instruction-hierarchy.md    ← governance rules (ALWAYS first)
-2. .ai/instructions/global-rules.md             ← non-negotiable rules
-3. .ai/instructions/ai-agent-operating-rules.md ← execution protocol
-4. .ai/memory/current-architecture.md           ← current system state
-5. .ai/memory/active-work.md                    ← what's in-flight
-6. .ai/memory/known-issues.md                   ← known pitfalls
-7. [task-relevant skill from .ai/skills/]       ← load only what's needed
-```
-
-Do NOT load the entire repository context. Load only what is relevant to your current task.
+| Capability | Without AIEP | With AIEP |
+|---|---|---|
+| Agent Selection | Manual, inconsistent specialist choice | Deterministic routing with fallback chain |
+| Guardrails | Ad-hoc checks | Built-in auth, tenant scope, rate-limit, idempotency |
+| Quality Gate | Best-effort validation | Mandatory verification gate before final response |
+| Coordination | Single linear flow | Concurrent dependency-aware graph orchestration |
+| Memory | Ephemeral per-run context | Shared indexed multi-tenant memory with continuity |
+| Cost Control | Reactive token usage | Budget-aware routing + adaptive weight tuning |
+| Explainability | Hard to debug decisions | Traceable decision path and metrics per request |
 
 ---
 
-## What This Repository Is
+## Troubleshooting (Top 5)
 
-The AI Engineering Platform (AIEP) is a production-grade system for:
+| Symptom | Likely Cause | Fix |
+|---|---|---|
+| `401 Unauthorized` on `/orchestrate` | Missing or invalid API credentials | Send valid `x-api-key` or `Authorization: Bearer ...` according to server auth configuration |
+| `403 TENANT_FORBIDDEN` | Credential not allowed for tenant | Use an allowed `x-tenant-id` for that key or update key tenant scope |
+| `429 RATE_LIMITED` | Per-principal or per-tenant rate limit exceeded | Retry after `Retry-After`, lower request burst, or adjust server rate-limit config |
+| `422 POLICY_BLOCKED` | Risk/policy violation (for example high-risk without confirmation) | Set `confirmation: true` for approved high-risk operations and re-check task constraints |
+| Shared state not updating across instances | `ORCHESTRATION_SHARED_STATE_URL` missing or unreachable | Start shared state service and set `ORCHESTRATION_SHARED_STATE_URL=http://127.0.0.1:8790` in API process |
 
-- Orchestrating AI workflows across multiple LLM providers
-- Managing prompt versioning, evaluation, and deployment
-- Providing AI observability: latency, cost, accuracy, drift detection
-- Enabling multi-agent pipelines with coordination primitives
-- Serving as the internal AI platform for engineering teams
+For deeper diagnostics, use:
+
+- `GET /health`
+- `GET /weights`
+- `GET /metrics`
 
 ---
 
@@ -241,169 +203,172 @@ The AI Engineering Platform (AIEP) is a production-grade system for:
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
-# Start local development environment
-docker compose up -d
-pnpm dev
+# Run tests
+npm test
 
-# Run test suite
-pnpm test
+# Run orchestration benchmark (large corpus)
+npm run benchmark:orchestration
 
-# Check types
-pnpm typecheck
-
-# Lint
-pnpm lint
+# Run runtime demo
+npm run demo:router-runtime
 ```
 
-**Prerequisites:** Node.js ≥ 20, Docker, pnpm ≥ 9
+### Distributed Setup (Recommended)
 
----
+```bash
+# Terminal 1: shared state service
+npm run start:shared-state-service
 
-## Repository Structure
-
-```
-.ai/                AI agent operational system
-  instructions/     Governance rules and hierarchy
-  skills/           Reusable AI coding capabilities
-  memory/           Living project state
-  architecture/     System design documents
-  playbooks/        Operational runbooks
-  prompts/          Reusable prompt templates
-  templates/        Document templates (ADR, PR, etc.)
-  context/          Context engineering guides
-  product/          Product context and domain model
-  testing/          Test patterns and standards
-  security/         Security rules and checklists
-  deployment/       Deployment and rollback guides
-  glossary/         Domain and AI terminology
-
-docs/               Human-readable technical documentation
-src/                Application source code
-tests/              Test suites
-infra/              Infrastructure as code (Terraform, Helm)
-scripts/            Build and operational scripts
-.github/            GitHub Actions CI/CD + Copilot configuration
+# Terminal 2: orchestration API
+ORCHESTRATION_SHARED_STATE_URL=http://127.0.0.1:8790 npm run start:orchestration-api
 ```
 
 ---
 
-## Documentation Index
+## API Demo in 30 Seconds
 
-### Entry Points for AI Agents
+### 1) Health check
 
-| File | Purpose | Load When |
-|------|---------|-----------|
-| [AGENT_GUIDE.md](./AGENT_GUIDE.md) | Complete AI agent onboarding | Every agent session |
-| [COPILOT_INSTRUCTIONS.md](./COPILOT_INSTRUCTIONS.md) | GitHub Copilot-specific guidance | Copilot sessions |
-| [CLAUDE.md](./CLAUDE.md) | Claude Code-specific guidance | Claude sessions |
+```bash
+curl -s http://127.0.0.1:8787/health | jq
+```
 
-### Workspace Custom Agents and Skills
+### 2) Single-request orchestration
 
-The repository includes workspace-level customizations under `.github/` to make agent workflows production-ready.
+```bash
+curl -s -X POST http://127.0.0.1:8787/orchestrate \
+  -H "Content-Type: application/json" \
+  -H "x-tenant-id: demo-tenant" \
+  -d '{
+    "requestId": "demo-001",
+    "task": {
+      "domain": "backend",
+      "risk": "MEDIUM",
+      "description": "Design and validate API changes"
+    },
+    "budget": {
+      "tokenBudgetTier": "LOW",
+      "latencyBudgetTier": "MEDIUM"
+    },
+    "confirmation": true,
+    "executionEvidence": {
+      "testsPassed": true,
+      "securityChecksPassed": true,
+      "contractChecksPassed": true,
+      "errorHandlingValidated": true,
+      "qualityScore": 0.92,
+      "tokenUsage": 1800,
+      "latencyMs": 130
+    }
+  }' | jq
+```
 
-#### Agents (`.github/agents/`)
+### 3) Concurrent graph orchestration
 
-| File | Purpose |
-|------|---------|
-| [aiep-context-planner.agent.md](./.github/agents/aiep-context-planner.agent.md) | Builds risk-aware plans and context-loading order before coding |
-| [aiep-implementation-guardian.agent.md](./.github/agents/aiep-implementation-guardian.agent.md) | Implements/refactors with governance, security, and test enforcement |
-| [aiep-code-reviewer.agent.md](./.github/agents/aiep-code-reviewer.agent.md) | Performs findings-first code review focused on risk and regressions |
-| [aiep-senior-staff-frontend.agent.md](./.github/agents/aiep-senior-staff-frontend.agent.md) | Senior frontend engineering for React architecture, accessibility, and performance |
-| [aiep-senior-staff-backend.agent.md](./.github/agents/aiep-senior-staff-backend.agent.md) | Senior backend engineering for APIs, domain logic, and service reliability |
-| [aiep-senior-staff-ui-ux.agent.md](./.github/agents/aiep-senior-staff-ui-ux.agent.md) | Senior UI/UX engineering for interaction quality, usability, and implementation detail |
-| [aiep-senior-staff-sre.agent.md](./.github/agents/aiep-senior-staff-sre.agent.md) | Senior SRE engineering for reliability, observability, and operational safety |
-| [aiep-senior-staff-router.agent.md](./.github/agents/aiep-senior-staff-router.agent.md) | Deterministic router that delegates each task to exactly one specialist agent |
+```bash
+curl -s -X POST http://127.0.0.1:8787/orchestrate-graph \
+  -H "Content-Type: application/json" \
+  -H "x-tenant-id: demo-tenant" \
+  -d '{
+    "requestId": "graph-001",
+    "maxConcurrency": 2,
+    "nodes": [
+      {
+        "id": "n1",
+        "agentId": "routing",
+        "task": {"domain": "backend", "risk": "MEDIUM", "description": "Plan backend implementation"},
+        "budget": {"tokenBudgetTier": "LOW", "latencyBudgetTier": "LOW"},
+        "confirmation": true,
+        "executionEvidence": {"testsPassed": true, "securityChecksPassed": true, "contractChecksPassed": true, "errorHandlingValidated": true, "qualityScore": 0.9}
+      },
+      {
+        "id": "n2",
+        "agentId": "routing",
+        "task": {"domain": "review", "risk": "LOW", "description": "Review implementation plan"},
+        "budget": {"tokenBudgetTier": "LOW", "latencyBudgetTier": "LOW"},
+        "confirmation": true,
+        "executionEvidence": {"testsPassed": true, "securityChecksPassed": true, "contractChecksPassed": true, "errorHandlingValidated": true, "qualityScore": 0.88}
+      }
+    ],
+    "edges": [{"from": "n1", "to": "n2"}]
+  }' | jq
+```
 
-Router behavior note:
-For operational tasks that require file edits, the router switches from read/execute-only SRE to [aiep-implementation-guardian.agent.md](./.github/agents/aiep-implementation-guardian.agent.md) to ensure edit-capable execution while preserving SRE-driven rationale.
+---
 
-Cross-specialist collaboration note:
-After the router selects a primary specialist, that specialist may automatically invoke exactly one peer specialist when cross-domain dependencies block completion (single-hop, no loops), and must return one consolidated result. This applies across Context Planner, Code Reviewer, Implementation Guardian, and all senior-staff specialists.
+## What You Get
 
-#### Skills (`.github/skills/`)
+| Capability | Description |
+|---|---|
+| Deterministic Routing | Domain + risk + quality + cost + latency scoring |
+| Fallback Chain | Automatic secondary specialist routing |
+| Policy Guardrails | Auth, tenant isolation, rate limits, idempotency |
+| Concurrent Graph Engine | Multi-node orchestration with dependencies, retries, timeouts |
+| Shared Memory | Indexed tenant-aware state (local or remote service) |
+| Adaptive Tuning | Rolling success/cost/latency feedback into routing weights |
+| Verification Gate | Security, tests, contracts, and error-handling checks |
+| Traceability | Decision path and execution checkpoints per request |
+| Benchmarking | 243-scenario corpus for routing profile evaluation |
 
-| File | Purpose |
-|------|---------|
-| [aiep-context-bootstrap/SKILL.md](./.github/skills/aiep-context-bootstrap/SKILL.md) | Loads mandatory context plus domain-specific skill/doc files |
-| [aiep-safe-implementation/SKILL.md](./.github/skills/aiep-safe-implementation/SKILL.md) | Standard implementation workflow with validation checkpoints |
-| [aiep-pr-readiness/SKILL.md](./.github/skills/aiep-pr-readiness/SKILL.md) | Pre-PR readiness checks for security, tests, contracts, and docs |
-| [aiep-memory-sync/SKILL.md](./.github/skills/aiep-memory-sync/SKILL.md) | Post-task memory lifecycle sync for `.ai/memory` with confirmation-aware updates |
-| [aiep-senior-staff-frontend/SKILL.md](./.github/skills/aiep-senior-staff-frontend/SKILL.md) | Senior frontend workflow for architecture, accessibility, performance, and tests |
-| [aiep-senior-staff-backend/SKILL.md](./.github/skills/aiep-senior-staff-backend/SKILL.md) | Senior backend workflow for contracts, secure logic, data integrity, and reliability |
-| [aiep-senior-staff-ui-ux/SKILL.md](./.github/skills/aiep-senior-staff-ui-ux/SKILL.md) | Senior UI/UX workflow for user journeys, interaction quality, and accessible implementation |
-| [aiep-senior-staff-sre/SKILL.md](./.github/skills/aiep-senior-staff-sre/SKILL.md) | Senior SRE workflow for reliability checks, SLI/SLO impact, and operational readiness |
+---
 
-#### Prompts (`.github/prompts/`)
+## Core Endpoints
 
-| File | Purpose |
-|------|---------|
-| [aiep-senior-staff-router.prompt.md](./.github/prompts/aiep-senior-staff-router.prompt.md) | Routes a task to exactly one senior-staff specialist agent and executes with role-specific workflow |
+| Endpoint | Purpose |
+|---|---|
+| GET /health | Runtime health |
+| GET /weights | Active routing weights + rolling metrics |
+| GET /metrics | Quality dashboard + state index summary |
+| POST /orchestrate | Single-request orchestration |
+| POST /orchestrate-graph | Concurrent multi-node orchestration |
 
-#### Instructions (`.github/instructions/`)
+---
 
-| File | Purpose |
-|------|---------|
-| [copilot-instructions.md](./.github/copilot-instructions.md) | Global GitHub Copilot workspace behavior, standards, and integration model |
-| [aiep-ai-bridge.instructions.md](./.github/instructions/aiep-ai-bridge.instructions.md) | Enforces `.github` and `.ai` integration: context loading order, domain-skill mapping, and governance boundaries |
-| [aiep-skill-orchestration.instructions.md](./.github/instructions/aiep-skill-orchestration.instructions.md) | Centralizes deterministic skill choreography across router, specialist agents, and prompts |
+## Repository Layout
 
-#### Hooks (`.github/hooks/`)
+```text
+.ai/                         Governance, memory, domain skills
+.github/                     Agents, prompts, skills, hooks
+docs/                        Engineering and architecture docs
+src/orchestration/           Routing, policy, memory, verifier, tuning, graph engine
+src/api/                     Orchestration API and shared state service
+scripts/                     Runtime utilities and launch scripts
+tests/orchestration/         Orchestration test suite
+```
 
-| File | Purpose |
-|------|---------|
-| [aiep-guardrails.json](./.github/hooks/aiep-guardrails.json) | Enforces PreToolUse guardrails via hook command |
-| [scripts/pretool-guardrails.cjs](./.github/hooks/scripts/pretool-guardrails.cjs) | Blocks restricted-path writes and requests confirmation for `.ai/memory` writes |
+---
 
-### Architecture
+## Documentation
 
-| File | Purpose |
-|------|---------|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture overview |
-| [docs/SYSTEM_OVERVIEW.md](./docs/SYSTEM_OVERVIEW.md) | End-to-end system map |
-| [.ai/architecture/system-design.md](./.ai/architecture/system-design.md) | Detailed system design |
-| [.ai/architecture/component-map.md](./.ai/architecture/component-map.md) | Service and component registry |
+### Core Docs
 
-### Engineering Standards
+- [Architecture](./docs/ARCHITECTURE.md)
+- [System Overview](./docs/SYSTEM_OVERVIEW.md)
+- [API Conventions](./docs/API_CONVENTIONS.md)
+- [Security Rules](./docs/SECURITY_RULES.md)
+- [Testing Strategy](./docs/TESTING_STRATEGY.md)
+- [Observability](./docs/OBSERVABILITY.md)
 
-| File | Purpose |
-|------|---------|
-| [docs/ENGINEERING_STANDARDS.md](./docs/ENGINEERING_STANDARDS.md) | Core engineering standards |
-| [docs/CODE_STYLE.md](./docs/CODE_STYLE.md) | Code style guide |
-| [docs/API_CONVENTIONS.md](./docs/API_CONVENTIONS.md) | REST and GraphQL conventions |
-| [docs/DATABASE_CONVENTIONS.md](./docs/DATABASE_CONVENTIONS.md) | Database patterns and standards |
-| [docs/ERROR_HANDLING.md](./docs/ERROR_HANDLING.md) | Error handling patterns |
+### Agent Governance and Skills
 
-### Quality and Operations
+- [Agent Guide](./AGENT_GUIDE.md)
+- [Copilot Instructions](./COPILOT_INSTRUCTIONS.md)
+- [AIEP AI Bridge](./.github/instructions/aiep-ai-bridge.instructions.md)
+- [Skill Orchestration Rules](./.github/instructions/aiep-skill-orchestration.instructions.md)
+- [Senior Staff Router Agent](./.github/agents/aiep-senior-staff-router.agent.md)
+- [Orchestration Runtime Skill](./.github/skills/aiep-agent-orchestration-runtime/SKILL.md)
 
-| File | Purpose |
-|------|---------|
-| [docs/TESTING_STRATEGY.md](./docs/TESTING_STRATEGY.md) | Testing philosophy and requirements |
-| [docs/SECURITY_RULES.md](./docs/SECURITY_RULES.md) | Security rules and OWASP compliance |
-| [docs/PERFORMANCE_GUIDELINES.md](./docs/PERFORMANCE_GUIDELINES.md) | Performance budgets and patterns |
-| [docs/OBSERVABILITY.md](./docs/OBSERVABILITY.md) | Logging, metrics, tracing standards |
-| [docs/DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md) | Deployment procedures |
+### Memory and Decision Continuity
 
-### AI-Specific Documentation
-
-| File | Purpose |
-|------|---------|
-| [docs/AI_AGENT_RULES.md](./docs/AI_AGENT_RULES.md) | Agent governance (human-readable summary) |
-| [docs/PROMPT_ENGINEERING_GUIDE.md](./docs/PROMPT_ENGINEERING_GUIDE.md) | Prompt design standards |
-| [docs/CONTEXT_LOADING_STRATEGY.md](./docs/CONTEXT_LOADING_STRATEGY.md) | When and how to load context |
-| [docs/RETRIEVAL_STRATEGY.md](./docs/RETRIEVAL_STRATEGY.md) | Semantic and keyword retrieval patterns |
-
-### Product and Domain
-
-| File | Purpose |
-|------|---------|
-| [docs/PRODUCT_CONTEXT.md](./docs/PRODUCT_CONTEXT.md) | Product goals and user personas |
-| [docs/DOMAIN_GLOSSARY.md](./docs/DOMAIN_GLOSSARY.md) | Domain terminology |
-| [docs/DECISION_LOG.md](./docs/DECISION_LOG.md) | Architectural decision history |
+- [Current Architecture Memory](./.ai/memory/current-architecture.md)
+- [Active Work Memory](./.ai/memory/active-work.md)
+- [Known Issues Memory](./.ai/memory/known-issues.md)
+- [Decision Log](./docs/DECISION_LOG.md)
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development workflow, PR process, and code review guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for workflow and PR process.

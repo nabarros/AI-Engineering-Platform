@@ -11,7 +11,12 @@ Run this task with the deterministic router agent and enforce single-specialist 
 
 ## Required Result
 - Selected specialist
+- Candidate score snapshot
+- Budget tier used (token + latency)
+- Fallback chain
 - Routing rationale
 - Work completed
 - Validation performed
+- Verification gate result
+- Traceability summary
 - Open risks or follow-ups
