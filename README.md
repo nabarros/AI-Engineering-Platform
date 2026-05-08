@@ -204,36 +204,6 @@ curl -s -X POST http://127.0.0.1:8787/orchestrate \
   }' | jq
 ```
 
-### Video Demo (No Extra Software)
-
-Save your demo recording at:
-
-- `docs/assets/vscode-router-demo.mp4`
-
-README embed:
-
-<video controls muted playsinline width="960" src="./docs/assets/vscode-router-demo.mp4">
-  If inline playback is not supported, open docs/assets/vscode-router-demo.mp4 directly.
-</video>
-
-Record on macOS with built-in tools (no install):
-
-1. Press `Shift + Command + 5`.
-2. Select `Record Selected Portion` (or `Record Entire Screen`).
-3. Capture this flow in VS Code:
-   - Open Copilot Chat
-   - Prompt: `Use AIEP Senior Staff Router to implement ... with tests`
-   - Show specialist routing + validation output
-   - Run `npm test` and show passing tests
-4. Stop recording and save as `vscode-router-demo.mp4`.
-5. Move it to `docs/assets/vscode-router-demo.mp4`.
-
-Recommended demo format:
-
-- 45 to 90 seconds
-- 1280x720 or 1920x1080
-- 100% editor zoom for readability
-
 ---
 
 ## Without vs With AIEP
