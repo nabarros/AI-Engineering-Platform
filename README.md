@@ -3,10 +3,19 @@
 > Agent orchestration platform for building, routing, validating, and operating AI-powered engineering workflows with deterministic behavior.
 
 [![Node 20+](https://img.shields.io/badge/Node-20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Tests](https://img.shields.io/badge/Tests-81%20passing-16a34a?style=for-the-badge)](./tests/orchestration)
+[![Tests](https://img.shields.io/badge/Tests-81%20cases-16a34a?style=for-the-badge)](./tests/orchestration)
 [![Orchestration](https://img.shields.io/badge/Agent-Orchestration-2563eb?style=for-the-badge)](./src/orchestration)
 [![Security Guardrails](https://img.shields.io/badge/Security-Guardrails-f97316?style=for-the-badge)](./docs/SECURITY_RULES.md)
-[![P0–P4 Complete](https://img.shields.io/badge/Roadmap-P0–P4%20Complete-7c3aed?style=for-the-badge)](./docs/reports/aiep_sustainable_implementation_roadmap.md)
+[![P0–P4 Implemented](https://img.shields.io/badge/Roadmap-P0–P4%20Implemented-7c3aed?style=for-the-badge)](./docs/reports/aiep_sustainable_implementation_roadmap.md)
+
+## Quick Navigation
+
+- [Start Here: VS Code + GitHub Copilot Setup](#start-here-vs-code--github-copilot-setup)
+- [Quick Start](#quick-start)
+- [API Demo in 30 Seconds](#api-demo-in-30-seconds)
+- [Agent Specialist Orchestration](#agent-specialist-orchestration)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
 
 ## Start Here: VS Code + GitHub Copilot Setup
 
@@ -16,13 +25,68 @@ Follow the full setup guide first:
 
 ### Use the Router Agent in VS Code
 
-After setup, open GitHub Copilot Chat and ask through the router entrypoint.
+After setup, use GitHub Copilot Chat with the router entrypoint to route, validate, and execute tasks safely.
 
-1. Open this workspace in VS Code.
-2. Open Copilot Chat.
-3. Use a router-first prompt (examples below).
-4. Include domain, risk, and acceptance criteria.
-5. For high-risk work, explicitly state approval in the prompt.
+### Step-by-Step: First Task in VS Code
+
+1. Open the AI-Engineering-Platform workspace in VS Code.
+2. Open GitHub Copilot Chat in the editor.
+3. Submit a router prompt to the AIEP Senior Staff Router.
+4. In the same prompt, include domain, risk level, and acceptance criteria.
+5. For high-risk tasks, include explicit approval before execution.
+6. Review the response for specialist selection, fallback chain, and verification summary.
+7. Send a follow-up prompt to refine scope, address findings, or request updates.
+8. Use [AGENT_GUIDE.md](./AGENT_GUIDE.md) and [docs/AGENT_ORCHESTRATION.md](./docs/AGENT_ORCHESTRATION.md) for routing and lifecycle details.
+
+### Step-by-Step: Using Memory Effectively
+
+1. Start by asking the router to load relevant context and memory for your task.
+2. State task and scope explicitly so retrieval stays intent-aware.
+3. Ask the agent to consult [.ai/memory/current-architecture.md](./.ai/memory/current-architecture.md) before design changes.
+4. Ask it to check [.ai/memory/active-work.md](./.ai/memory/active-work.md) before touching in-flight areas.
+5. Ask it to check [.ai/memory/known-issues.md](./.ai/memory/known-issues.md) before debugging or fixes.
+6. Ask for a short memory-based assumptions summary before implementation.
+7. Ask for memory-sync recommendations at the end, without writing memory files unless explicitly confirmed.
+
+### Step-by-Step: Add Skills to Agents
+
+1. Identify the application topic and choose the primary specialist agent for execution.
+2. Choose the right domain skill from [.ai/skills/](./.ai/skills/): api-design, react-patterns, database-patterns, auth-patterns, refactoring-rules, testing-jest, debugging-node, migration-strategy, performance-optimization.
+3. Add or update reusable orchestration skills in [.github/skills/](./.github/skills/) when shared execution behavior is required.
+4. Update specialist agent files in [.github/agents/](./.github/agents/) to reflect orchestration and domain-loading expectations.
+5. If routing criteria changed, update Domain Skill Mapping and routing rules in [.github/agents/aiep-senior-staff-router.agent.md](./.github/agents/aiep-senior-staff-router.agent.md).
+6. Prevent duplication drift by centralizing full sequencing in [.github/instructions/aiep-skill-orchestration.instructions.md](./.github/instructions/aiep-skill-orchestration.instructions.md).
+7. Test with a router prompt and verify selected specialist, fallback chain, and verification output.
+8. For state-changing outcomes, request memory-sync recommendations; do not write .ai/memory/** without explicit human confirmation.
+
+### Application Topics: Agent + Skill Map
+
+| Topic | Primary Agent | Domain Skills (.ai/skills) | Orchestration Skills (.github/skills) |
+|---|---|---|---|
+| Planning and scoping | AIEP Context Planner | refactoring-rules, migration-strategy | aiep-context-bootstrap, aiep-safe-implementation |
+| Backend API development | AIEP Senior Staff Backend | api-design, testing-jest | aiep-context-bootstrap, aiep-senior-staff-backend, aiep-safe-implementation |
+| Backend data and persistence | AIEP Senior Staff Backend | database-patterns, testing-jest, performance-optimization | aiep-context-bootstrap, aiep-senior-staff-backend, aiep-safe-implementation |
+| Frontend UI and state | AIEP Senior Staff Frontend | react-patterns, testing-jest, performance-optimization | aiep-context-bootstrap, aiep-senior-staff-frontend, aiep-safe-implementation |
+| UX and accessibility | AIEP Senior Staff UI/UX | react-patterns, testing-jest | aiep-context-bootstrap, aiep-senior-staff-ui-ux, aiep-safe-implementation |
+| Reliability and operations | AIEP Senior Staff SRE | debugging-node, performance-optimization | aiep-context-bootstrap, aiep-senior-staff-sre, aiep-pr-readiness |
+| Security and auth-sensitive changes | AIEP Senior Staff Backend | auth-patterns, api-design, testing-jest | aiep-context-bootstrap, aiep-senior-staff-backend, aiep-pr-readiness |
+| Refactoring and modernization | AIEP Implementation Guardian | refactoring-rules, migration-strategy, testing-jest | aiep-context-bootstrap, aiep-safe-implementation, aiep-pr-readiness |
+| Testing and quality gates | AIEP Code Reviewer | testing-jest | aiep-context-bootstrap, aiep-pr-readiness |
+| Debugging and incident fixes | AIEP Implementation Guardian | debugging-node, testing-jest | aiep-context-bootstrap, aiep-safe-implementation, aiep-pr-readiness |
+| Migration work | AIEP Senior Staff Backend | migration-strategy, database-patterns, api-design | aiep-context-bootstrap, aiep-senior-staff-backend, aiep-safe-implementation |
+| Performance and cost optimization | AIEP Senior Staff SRE | performance-optimization, debugging-node | aiep-context-bootstrap, aiep-senior-staff-sre, aiep-pr-readiness |
+| Memory-aware implementation | AIEP Senior Staff Router | refactoring-rules, debugging-node | aiep-context-bootstrap, aiep-safe-implementation, aiep-memory-sync |
+
+### Memory- and Skill-Aware Prompt Example
+
+```text
+Use AIEP Senior Staff Router for a backend API task to tighten request validation and error handling.
+Before implementation, load relevant context and memory from .ai/memory/current-architecture.md, .ai/memory/active-work.md, and .ai/memory/known-issues.md.
+Apply .ai/skills/api-design.md and .ai/skills/testing-jest.md, then follow orchestration via .github/instructions/aiep-skill-orchestration.instructions.md.
+Return selected specialist, fallback chain, verification summary, and memory-sync recommendations only.
+```
+
+If you prefer API usage, jump to the Quick Start and API Demo sections below.
 
 Copy-paste prompt examples:
 
@@ -73,7 +137,7 @@ Its purpose is to provide one governed system where AI agents can:
 
 In short, AIEP turns autonomous AI execution into a production engineering discipline: fast, measurable, secure, and reproducible.
 
-The platform has completed all P0–P4 roadmap priorities. See [Roadmap](./docs/reports/aiep_sustainable_implementation_roadmap.md) and [Reports](./docs/reports/) for full audit trail.
+Core P0–P4 capabilities are implemented; selected features remain in controlled rollout. See [Roadmap](./docs/reports/aiep_sustainable_implementation_roadmap.md) and [Reports](./docs/reports/) for full audit trail.
 
 ---
 
@@ -236,6 +300,42 @@ curl -s -X POST http://127.0.0.1:8787/orchestrate \
 
 ---
 
+## Agent Specialist Orchestration
+
+The router selects one primary specialist per request using deterministic scoring across domain, risk, quality, cost, and latency.
+
+**8 routing-system agents (Router + 7 specialists):**
+- **Router** — Entry point and deterministic specialist selection
+- **Context Planner** — Pre-execution planning, risk scoping, context loading
+- **Code Reviewer** — Review-first, security audit, quality validation
+- **Implementation Guardian** — Safe coding, refactoring, architecture constraints
+- **Senior Backend** — API design, domain logic, database patterns
+- **Senior Frontend** — React/TS UI, state management, accessibility
+- **Senior UI/UX** — User journeys, interaction design, design systems
+- **Senior SRE** — Observability, incident readiness, SLI/SLO, release safety
+
+**How it works:**
+1. Request routed by deterministic scoring (domain → quality → history → cost → latency)
+2. Primary specialist executes (may invoke exactly one peer if cross-domain blocker)
+3. Verification gate validates security, contracts, and test coverage
+4. Fallback chain activates if verification fails
+5. Consolidated result returned with routing trace
+
+**Key facts:**
+- **Deterministic routing** — No random specialist selection; explainable scores
+- **Single primary** — One specialist per request; no overlapping work
+- **Single-hop peer collaboration** — Primary may invoke one peer specialist if needed (e.g., Frontend → UX for accessibility guidance)
+- **Fallback chain** — Pre-computed 2nd and 3rd choice specialists if primary fails
+- **Budget-aware** — Token tier and latency budget determine eligible specialists
+- **Verification mandatory** — All responses pass security, contract, and test gates
+
+**See detailed routing logic and capability matrix:**
+- [Agent Orchestration Diagram](docs/AGENT_ORCHESTRATION.md)
+- [Agent Directory](.github/agents/README.md)
+- [AGENT_GUIDE.md](AGENT_GUIDE.md) for prompt examples
+
+---
+
 ## Without vs With AIEP
 
 | Capability | Without AIEP | With AIEP |
@@ -271,6 +371,16 @@ For deeper diagnostics, use:
 - \`GET /weights\`
 - \`GET /metrics\`
 
+## Current Rollout Caveats
+
+- \`agent_tool_use\` is in controlled rollout at 25%.
+- \`semantic_cache\` is in controlled rollout at 50%.
+- \`prompt_eval_auto\` is disabled in production (under development).
+
+Source-of-truth status references:
+- [current-architecture.md](./.ai/memory/current-architecture.md)
+- [active-work.md](./.ai/memory/active-work.md)
+
 ---
 
 ## Quick Start
@@ -279,7 +389,7 @@ For deeper diagnostics, use:
 # Install dependencies
 npm install
 
-# Run tests (81 passing)
+# Run tests (suite includes 81 cases)
 npm test
 
 # Run orchestration benchmark (large corpus)
@@ -396,7 +506,7 @@ curl -s -X POST http://127.0.0.1:8787/orchestrate-graph \
 | Fallback Chain | Automatic secondary specialist routing |
 | Policy Guardrails | Auth, tenant isolation, rate limits, idempotency |
 | Concurrent Graph Engine | Multi-node orchestration with dependencies, retries, timeouts |
-| Layered Memory | Five-layer tenant-aware memory contract (session → global) |
+| Layered Memory | Four-layer tenant-aware memory contract (session → global) |
 | Intent-Aware Retrieval | Task-intent retrieval planner with graph-indexed state and precision gates |
 | Memory Compaction | Archive and compact old memory layers with provenance metadata |
 | Delegation Handoff | Typed memory handoff packets for cross-agent continuity |
@@ -432,12 +542,12 @@ curl -s -X POST http://127.0.0.1:8787/orchestrate-graph \
 \`\`\`text
 .ai/                         Governance, memory, domain skills
 .github/                     Agents, prompts, skills, hooks
-docs/                        Engineering and architecture reference docs (20 files)
-docs/reports/                Analysis reports, phase evidence, token economics reports (26 files)
+docs/                        Engineering and architecture reference docs
+docs/reports/                Analysis reports, phase evidence, token economics reports
 src/orchestration/           Routing, policy, memory, verifier, tuning, graph engine
   router.js                  Deterministic specialist router
   orchestrator.js            Core orchestration with P4 integrations
-  memory-contract.js         Five-layer memory contract (P3)
+  memory-contract.js         Four-layer memory contract (P3)
   memory-store.js            Layered memory store with graph indexing (P3)
   retrieval-planner.js       Intent-aware retrieval planner (P3)
   retrieval-quality.js       Retrieval quality reporting with precision gates (P3)
@@ -455,7 +565,7 @@ src/orchestration/           Routing, policy, memory, verifier, tuning, graph en
   cross-priority-benchmark-report.js  Composed cross-priority benchmark (P3+P4)
 src/api/                     Orchestration API and shared state service
 scripts/                     Runtime utilities, report generators, launch scripts
-tests/orchestration/         Orchestration test suite (81 tests, 0 failures)
+tests/orchestration/         Orchestration test suite (81 defined test cases)
 \`\`\`
 
 ---

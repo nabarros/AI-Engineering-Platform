@@ -19,6 +19,22 @@ The source analysis identifies the strongest current advantage as deterministic,
 - New capabilities must remain deterministic, testable, and auditable.
 - Cost controls must not reduce quality on high-risk or high-complexity tasks.
 
+## Implementation and Rollout Status
+
+Checklist completion in this roadmap means implemented and evidenced; it does not always imply 100% production rollout.
+
+Status legend:
+- `Implemented`
+- `In Controlled Rollout`
+- `Enabled`
+- `Disabled`
+
+| Flag | Status |
+|---|---|
+| `agent_tool_use` | In Controlled Rollout (25%) |
+| `semantic_cache` | In Controlled Rollout (50%) |
+| `prompt_eval_auto` | Disabled (under development) |
+
 ## Objective Definitions
 
 | Objective ID | Objective | Outcome Signal |
@@ -190,6 +206,7 @@ The roadmap is considered sustainably implemented when:
 ## Execution TO DO List (All Priorities)
 
 This is the most urgent execution backlog from the report and should be used as the default implementation queue.
+Checked items indicate implementation/evidence completion; rollout status is tracked in `.ai/memory/current-architecture.md` and `.ai/memory/active-work.md`.
 
 ### Priority 0 (Immediate)
 

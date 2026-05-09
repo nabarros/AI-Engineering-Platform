@@ -1,0 +1,390 @@
+================================================================================
+                  AIEP AGENT ORCHESTRATION - ASCII REFERENCE
+================================================================================
+
+COMPLETE ROUTING FLOW
+─────────────────────────────────────────────────────────────────────────────
+
+                              ┌─────────────────┐
+                              │  REQUEST ENTERS │
+                              │ (domain, risk,  │
+                              │     budget)     │
+                              └────────┬────────┘
+                                       │
+                                       ▼
+                          ┌────────────────────────┐
+                          │   ROUTER RECEIVES REQ  │
+                          │ Deterministic Scoring  │
+                          └────────────┬───────────┘
+                                       │
+                ┌──────────────────────┼──────────────────────┐
+                │                      │                      │
+         Budget│Check                  │              LOW-MED │Budget
+         LOW   │                       │                      │
+                │                      │              MEDIUM+ │
+                │                      │                      │
+                ▼                      ▼                      ▼
+           ┌────────┐      ┌───────────────────┐      ┌─────────────┐
+           │Limited │      │   All Eligible    │      │   Premium   │
+           │Candidates                        │      │  Candidates │
+           │        │      │ Context Planner   │      │             │
+           │        │      │ Code Reviewer     │      │  + Backend  │
+           │        │      │ Impl Guardian     │      │  + Frontend │
+           │        │      │ + UX/Backend/Etc  │      │  + SRE      │
+           └────┬───┘      └─────────┬─────────┘      └──────┬──────┘
+                │                    │                       │
+                └────────────┬───────┼───────────────────────┘
+                             │       │
+                             ▼       ▼
+                        ┌─────────────────────┐
+                        │  DETERMINISTIC      │
+                        │  SCORING RUBRIC     │
+                        │  (in order):        │
+                        │  1. Domain Fit      │
+                        │  2. Quality Fit     │
+                        │  3. Hist. Success   │
+                        │  4. Token Budget    │
+                        │  5. Latency Budget  │
+                        └──────────┬──────────┘
+                                   │
+                                   ▼
+                        ┌─────────────────────┐
+                        │ SELECT PRIMARY      │
+                        │ SPECIALIST          │
+                        │ (Highest Score)     │
+                        └──────────┬──────────┘
+                                   │
+                ┌──────────────────┼──────────────────┐
+                │                  │                  │
+                ▼                  ▼                  ▼
+           ┌─────────┐      ┌──────────┐      ┌─────────────┐
+           │Planning │      │ Review   │      │Coding/Domain│
+           │         │      │          │      │             │
+           │Context  │      │Code      │      │ Impl Guard  │
+           │Planner  │      │Reviewer  │      │ Backend     │
+           │         │      │          │      │ Frontend    │
+           │         │      │          │      │ UX/SRE      │
+           └────┬────┘      └────┬─────┘      └──────┬──────┘
+                │                │                   │
+                └────────┬───────┴────────┬──────────┘
+                         │                │
+                         ▼                ▼
+                ┌────────────────────────────┐
+                │  EXECUTE TASK              │
+                │  (May invoke one peer if   │
+                │   cross-domain blocker)    │
+                └────────────┬───────────────┘
+                             │
+                    ┌────────┴────────┐
+                    │                 │
+                    ▼                 ▼
+           ┌────────────────┐ ┌──────────────┐
+           │ No Peer Needed │ │Peer Invoked  │
+           └────────┬───────┘ └──────┬───────┘
+                    │                │
+                    │         (Single-Hop Only)
+                    │         (No chains)
+                    │
+                    └────────┬───────┘
+                             │
+                             ▼
+                    ┌────────────────────┐
+                    │ VERIFICATION GATE  │
+                    │ • Security check   │
+                    │ • Contract valid   │
+                    │ • Tests pass       │
+                    └────────┬───────────┘
+                             │
+                    ┌────────┴───────┐
+                    │                │
+              PASS  │                │ FAIL
+                    ▼                ▼
+           ┌────────────────┐ ┌─────────────────────┐
+           │✓ RETURN RESULT │ │ ACTIVATE FALLBACK   │
+           │ Consolidated  │ │ Chain (pre-computed)│
+           │ Output        │ │                     │
+           └────────────────┘ └──────────┬──────────┘
+                    │                   │
+                    │          ┌────────┴─────┐
+                    │          │              │
+                    │     PASS  │              │ FAIL
+                    │          ▼              ▼
+                    │    ┌──────────────┐ ┌─────────┐
+                    │    │✓ SUCCESS     │ │✗ ERROR  │
+                    │    │Fallback works│ │All fail  │
+                    │    └──────────────┘ └─────────┘
+                    │
+                    └────────────────┬────────────────┐
+                                     │                │
+                                     ▼                ▼
+                            ┌──────────────────┐ ┌──────────┐
+                            │ RESPONSE SENT    │ │ERROR MSG │
+                            │ TRACE RECORDED   │ │ RETURNED │
+                            │ MEMORY UPDATED   │ └──────────┘
+                            └──────────────────┘
+
+
+SPECIALIST ROSTER WITH RISK CEILINGS
+──────────────────────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ # │ AGENT                    │ DOMAIN              │ RISK CEILING      │
+├──┼──────────────────────────┼─────────────────────┼──────────────────┤
+│ 1 │ Router                   │ Orchestration       │ LOW–HIGH (meta)  │
+│ 2 │ Context Planner          │ Planning/Discovery  │ LOW              │
+│ 3 │ Code Reviewer            │ Quality/Validation  │ LOW–MEDIUM       │
+│ 4 │ Implementation Guardian  │ Safe Coding         │ MEDIUM–HIGH      │
+│ 5 │ Senior Backend           │ APIs & Services     │ MEDIUM–HIGH      │
+│ 6 │ Senior Frontend          │ React/TS UI         │ MEDIUM–HIGH      │
+│ 7 │ Senior UI/UX             │ Interaction Design  │ MEDIUM           │
+│ 8 │ Senior SRE               │ Reliability & Ops   │ MEDIUM–HIGH      │
+└──┴──────────────────────────┴─────────────────────┴──────────────────┘
+
+
+PEER INVOCATION PATTERNS (Single-Hop Only)
+──────────────────────────────────────────────────────────────────────────────
+
+Implementation Guardian                   Senior Frontend
+        │                                      │
+        ├─ → Senior Backend                   ├─ → Senior UI/UX
+        │   (API contract)                    │   (UX guidance)
+        │                                     │
+        ├─ → Senior Frontend                 └─ → Code Reviewer
+        │   (component)                          (quality gate)
+        │
+        └─ → Code Reviewer
+            (quality gate)
+
+
+Senior Backend
+        │
+        └─ → Code Reviewer
+            (quality/security gate)
+
+
+FALLBACK CHAIN EXAMPLE
+──────────────────────────────────────────────────────────────────────────────
+
+                    PRIMARY SPECIALIST #1
+                           │
+                           ▼
+                    [Execute Task]
+                           │
+                           ▼
+                 [Verification Gate]
+                           │
+                    ┌──────┴──────┐
+                    │             │
+                PASS│             │FAIL
+                    │             ▼
+                    │    FALLBACK SPECIALIST #1
+                    │             │
+                    │             ▼
+                    │     [Execute Task]
+                    │             │
+                    │             ▼
+                    │  [Verification Gate]
+                    │             │
+                    │        ┌────┴────┐
+                    │        │         │
+                    │    PASS│         │FAIL
+                    │        │         ▼
+                    │        │  FALLBACK SPECIALIST #2
+                    │        │         │
+                    │        │         ▼
+                    │        │  [Execute Task]
+                    │        │         │
+                    │        │         ▼
+                    │        │ [Verification Gate]
+                    │        │         │
+                    │        │    ┌────┴────┐
+                    │        │    │         │
+                    │    PASS│    │         │FAIL
+                    │        ▼    ▼         ▼
+                    │     ┌──────────┐ ┌──────────┐
+                    │     │ SUCCESS  │ │ ERROR    │
+                    │     │(Fallback)│ │(Exhausted│
+                    │     └──────────┘ └──────────┘
+                    │
+                    └────────────┐
+                                 │
+                                 ▼
+                        ┌─────────────────┐
+                        │ RESULT RETURNED │
+                        │ (with trace of  │
+                        │  all attempts)  │
+                        └─────────────────┘
+
+
+COLLABORATION RULES (ENFORCED)
+──────────────────────────────────────────────────────────────────────────────
+
+✓ ALLOWED:
+  • Exactly 1 primary specialist per request
+  • Primary may invoke AT MOST 1 peer
+  • Peer invocation is single-hop only
+  • Primary owns final integrated output
+  • Fallback chain pre-computed at routing time
+  • Context Planner as valid peer (any primary)
+  • Code Reviewer as valid peer (any primary)
+
+✗ NOT ALLOWED:
+  • Chains (A → B → C)
+  • Circular dependencies (A → B → A)
+  • Multiple simultaneous peers
+  • Peer invoking another peer
+  • SRE making file edits (use Impl Guardian)
+  • Bypassing verification gate
+
+
+ROUTING DECISION MATRIX
+──────────────────────────────────────────────────────────────────────────────
+
+Task Type                           Primary Specialist
+────────────────────────────────────────────────────────────────────────────
+"Help me plan before coding"        → Context Planner
+"Review this code"                  → Code Reviewer
+"Build a React component"           → Senior Frontend
+"Design an API endpoint"            → Senior Backend
+"Improve the UX flow"               → Senior UI/UX
+"Refactor this safely"              → Implementation Guardian
+"Is our deployment ready?"          → Senior SRE
+"Build [feature] across domains"    → Implementation Guardian (+ peer)
+"I'm not sure"                      → Router (auto-select)
+
+
+TOKEN BUDGET ALLOCATION BY RISK LEVEL
+──────────────────────────────────────────────────────────────────────────────
+
+Risk Level      Recommended Tier    Suitable Specialists
+──────────────────────────────────────────────────────────────────────────────
+LOW             Any (optimize)      Context Planner, Code Reviewer, UI/UX
+LOW-MEDIUM      Low-Medium          Code Reviewer, UI/UX, low-risk work
+MEDIUM          Medium              Backend, Frontend, Impl Guardian
+MEDIUM-HIGH     Medium-Premium      Backend, Frontend, SRE, Impl Guardian
+HIGH-CRITICAL   Premium+            Impl Guardian + peer (explicit confirm)
+
+
+QUICK REFERENCE: WHEN TO USE EACH SPECIALIST
+──────────────────────────────────────────────────────────────────────────────
+
+┌─ DISCOVERY & PLANNING
+│  └─ Context Planner
+│     • Pre-execution analysis
+│     • Risk scoping
+│     • Mandatory context loading
+│
+├─ QUALITY & VALIDATION
+│  └─ Code Reviewer
+│     • Review-first execution
+│     • Security audit
+│     • Test coverage analysis
+│
+├─ SAFE IMPLEMENTATION
+│  └─ Implementation Guardian
+│     • Cross-cutting refactoring
+│     • Architecture constraint checking
+│     • Explicit error handling
+│
+├─ DOMAIN IMPLEMENTATION
+│  ├─ Senior Backend
+│  │  • API contracts & design
+│  │  • Domain business logic
+│  │  • Data handling & databases
+│  │
+│  ├─ Senior Frontend
+│  │  • React/TS components
+│  │  • State management
+│  │  • Accessibility & performance
+│  │
+│  └─ Senior UI/UX
+│     • User journeys
+│     • Interaction quality
+│     • Design systems
+│
+└─ OPERATIONS & RELIABILITY
+   └─ Senior SRE
+      • Observability patterns
+      • Incident readiness
+      • Release safety
+
+
+PEER COLLABORATION EXAMPLE: Implementation Guardian → Senior Backend
+──────────────────────────────────────────────────────────────────────
+
+Step 1: Router selects Implementation Guardian (highest score)
+        Task: "Implement new feature using a new backend API"
+
+Step 2: Implementation Guardian starts: "I'll build the frontend component"
+        Issue discovered: "Need API contract first"
+
+Step 3: Implementation Guardian invokes peer: Senior Backend
+        Request: "Define API contract for [feature]"
+
+Step 4: Senior Backend returns:
+        • OpenAPI spec
+        • Request/response schemas
+        • Security requirements
+        • Error codes
+
+Step 5: Implementation Guardian integrates:
+        • Builds component using API spec
+        • Adds tests
+        • Adds error handling
+
+Step 6: Verification gate runs:
+        • Security checks pass
+        • Contract validation passes
+        • Tests pass
+
+Step 7: Response returned:
+        • Implementation Guardian output (component)
+        • Senior Backend output (API spec)
+        • Consolidated trace showing peer invocation
+
+
+MEMORY & TOKEN TRACKING
+──────────────────────────────────────────────────────────────────────────────
+
+Router maintains in .ai/memory/active-work.md:
+  • Specialist selection history
+  • Routing scores (debug trace)
+  • Peer invocation patterns
+  • Fallback activation frequency
+  • Token usage by specialist
+  • Latency metrics by tier
+
+Monitor for:
+  • Fallback chain activation (indicates suboptimal routing)
+  • Peer invocation frequency (indicates cross-domain work)
+  • Token budget overruns (indicates tier mismatch)
+  • Latency budget violations (indicates load issues)
+
+
+SUPPORT & TROUBLESHOOTING
+──────────────────────────────────────────────────────────────────────────────
+
+Q: "My request routed to the wrong specialist"
+A: Router uses deterministic scoring. Check:
+   1. Domain description clear in request?
+   2. Risk level stated explicitly?
+   3. Budget tier adequate for task?
+
+Q: "Fallback chain activated too often"
+A: Indicates routing suboptimal. Check active-work.md for patterns.
+
+Q: "Token budget exceeded"
+A: Peer invocation or multiple fallbacks used. Check task scope.
+
+Q: "I need cross-domain expertise"
+A: Use Implementation Guardian primary, which can invoke 1 peer specialist.
+
+Q: "Can I skip verification gate?"
+A: No. Verification gate is mandatory for security/contract/test validation.
+
+
+================================================================================
+Document generated: 2026-05-09
+Status: Ready for terminal viewing and offline reference
+Archive compatible: ASCII-only (no special characters beyond UTF-8 box-drawing)
+================================================================================

@@ -260,3 +260,13 @@ Update .ai/memory/recent-decisions.md      → if architectural decisions were m
 Update .ai/memory/known-issues.md          → if new issues discovered or closed
 Update .ai/memory/technical-debt.md        → if shortcuts or workarounds taken
 ```
+
+---
+
+## 13. Visual Agent Routing Reference
+
+For a comprehensive visual overview of how agents relate and the specialist routing flow, see:
+
+- [Agent Orchestration Diagram](docs/AGENT_ORCHESTRATION.md) — Visual routing, capabilities, fallback chains
+- [Agent Directory](.github/agents/README.md) — Specialist roster, collaboration rules, decision guide
+- [Agent Orchestration ASCII Reference](docs/diagrams/agent-orchestration-ascii.txt) — Terminal-friendly reference
