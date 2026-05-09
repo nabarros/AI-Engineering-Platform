@@ -1,0 +1,140 @@
+{
+  "report": {
+    "generatedAt": 1778284800000,
+    "benchmarkScope": "cross-priority",
+    "sampleCounts": {
+      "orchestrationRuns": 8,
+      "retrievalSamples": 8
+    },
+    "reliability": {
+      "totalRuns": 8,
+      "completionRate": 0.875,
+      "recoveryRate": 0.25,
+      "verificationFailureRate": 0.375
+    },
+    "recoveryIndicators": {
+      "totalRuns": 8,
+      "verificationFailures": 3,
+      "recoveredFailures": 2,
+      "unrecoveredFailures": 1,
+      "recoveryCoverage": 0.6667,
+      "recoveryPlanActivationRate": 0.375,
+      "averageRecoveryLatencyMs": 120
+    },
+    "retrievalQuality": {
+      "report": {
+        "generatedAt": 1778284800000,
+        "retrievalAttempts": 8,
+        "averageLatencyMs": 176.63,
+        "averagePrecision": 0.55,
+        "missCount": 0,
+        "missRate": 0,
+        "missDiagnostics": {},
+        "samples": [
+          {
+            "requestId": "pilot-001",
+            "intent": "bugfix",
+            "latencyMs": 210,
+            "retrievedCount": 5,
+            "relevantRetrievedCount": 2,
+            "missReason": null
+          },
+          {
+            "requestId": "pilot-002",
+            "intent": "feature",
+            "latencyMs": 245,
+            "retrievedCount": 5,
+            "relevantRetrievedCount": 2,
+            "missReason": "low_graph_coverage"
+          },
+          {
+            "requestId": "pilot-003",
+            "intent": "review",
+            "latencyMs": 190,
+            "retrievedCount": 4,
+            "relevantRetrievedCount": 1,
+            "missReason": "stale_memory"
+          },
+          {
+            "requestId": "pilot-004",
+            "intent": "docs",
+            "latencyMs": 175,
+            "retrievedCount": 4,
+            "relevantRetrievedCount": 1,
+            "missReason": null
+          },
+          {
+            "requestId": "pilot-101",
+            "intent": "bugfix",
+            "latencyMs": 150,
+            "retrievedCount": 5,
+            "relevantRetrievedCount": 4,
+            "missReason": null
+          },
+          {
+            "requestId": "pilot-102",
+            "intent": "feature",
+            "latencyMs": 168,
+            "retrievedCount": 5,
+            "relevantRetrievedCount": 4,
+            "missReason": null
+          },
+          {
+            "requestId": "pilot-103",
+            "intent": "review",
+            "latencyMs": 142,
+            "retrievedCount": 4,
+            "relevantRetrievedCount": 3,
+            "missReason": "partial_ownership_links"
+          },
+          {
+            "requestId": "pilot-104",
+            "intent": "docs",
+            "latencyMs": 133,
+            "retrievedCount": 4,
+            "relevantRetrievedCount": 3,
+            "missReason": null
+          }
+        ]
+      },
+      "gates": {
+        "status": "pass",
+        "thresholds": {
+          "maxLatencyMs": 200,
+          "minPrecision": 0.5,
+          "maxMissRate": 0.1
+        },
+        "evaluatedMetrics": {
+          "averageLatencyMs": 176.63,
+          "averagePrecision": 0.55,
+          "missRate": 0
+        },
+        "breaches": []
+      }
+    },
+    "readiness": {
+      "status": "fail",
+      "thresholds": {
+        "minCompletionRate": 0.75,
+        "maxVerificationFailureRate": 0.35,
+        "minRecoveryCoverage": 0.6,
+        "retrievalQuality": {
+          "maxLatencyMs": 200,
+          "minPrecision": 0.5,
+          "maxMissRate": 0.1
+        }
+      },
+      "breaches": [
+        {
+          "metric": "verificationFailureRate",
+          "actual": 0.375,
+          "operator": "<=",
+          "threshold": 0.35
+        }
+      ]
+    }
+  },
+  "governanceSignals": {
+    "qualityRetentionDelta": 0.01
+  }
+}

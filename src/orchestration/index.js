@@ -52,6 +52,23 @@ export { createSkillExceptionRegistry } from "./skill-exceptions.js";
 export { runExceptionExpiryEnforcement } from "./exception-expiry-enforcement.js";
 export { SUBSET_POLICY_ALERT_RULES, evaluateSubsetPolicyViolationAlert } from "./subset-policy-alerts.js";
 export { createVerificationCache } from "./verification-cache.js";
+export {
+	MODEL_TIER_POLICY_VERSION,
+	resolveConfidenceBand,
+	resolveModelTierForStep,
+	buildTieringRoutingMatrix
+} from "./model-tiering-policy.js";
+export { TOKEN_LIMITS_BY_TIER, createTokenBudgetAllocator } from "./token-budget-allocator.js";
+export { createTokenForecaster, buildTokenForecastValidationReport } from "./token-forecaster.js";
+export { DEFAULT_COST_QUALITY_GUARDRAILS, optimizeCostQuality } from "./cost-quality-optimizer.js";
+export { buildContextHash, createResponseCache } from "./response-cache.js";
+export {
+	buildSpendAttributionReport,
+	detectSpendAnomalies,
+	buildSpendAttributionSnapshot
+} from "./spend-attribution.js";
+export { createDowngradePolicy } from "./downgrade-policy.js";
+export { createCostPolicyRedTeamScenarios, runCostPolicyRedTeamEvaluation } from "./red-team-evaluation.js";
 export { auditTopPromptSkillReferences } from "./prompt-skill-audit.js";
 export { detectTaskIntent, buildOrientedQuery, retrieveOrientedContext } from "./retrieval-strategy.js";
 export { buildRetrievalPlan } from "./retrieval-planner.js";
@@ -81,4 +98,10 @@ export { IndexedSharedStateStore, TenantStateStore } from "./persistence/indexed
 export { HttpSharedStateStore } from "./persistence/http-shared-state-store.js";
 export { AdaptiveWeightTuner } from "./adaptive-weight-tuner.js";
 export { generateScenarioCorpus, evaluateWeights, buildMultiStepReliabilityBenchmark } from "./benchmark.js";
+export {
+	buildRecoveryIndicators,
+	buildCrossPriorityBenchmarkReport,
+	createDeterministicCrossPriorityBenchmarkSample,
+	renderCrossPriorityBenchmarkMarkdown
+} from "./cross-priority-benchmark-report.js";
 export { executeTaskGraph } from "./multi-agent-engine.js";

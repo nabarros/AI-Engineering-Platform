@@ -1,0 +1,116 @@
+{
+  "report": {
+    "generatedAt": 1778284800000,
+    "sampleCount": 6,
+    "thresholds": {
+      "maxMeanAbsolutePercentageError": 0.2,
+      "minCoverageWithinErrorBound": 0.85
+    },
+    "metrics": {
+      "meanAbsolutePercentageError": 0.019,
+      "coverageWithinErrorBound": 1
+    },
+    "status": "pass",
+    "breaches": [],
+    "samples": [
+      {
+        "stepType": "routing",
+        "risk": "LOW",
+        "modelTier": "LOW",
+        "objective": "objective:review",
+        "actualTokens": 550,
+        "predictedTokens": 540,
+        "errorBound": 60,
+        "absoluteError": 10,
+        "withinErrorBound": true
+      },
+      {
+        "stepType": "routing",
+        "risk": "MEDIUM",
+        "modelTier": "MEDIUM",
+        "objective": "objective:backend",
+        "actualTokens": 840,
+        "predictedTokens": 850,
+        "errorBound": 60,
+        "absoluteError": 10,
+        "withinErrorBound": true
+      },
+      {
+        "stepType": "execution",
+        "risk": "MEDIUM",
+        "modelTier": "MEDIUM",
+        "objective": "objective:backend",
+        "actualTokens": 2050,
+        "predictedTokens": 2025,
+        "errorBound": 75,
+        "absoluteError": 25,
+        "withinErrorBound": true
+      },
+      {
+        "stepType": "execution",
+        "risk": "LOW",
+        "modelTier": "LOW",
+        "objective": "objective:review",
+        "actualTokens": 1210,
+        "predictedTokens": 1180,
+        "errorBound": 60,
+        "absoluteError": 30,
+        "withinErrorBound": true
+      },
+      {
+        "stepType": "verification",
+        "risk": "LOW",
+        "modelTier": "LOW",
+        "objective": "objective:review",
+        "actualTokens": 710,
+        "predictedTokens": 700,
+        "errorBound": 60,
+        "absoluteError": 10,
+        "withinErrorBound": true
+      },
+      {
+        "stepType": "verification",
+        "risk": "MEDIUM",
+        "modelTier": "MEDIUM",
+        "objective": "objective:backend",
+        "actualTokens": 910,
+        "predictedTokens": 880,
+        "errorBound": 60,
+        "absoluteError": 30,
+        "withinErrorBound": true
+      }
+    ]
+  },
+  "forecasterSnapshot": [
+    {
+      "bucketKey": "execution|LOW|LOW|objective:review",
+      "sampleCount": 1,
+      "averageTokens": 1180
+    },
+    {
+      "bucketKey": "execution|MEDIUM|MEDIUM|objective:backend",
+      "sampleCount": 2,
+      "averageTokens": 2025
+    },
+    {
+      "bucketKey": "routing|LOW|LOW|objective:review",
+      "sampleCount": 2,
+      "averageTokens": 540
+    },
+    {
+      "bucketKey": "routing|MEDIUM|MEDIUM|objective:backend",
+      "sampleCount": 1,
+      "averageTokens": 850
+    },
+    {
+      "bucketKey": "verification|LOW|LOW|objective:review",
+      "sampleCount": 1,
+      "averageTokens": 700
+    },
+    {
+      "bucketKey": "verification|MEDIUM|MEDIUM|objective:backend",
+      "sampleCount": 1,
+      "averageTokens": 880
+    }
+  ]
+}

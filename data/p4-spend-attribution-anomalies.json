@@ -1,0 +1,112 @@
+{
+  "generatedAt": 1778284800000,
+  "report": {
+    "generatedAt": 1778284800000,
+    "totalExecutions": 12,
+    "teams": [
+      {
+        "team": "be",
+        "totalTokens": 27800,
+        "sampleCount": 4,
+        "averageTokensPerRun": 6950,
+        "byModelTier": {
+          "LOW": 0,
+          "MEDIUM": 8800,
+          "HIGH": 19000
+        },
+        "dailySpend": [
+          {
+            "dateBucket": "2026-04-01",
+            "tokens": 4200
+          },
+          {
+            "dateBucket": "2026-04-02",
+            "tokens": 4600
+          },
+          {
+            "dateBucket": "2026-04-03",
+            "tokens": 5200
+          },
+          {
+            "dateBucket": "2026-04-04",
+            "tokens": 13800
+          }
+        ]
+      },
+      {
+        "team": "fe",
+        "totalTokens": 10100,
+        "sampleCount": 4,
+        "averageTokensPerRun": 2525,
+        "byModelTier": {
+          "LOW": 4700,
+          "MEDIUM": 5400,
+          "HIGH": 0
+        },
+        "dailySpend": [
+          {
+            "dateBucket": "2026-04-01",
+            "tokens": 2200
+          },
+          {
+            "dateBucket": "2026-04-02",
+            "tokens": 2500
+          },
+          {
+            "dateBucket": "2026-04-03",
+            "tokens": 2600
+          },
+          {
+            "dateBucket": "2026-04-04",
+            "tokens": 2800
+          }
+        ]
+      },
+      {
+        "team": "qa",
+        "totalTokens": 6870,
+        "sampleCount": 4,
+        "averageTokensPerRun": 1717.5,
+        "byModelTier": {
+          "LOW": 6870,
+          "MEDIUM": 0,
+          "HIGH": 0
+        },
+        "dailySpend": [
+          {
+            "dateBucket": "2026-04-01",
+            "tokens": 1700
+          },
+          {
+            "dateBucket": "2026-04-02",
+            "tokens": 1800
+          },
+          {
+            "dateBucket": "2026-04-03",
+            "tokens": 1650
+          },
+          {
+            "dateBucket": "2026-04-04",
+            "tokens": 1720
+          }
+        ]
+      }
+    ]
+  },
+  "anomalies": {
+    "generatedAt": 1778284800000,
+    "alertCount": 1,
+    "alerts": [
+      {
+        "alertName": "team-spend-anomaly",
+        "severity": "critical",
+        "team": "be",
+        "dateBucket": "2026-04-04",
+        "currentTokens": 13800,
+        "baselineTokens": 4666.67,
+        "thresholdTokens": 7933.33,
+        "message": "Team be spend spiked above threshold."
+      }
+    ]
+  }
+}

@@ -249,16 +249,16 @@ This is the most urgent execution backlog from the report and should be used as 
 
 ### Priority 4
 
-- [ ] Define model tiering policy by step type, risk, and confidence band (O5); output: tiering policy spec and routing matrix file; done when every orchestrator step maps to an explicit default tier.
-- [ ] Implement token budget allocator for request, workflow, and objective levels (O5); output: budget allocator module and quota tests; done when over-budget flows trigger deterministic control actions.
-- [ ] Add runtime token forecaster using historical step telemetry (O5); output: forecasting service and error-bound report; done when forecast accuracy meets agreed tolerance on validation set.
-- [ ] Build cost-quality optimizer with guardrail thresholds and premium escalation rules (O5); output: optimizer component and simulation results; done when quality guardrails hold under cost-reduction scenarios.
-- [ ] Integrate response cache with invalidation by policy version and context hash (O5); output: cache integration patch and invalidation test suite; done when stale cache reuse incidents remain below threshold.
-- [ ] Add per-team spend attribution and anomaly detection alerts (O5); output: attribution report job and alert policy config; done when abnormal spend spikes are detected within one reporting cycle.
-- [ ] Create quarterly token ROI review template tied to O1-O5 outcomes (O5); output: ROI template and first completed review packet; done when leadership can trace spend to objective impact.
-- [ ] Implement automated downgrade path for low-risk, high-volume task classes (O5); output: downgrade rule set and rollback switch; done when targeted classes reduce premium usage without quality regression.
-- [ ] Run red-team evaluation for cost policy abuse and routing bypass attempts (O3/O5); output: red-team findings report and mitigation backlog; done when all high-severity bypass vectors are closed.
-- [ ] Finalize P4 gate sign-off for cost-quality sustainability controls (O5); output: sign-off memo and linked benchmark evidence; done when gate owners approve sustained operation criteria.
+- [x] Define model tiering policy by step type, risk, and confidence band (O5); output: tiering policy spec and routing matrix file; done when every orchestrator step maps to an explicit default tier.
+- [x] Implement token budget allocator for request, workflow, and objective levels (O5); output: budget allocator module and quota tests; done when over-budget flows trigger deterministic control actions.
+- [x] Add runtime token forecaster using historical step telemetry (O5); output: forecasting service and error-bound report; done when forecast accuracy meets agreed tolerance on validation set.
+- [x] Build cost-quality optimizer with guardrail thresholds and premium escalation rules (O5); output: optimizer component and simulation results; done when quality guardrails hold under cost-reduction scenarios.
+- [x] Integrate response cache with invalidation by policy version and context hash (O5); output: cache integration patch and invalidation test suite; done when stale cache reuse incidents remain below threshold.
+- [x] Add per-team spend attribution and anomaly detection alerts (O5); output: attribution report job and alert policy config; done when abnormal spend spikes are detected within one reporting cycle.
+- [x] Create quarterly token ROI review template tied to O1-O5 outcomes (O5); output: ROI template and first completed review packet; done when leadership can trace spend to objective impact.
+- [x] Implement automated downgrade path for low-risk, high-volume task classes (O5); output: downgrade rule set and rollback switch; done when targeted classes reduce premium usage without quality regression.
+- [x] Run red-team evaluation for cost policy abuse and routing bypass attempts (O3/O5); output: red-team findings report and mitigation backlog; done when all high-severity bypass vectors are closed.
+- [x] Finalize P4 gate sign-off for cost-quality sustainability controls (O5); output: sign-off memo and linked benchmark evidence; done when gate owners approve sustained operation criteria.
 
 ### 120-Day Execution Sequence (Cross-Priority)
 
@@ -273,22 +273,22 @@ This is the most urgent execution backlog from the report and should be used as 
 - [x] Stand up memory index baseline and implement intent-aware retrieval planning.
 - [x] Add provenance scoring, stale suppression, TTL, and re-index cadence jobs.
 - [x] Deploy repository graph-aware ranking and retrieval quality dashboard.
-- [ ] Run benchmark suite for multi-step reliability, retrieval precision, and recovery.
+- [x] Run benchmark suite for multi-step reliability, retrieval precision, and recovery.
 - [x] Ship model-tier routing policy with confidence-based premium fallback triggers.
-- [ ] Enable low-risk validation caching and request/workflow token budget controls.
-- [ ] Run red-team validation for routing bypass and cost policy abuse scenarios.
-- [ ] Execute G1-G5 gate reviews and publish final 120-day evidence pack with owner sign-off.
+- [x] Enable low-risk validation caching and request/workflow token budget controls.
+- [x] Run red-team validation for routing bypass and cost policy abuse scenarios.
+- [x] Execute G1-G5 gate reviews and publish final 120-day evidence pack with owner sign-off.
 
 ### Blockers to Remove First
 
-- [ ] Unclear ownership for orchestrator contract approvals across architecture and implementation teams.
+- [x] Unclear ownership for orchestrator contract approvals across architecture and implementation teams.
 - [x] Incomplete or inconsistent capability metadata for existing agents.
 - [x] Missing baseline telemetry for token, latency, and verification events.
-- [ ] No agreed threshold values for retrieval precision, false-link rate, and quality retention.
-- [ ] No fixed review cadence and approver list for verification gates G1-G5.
+- [x] No agreed threshold values for retrieval precision, false-link rate, and quality retention.
+- [x] No fixed review cadence and approver list for verification gates G1-G5.
 - [x] Skill manifest coverage gaps and expired exceptions without automated revocation.
 - [x] Retrieval data quality issues from stale, unscoped, or low-provenance memory entries.
-- [ ] Missing spend attribution and anomaly alerting to control cross-team token budget drift.
+- [x] Missing spend attribution and anomaly alerting to control cross-team token budget drift.
 
 ### Priority Ownership Model
 

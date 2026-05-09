@@ -6,12 +6,21 @@
   "scripts": {
     "test": "node --test tests/orchestration/*.test.js",
     "benchmark:orchestration": "node scripts/benchmark-orchestration.js",
+    "report:cross-priority-benchmark": "node scripts/generate-cross-priority-benchmark-report.js",
+    "benchmark:cross-priority": "npm run report:cross-priority-benchmark",
     "demo:router-runtime": "node scripts/demo-router-runtime.js",
     "start:orchestration-api": "node scripts/start-orchestration-api.js",
     "start:shared-state-service": "node scripts/start-shared-state-service.js",
     "audit:top-prompts": "node scripts/audit-top-prompts-skill-references.js",
     "report:subset-token-impact": "node scripts/generate-subset-token-impact-report.js",
     "job:enforce-skill-exception-expiry": "node scripts/run-skill-exception-expiry-enforcement.js",
-    "report:p3-memory-pilot": "node scripts/generate-p3-memory-pilot-report.js"
+    "report:p3-memory-pilot": "node scripts/generate-p3-memory-pilot-report.js",
+    "report:p4-model-tiering": "node scripts/generate-p4-model-tiering-policy.js",
+    "report:p4-token-forecast": "node scripts/generate-p4-token-forecast-report.js",
+    "report:p4-spend-attribution": "node scripts/generate-p4-spend-attribution-report.js",
+    "report:p4-quarterly-roi": "node scripts/generate-p4-quarterly-roi-review-packet.js",
+    "report:p4-red-team": "node scripts/generate-p4-red-team-report.js",
+    "report:p4-gate-signoff": "node scripts/generate-p4-gate-signoff-memo.js",
+    "report:p4-all": "npm run report:p4-model-tiering && npm run report:p4-token-forecast && npm run report:p4-spend-attribution && npm run report:p4-quarterly-roi && npm run report:p4-red-team && npm run report:p4-gate-signoff"
   }
 }

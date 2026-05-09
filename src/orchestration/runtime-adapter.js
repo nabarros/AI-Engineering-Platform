@@ -11,7 +11,11 @@ export function createRouterRuntimeAdapter(options = {}) {
     weightTuner,
     relationshipShadowTracker: options.relationshipShadowTracker,
     exceptionRegistry: options.exceptionRegistry,
-    verificationCache: options.verificationCache
+    verificationCache: options.verificationCache,
+    tokenBudgetAllocator: options.tokenBudgetAllocator,
+    tokenForecaster: options.tokenForecaster,
+    downgradePolicy: options.downgradePolicy,
+    responseCache: options.responseCache
   });
 
   return {
@@ -47,6 +51,13 @@ export function createRouterRuntimeAdapter(options = {}) {
           mismatchRate: 0,
           byMismatchType: {}
         },
+        modelTierDecision: result.modelTierDecision || null,
+        tokenForecast: result.tokenForecast || null,
+        budgetDecision: result.budgetDecision || null,
+        downgradeDecision: result.downgradeDecision || null,
+        costQualityDecision: result.costQualityDecision || null,
+        responseCacheContextHash: result.responseCacheContextHash || null,
+        spendAttribution: result.spendAttribution || null,
         activeWeights: weightTuner ? weightTuner.getWeights() : (options.scoringWeights || DEFAULT_SCORING_WEIGHTS),
         rollingMetrics: weightTuner ? weightTuner.getRollingMetrics() : null,
         ok: result.ok,
@@ -66,6 +77,14 @@ export function createRouterRuntimeAdapter(options = {}) {
       }
 
       return output;
+    },
+
+    invalidateResponseCacheByPolicyVersion(policyVersion) {
+      return orchestrator.invalidateResponseCacheByPolicyVersion(policyVersion);
+    },
+
+    invalidateResponseCacheByContext(context) {
+      return orchestrator.invalidateResponseCacheByContext(context);
     }
   };
 }

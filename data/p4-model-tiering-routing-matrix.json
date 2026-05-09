@@ -1,0 +1,510 @@
+{
+  "policyVersion": "p4-tiering-policy-v1",
+  "generatedAt": 1778342237436,
+  "rows": [
+    {
+      "stepType": "routing",
+      "risk": "LOW",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "LOW",
+      "confidenceBand": "MEDIUM",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "LOW",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "MEDIUM",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "MEDIUM",
+      "confidenceBand": "MEDIUM",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "MEDIUM",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "HIGH",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "HIGH",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "HIGH",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "CRITICAL",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "CRITICAL",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "routing",
+      "risk": "CRITICAL",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "LOW",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "LOW",
+      "confidenceBand": "MEDIUM",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "LOW",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "MEDIUM",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "MEDIUM",
+      "confidenceBand": "MEDIUM",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "MEDIUM",
+      "confidenceBand": "HIGH",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "HIGH",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "HIGH",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "HIGH",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "CRITICAL",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "CRITICAL",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "planning",
+      "risk": "CRITICAL",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "LOW",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "LOW",
+      "confidenceBand": "MEDIUM",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "LOW",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "MEDIUM",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "MEDIUM",
+      "confidenceBand": "MEDIUM",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "MEDIUM",
+      "confidenceBand": "HIGH",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "HIGH",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "HIGH",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "HIGH",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "CRITICAL",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "CRITICAL",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "execution",
+      "risk": "CRITICAL",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "LOW",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "LOW",
+      "confidenceBand": "MEDIUM",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "LOW",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "MEDIUM",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "MEDIUM",
+      "confidenceBand": "MEDIUM",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "MEDIUM",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "HIGH",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "HIGH",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "HIGH",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "CRITICAL",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "CRITICAL",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "verification",
+      "risk": "CRITICAL",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "LOW",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "LOW",
+      "confidenceBand": "MEDIUM",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "LOW",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "MEDIUM",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "MEDIUM",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "MEDIUM",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "HIGH",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "HIGH",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "HIGH",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "CRITICAL",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "CRITICAL",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "recovery",
+      "risk": "CRITICAL",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "LOW",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "LOW",
+      "confidenceBand": "MEDIUM",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "LOW",
+      "confidenceBand": "HIGH",
+      "tier": "LOW",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "MEDIUM",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "MEDIUM",
+      "confidenceBand": "MEDIUM",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "MEDIUM",
+      "confidenceBand": "HIGH",
+      "tier": "MEDIUM",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "HIGH",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "HIGH",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "HIGH",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "CRITICAL",
+      "confidenceBand": "LOW",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "CRITICAL",
+      "confidenceBand": "MEDIUM",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    },
+    {
+      "stepType": "objective",
+      "risk": "CRITICAL",
+      "confidenceBand": "HIGH",
+      "tier": "HIGH",
+      "policyVersion": "p4-tiering-policy-v1"
+    }
+  ]
+}

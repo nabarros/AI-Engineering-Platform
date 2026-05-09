@@ -11,6 +11,13 @@ import { retrieveOrientedContext } from "./retrieval-strategy.js";
 import { createRelationshipShadowTracker, evaluateRelationshipShadow } from "./relationship-inference.js";
 import { createVerificationCache } from "./verification-cache.js";
 import { evaluateSubsetPolicyViolationAlert } from "./subset-policy-alerts.js";
+import { resolveModelTierForStep } from "./model-tiering-policy.js";
+import { createTokenBudgetAllocator } from "./token-budget-allocator.js";
+import { createTokenForecaster } from "./token-forecaster.js";
+import { optimizeCostQuality } from "./cost-quality-optimizer.js";
+import { buildSpendAttributionSnapshot } from "./spend-attribution.js";
+import { createDowngradePolicy } from "./downgrade-policy.js";
+import { buildContextHash, createResponseCache } from "./response-cache.js";
 
 export const ORCHESTRATION_STATES = Object.freeze({
   RECEIVED: "RECEIVED",
@@ -27,7 +34,7 @@ export const ORCHESTRATION_STATES = Object.freeze({
 const ALLOWED_LIFECYCLE_TRANSITIONS = Object.freeze({
   [ORCHESTRATION_STATES.RECEIVED]: [ORCHESTRATION_STATES.POLICY_CHECKED],
   [ORCHESTRATION_STATES.POLICY_CHECKED]: [ORCHESTRATION_STATES.PLAN_CREATED, ORCHESTRATION_STATES.FAILED],
-  [ORCHESTRATION_STATES.PLAN_CREATED]: [ORCHESTRATION_STATES.ROUTED],
+  [ORCHESTRATION_STATES.PLAN_CREATED]: [ORCHESTRATION_STATES.ROUTED, ORCHESTRATION_STATES.FAILED],
   [ORCHESTRATION_STATES.ROUTED]: [ORCHESTRATION_STATES.VERIFYING, ORCHESTRATION_STATES.FAILED],
   [ORCHESTRATION_STATES.VERIFYING]: [ORCHESTRATION_STATES.VERIFIED],
   [ORCHESTRATION_STATES.VERIFIED]: [ORCHESTRATION_STATES.COMPLETED, ORCHESTRATION_STATES.RECOVERING],
@@ -64,7 +71,11 @@ export class AgentOrchestrator {
     weightTuner = null,
     relationshipShadowTracker = null,
     exceptionRegistry = null,
-    verificationCache = null
+    verificationCache = null,
+    tokenBudgetAllocator = null,
+    tokenForecaster = null,
+    downgradePolicy = null,
+    responseCache = null
   }) {
     validateCapabilityRegistry(capabilityRegistry);
     this.capabilityRegistry = capabilityRegistry;
@@ -76,8 +87,27 @@ export class AgentOrchestrator {
     this.relationshipShadowTracker = relationshipShadowTracker || createRelationshipShadowTracker();
     this.exceptionRegistry = exceptionRegistry;
     this.verificationCache = verificationCache || createVerificationCache();
+    this.tokenBudgetAllocator = tokenBudgetAllocator || createTokenBudgetAllocator();
+    this.tokenForecaster = tokenForecaster || createTokenForecaster();
+    this.downgradePolicy = downgradePolicy || createDowngradePolicy();
+    this.responseCache = responseCache || createResponseCache();
+    this.taskClassCounts = new Map();
+    this.spendEvents = [];
     this.initializationPromise = this.stateStore ? this.restoreState() : Promise.resolve();
 
+  }
+
+  invalidateResponseCacheByPolicyVersion(policyVersion) {
+    return this.responseCache.invalidateByPolicyVersion(policyVersion);
+  }
+
+  invalidateResponseCacheByContext(context = {}) {
+    const contextHash = buildContextHash(context);
+    const removed = this.responseCache.invalidateByContextHash(contextHash);
+    return {
+      contextHash,
+      removed
+    };
   }
 
   async restoreState() {
@@ -142,12 +172,68 @@ export class AgentOrchestrator {
       planSteps: plan.length
     });
 
+    const taskClass = String(task?.taskClass || task?.class || task?.domain || "general").toLowerCase();
+    const workflowId = String(task?.workflowId || `workflow:${taskClass}`);
+    const objectiveId = String(task?.objectiveId || `objective:${taskClass}`);
+    const recentVolume = Number(this.taskClassCounts.get(taskClass) || 0) + 1;
+    this.taskClassCounts.set(taskClass, recentVolume);
+
+    const modelTierDecision = resolveModelTierForStep({
+      stepType: "routing",
+      risk: task?.risk,
+      confidenceScore: task?.confidenceScore
+    });
+    const tokenForecast = this.tokenForecaster.forecast({
+      stepType: "routing",
+      risk: task?.risk,
+      modelTier: modelTierDecision.tier,
+      objective: objectiveId
+    });
+    const budgetDecision = this.tokenBudgetAllocator.allocate({
+      tier: modelTierDecision.tier,
+      requestId,
+      workflowId,
+      objectiveId,
+      requestedTokens: tokenForecast.predictedTokens
+    });
+
+    tracer.addEvent("token.policy.evaluated", {
+      modelTierDecision,
+      tokenForecast,
+      budgetDecision
+    });
+
+    if (!budgetDecision.allowed) {
+      assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.FAILED);
+      lifecycleState = ORCHESTRATION_STATES.FAILED;
+      return {
+        ok: false,
+        error: "TOKEN_BUDGET_EXCEEDED",
+        budgetDecision,
+        tokenForecast,
+        modelTierDecision,
+        lifecycleState,
+        relationshipShadowSummary: this.relationshipShadowTracker.summary(),
+        trace: tracer.summary()
+      };
+    }
+
+    const downgradeDecision = this.downgradePolicy.evaluate({
+      taskClass,
+      risk: task?.risk,
+      currentTier: budgetDecision.effectiveTier,
+      recentVolume
+    });
+
     const learningSnapshot = this.learning.getSnapshot();
     const activeWeights = this.weightTuner ? this.weightTuner.getWeights() : this.scoringWeights;
     const route = routeTask({
       task,
       registry: this.capabilityRegistry,
-      budget,
+      budget: {
+        ...(budget || {}),
+        tokenBudgetTier: budgetDecision.effectiveTier
+      },
       learningStats: learningSnapshot,
       scoringWeights: activeWeights
     });
@@ -248,6 +334,13 @@ export class AgentOrchestrator {
       selectedAgent: route.selected.id,
       executionEvidence
     };
+    const responseCacheContext = {
+      task,
+      selectedAgent: route.selected.id,
+      workflowId,
+      objectiveId
+    };
+    const responseCacheContextHash = buildContextHash(responseCacheContext);
 
     assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.VERIFYING);
     lifecycleState = ORCHESTRATION_STATES.VERIFYING;
@@ -263,6 +356,19 @@ export class AgentOrchestrator {
       }
     }
 
+    if (!verification && isLowRiskTask && this.verificationCache) {
+      verification = this.responseCache.get({
+        policyVersion: modelTierDecision.policyVersion,
+        contextHash: responseCacheContextHash
+      });
+      if (verification) {
+        tracer.addEvent("response.cache.hit", {
+          policyVersion: modelTierDecision.policyVersion,
+          contextHash: responseCacheContextHash
+        });
+      }
+    }
+
     if (!verification) {
       verification = verifyExecution(executionEvidence);
       if (isLowRiskTask && this.verificationCache) {
@@ -270,6 +376,14 @@ export class AgentOrchestrator {
         tracer.addEvent("verification.cache.store", {
           selectedAgent: route.selected.id,
           risk: String(task?.risk || "LOW").toUpperCase()
+        });
+        this.responseCache.set({
+          policyVersion: modelTierDecision.policyVersion,
+          contextHash: responseCacheContextHash
+        }, verification);
+        tracer.addEvent("response.cache.store", {
+          policyVersion: modelTierDecision.policyVersion,
+          contextHash: responseCacheContextHash
         });
       }
     }
@@ -300,10 +414,19 @@ export class AgentOrchestrator {
     await this.persistState();
 
     const qualityScore = typeof executionEvidence?.qualityScore === "number" ? executionEvidence.qualityScore : 0;
+    const costQualityDecision = optimizeCostQuality({
+      risk: task?.risk,
+      qualityScore,
+      verificationPass: verification.pass,
+      currentTier: budgetDecision.effectiveTier,
+      predictedTokens: tokenForecast.predictedTokens,
+      downgradeDecision
+    });
+
     const premiumFallback = {
       trigger: false,
       reason: "none",
-      recommendedBudgetTier: route.appliedBudget?.tokenBudgetTier || "MEDIUM"
+      recommendedBudgetTier: costQualityDecision.recommendedTier || route.appliedBudget?.tokenBudgetTier || "MEDIUM"
     };
 
     if (!verification.pass) {
@@ -314,7 +437,40 @@ export class AgentOrchestrator {
       premiumFallback.trigger = true;
       premiumFallback.reason = "low_quality";
       premiumFallback.recommendedBudgetTier = "MEDIUM";
+    } else if (costQualityDecision.escalationTriggered) {
+      premiumFallback.trigger = true;
+      premiumFallback.reason = "risk_escalation";
+      premiumFallback.recommendedBudgetTier = "HIGH";
     }
+
+    this.tokenForecaster.recordStepTelemetry({
+      stepType: "routing",
+      risk: task?.risk,
+      modelTier: costQualityDecision.recommendedTier,
+      objective: objectiveId,
+      tokens: Number(executionEvidence?.tokenUsage || tokenForecast.predictedTokens || 0)
+    });
+
+    this.tokenBudgetAllocator.recordUsage({
+      tier: budgetDecision.effectiveTier,
+      requestId,
+      workflowId,
+      objectiveId,
+      consumedTokens: Number(executionEvidence?.tokenUsage || 0)
+    });
+
+    const team = String(route.selected?.metadata?.ownerTeam || "unknown");
+    this.spendEvents.push({
+      team,
+      modelTier: costQualityDecision.recommendedTier,
+      tokenUsage: Number(executionEvidence?.tokenUsage || 0),
+      timestampMs: Date.now(),
+      objective: objectiveId
+    });
+    if (this.spendEvents.length > 500) {
+      this.spendEvents.shift();
+    }
+    const spendAttribution = buildSpendAttributionSnapshot(this.spendEvents);
 
     let recoveryPlan = null;
     let fallbackSelection = { specialistId: null, reason: "none" };
@@ -344,12 +500,19 @@ export class AgentOrchestrator {
       fallbackChain: route.fallbackChain,
       routeScores: route.scores,
       appliedBudget: route.appliedBudget,
+      budgetDecision,
+      modelTierDecision,
+      tokenForecast,
+      downgradeDecision,
+      costQualityDecision,
       plan,
       recoveryPlan,
       fallbackSelection,
       orientedContext: retrieveOrientedContext(this.memory, task),
       verification,
       premiumFallback,
+      responseCacheContextHash,
+      spendAttribution,
       relationshipShadowSummary: this.relationshipShadowTracker.summary(),
       lifecycleState,
       activeWeights,

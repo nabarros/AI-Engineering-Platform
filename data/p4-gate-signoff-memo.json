@@ -1,0 +1,27 @@
+{
+  "generatedAt": 1778284800000,
+  "gate": "G5",
+  "status": "approved",
+  "scope": "Priority 4 cost-quality sustainability controls",
+  "evidence": {
+    "g1g3Package": "docs/phase2-p2-skill-determinism-evidence.md",
+    "g4Package": "docs/p3-memory-readiness-review.md",
+    "modelTiering": "data/p4-model-tiering-routing-matrix.json",
+    "tokenForecast": "data/p4-token-forecast-validation.json",
+    "spendAttribution": "data/p4-spend-attribution-anomalies.json",
+    "redTeam": "data/p4-red-team-cost-policy-report.json",
+    "quarterlyRoi": "data/p4-quarterly-token-roi-review.json"
+  },
+  "benchmarkSummary": {
+    "premiumTokenReduction": 0.15,
+    "qualityRetentionDelta": 0.01,
+    "forecastMape": 0.0297,
+    "forecastCoverageWithinErrorBound": 1,
+    "redTeamHighSeverityOpenFindings": 0
+  },
+  "signOff": {
+    "governance": "approved",
+    "quality": "approved",
+    "operations": "approved"
+  }
+}

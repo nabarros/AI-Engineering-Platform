@@ -1,0 +1,48 @@
+{
+  "generatedAt": 1778284800000,
+  "quarter": "2026-Q2",
+  "owners": [
+    "ai-economics-quality",
+    "orchestration-core"
+  ],
+  "outcomes": {
+    "O1": {
+      "impact": "medium",
+      "note": "Planner recovery reduced rerun cost for failed verifications."
+    },
+    "O2": {
+      "impact": "medium",
+      "note": "Relationship safety fallback reduced expensive misroutes."
+    },
+    "O3": {
+      "impact": "high",
+      "note": "Skill isolation + red-team controls reduced bypass risk."
+    },
+    "O4": {
+      "impact": "high",
+      "note": "Memory-assisted retrieval lowered repeated context token burn."
+    },
+    "O5": {
+      "impact": "high",
+      "note": "Tiering, budgets, cache, and downgrade policies reduced premium usage."
+    }
+  },
+  "kpis": {
+    "premiumTokenRatioBefore": 0.46,
+    "premiumTokenRatioAfter": 0.31,
+    "premiumTokenRatioDelta": -0.15,
+    "averageTokensPerSuccessfulTaskBefore": 3520,
+    "averageTokensPerSuccessfulTaskAfter": 2780,
+    "averageTokensDelta": -740,
+    "verificationPassRateBefore": 0.91,
+    "verificationPassRateAfter": 0.92
+  },
+  "decision": {
+    "continuePolicy": true,
+    "followUps": [
+      "Tighten objective-level limits for legacy high-churn workflows.",
+      "Extend anomaly alert routing to finance operations channel.",
+      "Re-run forecast calibration monthly with fresh telemetry."
+    ]
+  }
+}

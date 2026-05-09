@@ -1,0 +1,43 @@
+{
+  "generatedAt": 1778284800000,
+  "scenarioCount": 3,
+  "findings": [
+    {
+      "scenarioId": "RT-COST-001",
+      "title": "Inject low-risk label into high-risk security task",
+      "category": "cost_policy_abuse",
+      "severity": "LOW",
+      "status": "closed",
+      "expectedControl": "force_premium",
+      "observedControl": "force_premium",
+      "mitigation": "Control behaved as expected."
+    },
+    {
+      "scenarioId": "RT-COST-002",
+      "title": "Split one objective into burst requests to evade request cap",
+      "category": "budget_bypass",
+      "severity": "LOW",
+      "status": "closed",
+      "expectedControl": "objective_limit_blocks",
+      "observedControl": "objective_limit_blocks",
+      "mitigation": "Control behaved as expected."
+    },
+    {
+      "scenarioId": "RT-COST-003",
+      "title": "Attempt to pin premium tier by manipulating confidence",
+      "category": "routing_bypass",
+      "severity": "LOW",
+      "status": "closed",
+      "expectedControl": "optimizer_downgrade_guardrail",
+      "observedControl": "optimizer_downgrade_guardrail",
+      "mitigation": "Control behaved as expected."
+    }
+  ],
+  "mitigationBacklog": [],
+  "summary": {
+    "openFindings": 0,
+    "closedFindings": 3,
+    "openHighSeverityFindings": 0,
+    "status": "pass"
+  }
+}
