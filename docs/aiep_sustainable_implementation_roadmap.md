@@ -236,16 +236,16 @@ This is the most urgent execution backlog from the report and should be used as 
 
 ### Priority 3
 
-- [ ] Design multi-layer memory model contract for working, episodic, semantic, and procedural stores (O4); output: memory contract spec and interface definitions; done when storage and retrieval components implement the same typed contract.
-- [ ] Implement memory write-path with provenance, timestamp, and scope metadata (O4); output: write service module and validation tests; done when every memory write persists required metadata fields.
-- [ ] Build intent-aware retrieval planner for bugfix, feature, review, and docs tasks (O4/O5); output: retrieval planner module and intent fixtures; done when planner selects strategy deterministically per intent class.
-- [ ] Add repository graph indexer for symbol, dependency, and ownership links (O4); output: graph indexing pipeline and index health report; done when scheduled index runs complete with zero critical integrity errors.
-- [ ] Implement retrieval ranking blend with graph, recency, and provenance signals (O4); output: ranking configuration and offline evaluation notebook export; done when precision improves against baseline benchmark set.
-- [ ] Introduce memory compaction and archival workflow for stale low-value entries (O4/O5); output: compaction job and retention policy document; done when storage growth rate drops while retrieval precision remains stable.
-- [ ] Add cross-agent memory handoff packet in delegation contract (O2/O4); output: handoff packet schema and integration tests; done when delegated tasks resume with required prior context attached.
-- [ ] Create retrieval quality dashboard with latency, precision, and miss diagnostics (O4); output: dashboard panels and query definitions; done when weekly review can isolate top miss drivers without ad hoc analysis.
-- [ ] Run controlled pilot on memory-assisted execution for multi-step tasks (O4/O5); output: pilot report and before/after performance dataset; done when pilot shows measurable reduction in repeated context reconstruction.
-- [ ] Publish P3 memory readiness review with remediation actions (O4); output: readiness review record and prioritized action tracker; done when all P3 critical findings are closed or risk-accepted by owners.
+- [x] Design multi-layer memory model contract for working, episodic, semantic, and procedural stores (O4); output: memory contract spec and interface definitions; done when storage and retrieval components implement the same typed contract.
+- [x] Implement memory write-path with provenance, timestamp, and scope metadata (O4); output: write service module and validation tests; done when every memory write persists required metadata fields.
+- [x] Build intent-aware retrieval planner for bugfix, feature, review, and docs tasks (O4/O5); output: retrieval planner module and intent fixtures; done when planner selects strategy deterministically per intent class.
+- [x] Add repository graph indexer for symbol, dependency, and ownership links (O4); output: graph indexing pipeline and index health report; done when scheduled index runs complete with zero critical integrity errors.
+- [x] Implement retrieval ranking blend with graph, recency, and provenance signals (O4); output: ranking configuration and offline evaluation notebook export; done when precision improves against baseline benchmark set.
+- [x] Introduce memory compaction and archival workflow for stale low-value entries (O4/O5); output: compaction job and retention policy document; done when storage growth rate drops while retrieval precision remains stable.
+- [x] Add cross-agent memory handoff packet in delegation contract (O2/O4); output: handoff packet schema and integration tests; done when delegated tasks resume with required prior context attached.
+- [x] Create retrieval quality dashboard with latency, precision, and miss diagnostics (O4); output: dashboard panels and query definitions; done when weekly review can isolate top miss drivers without ad hoc analysis.
+- [x] Run controlled pilot on memory-assisted execution for multi-step tasks (O4/O5); output: pilot report and before/after performance dataset; done when pilot shows measurable reduction in repeated context reconstruction.
+- [x] Publish P3 memory readiness review with remediation actions (O4); output: readiness review record and prioritized action tracker; done when all P3 critical findings are closed or risk-accepted by owners.
 
 ### Priority 4
 
@@ -269,10 +269,10 @@ This is the most urgent execution backlog from the report and should be used as 
 - [x] Instrument step-level token, latency, and verification telemetry.
 - [x] Launch relationship inference in shadow mode and capture false-link metrics.
 - [x] Expand subset compiler inputs and enable pre-execution subset dry-run checks.
-- [ ] Audit top prompts for unnecessary skill references and remediate allowlist drift.
+- [x] Audit top prompts for unnecessary skill references and remediate allowlist drift.
 - [x] Stand up memory index baseline and implement intent-aware retrieval planning.
 - [x] Add provenance scoring, stale suppression, TTL, and re-index cadence jobs.
-- [ ] Deploy repository graph-aware ranking and retrieval quality dashboard.
+- [x] Deploy repository graph-aware ranking and retrieval quality dashboard.
 - [ ] Run benchmark suite for multi-step reliability, retrieval precision, and recovery.
 - [x] Ship model-tier routing policy with confidence-based premium fallback triggers.
 - [ ] Enable low-risk validation caching and request/workflow token budget controls.

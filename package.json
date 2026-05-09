@@ -11,6 +11,7 @@
     "start:shared-state-service": "node scripts/start-shared-state-service.js",
     "audit:top-prompts": "node scripts/audit-top-prompts-skill-references.js",
     "report:subset-token-impact": "node scripts/generate-subset-token-impact-report.js",
-    "job:enforce-skill-exception-expiry": "node scripts/run-skill-exception-expiry-enforcement.js"
+    "job:enforce-skill-exception-expiry": "node scripts/run-skill-exception-expiry-enforcement.js",
+    "report:p3-memory-pilot": "node scripts/generate-p3-memory-pilot-report.js"
   }
 }

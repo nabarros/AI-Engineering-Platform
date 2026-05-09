@@ -1,0 +1,169 @@
+{
+  "generatedAt": 1778284800000,
+  "baseline": {
+    "generatedAt": 1778284800000,
+    "retrievalAttempts": 4,
+    "averageLatencyMs": 205,
+    "averagePrecision": 0.325,
+    "missCount": 0,
+    "missRate": 0,
+    "missDiagnostics": {},
+    "samples": [
+      {
+        "requestId": "pilot-001",
+        "intent": "bugfix",
+        "latencyMs": 210,
+        "retrievedCount": 5,
+        "relevantRetrievedCount": 2,
+        "missReason": null
+      },
+      {
+        "requestId": "pilot-002",
+        "intent": "feature",
+        "latencyMs": 245,
+        "retrievedCount": 5,
+        "relevantRetrievedCount": 2,
+        "missReason": "low_graph_coverage"
+      },
+      {
+        "requestId": "pilot-003",
+        "intent": "review",
+        "latencyMs": 190,
+        "retrievedCount": 4,
+        "relevantRetrievedCount": 1,
+        "missReason": "stale_memory"
+      },
+      {
+        "requestId": "pilot-004",
+        "intent": "docs",
+        "latencyMs": 175,
+        "retrievedCount": 4,
+        "relevantRetrievedCount": 1,
+        "missReason": null
+      }
+    ]
+  },
+  "memoryAssisted": {
+    "generatedAt": 1778284800000,
+    "retrievalAttempts": 4,
+    "averageLatencyMs": 148.25,
+    "averagePrecision": 0.775,
+    "missCount": 0,
+    "missRate": 0,
+    "missDiagnostics": {},
+    "samples": [
+      {
+        "requestId": "pilot-101",
+        "intent": "bugfix",
+        "latencyMs": 150,
+        "retrievedCount": 5,
+        "relevantRetrievedCount": 4,
+        "missReason": null
+      },
+      {
+        "requestId": "pilot-102",
+        "intent": "feature",
+        "latencyMs": 168,
+        "retrievedCount": 5,
+        "relevantRetrievedCount": 4,
+        "missReason": null
+      },
+      {
+        "requestId": "pilot-103",
+        "intent": "review",
+        "latencyMs": 142,
+        "retrievedCount": 4,
+        "relevantRetrievedCount": 3,
+        "missReason": "partial_ownership_links"
+      },
+      {
+        "requestId": "pilot-104",
+        "intent": "docs",
+        "latencyMs": 133,
+        "retrievedCount": 4,
+        "relevantRetrievedCount": 3,
+        "missReason": null
+      }
+    ]
+  },
+  "delta": {
+    "latencyMsImprovement": 56.75,
+    "precisionImprovement": 0.45,
+    "missRateReduction": 0
+  },
+  "dashboards": {
+    "baseline": {
+      "generatedAt": 1778284800000,
+      "cards": {
+        "attempts": 4,
+        "averageLatencyMs": 205,
+        "averagePrecision": 0.325,
+        "missRate": 0
+      },
+      "qualityGates": {
+        "status": "fail",
+        "thresholds": {
+          "maxLatencyMs": 200,
+          "minPrecision": 0.5,
+          "maxMissRate": 0.1
+        },
+        "evaluatedMetrics": {
+          "averageLatencyMs": 205,
+          "averagePrecision": 0.325,
+          "missRate": 0
+        },
+        "breaches": [
+          {
+            "metric": "averageLatencyMs",
+            "actual": 205,
+            "operator": "<=",
+            "threshold": 200
+          },
+          {
+            "metric": "averagePrecision",
+            "actual": 0.325,
+            "operator": ">=",
+            "threshold": 0.5
+          }
+        ]
+      },
+      "topMissReasons": []
+    },
+    "memoryAssisted": {
+      "generatedAt": 1778284800000,
+      "cards": {
+        "attempts": 4,
+        "averageLatencyMs": 148.25,
+        "averagePrecision": 0.775,
+        "missRate": 0
+      },
+      "qualityGates": {
+        "status": "pass",
+        "thresholds": {
+          "maxLatencyMs": 200,
+          "minPrecision": 0.5,
+          "maxMissRate": 0.1
+        },
+        "evaluatedMetrics": {
+          "averageLatencyMs": 148.25,
+          "averagePrecision": 0.775,
+          "missRate": 0
+        },
+        "breaches": []
+      },
+      "topMissReasons": []
+    }
+  },
+  "acceptanceGates": {
+    "status": "pass",
+    "thresholds": {
+      "minLatencyMsImprovement": 40,
+      "minPrecisionImprovement": 0.2
+    },
+    "evaluatedMetrics": {
+      "latencyMsImprovement": 56.75,
+      "precisionImprovement": 0.45
+    },
+    "breaches": []
+  }
+}

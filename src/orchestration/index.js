@@ -3,6 +3,15 @@ export { DEFAULT_CAPABILITY_REGISTRY } from "./default-capability-registry.js";
 export { CAPABILITY_SCHEMA_VERSION, getCapabilityRegistrySchema } from "./capability-registry.js";
 export { OrchestrationMemory } from "./memory-store.js";
 export {
+	MEMORY_LAYER_CONTRACT_VERSION,
+	MEMORY_LAYERS,
+	LEGACY_SCOPE_ALIASES,
+	resolveMemoryLayer,
+	resolveLegacyScope,
+	createMemoryMetadata,
+	validateMemoryContractEntry
+} from "./memory-contract.js";
+export {
 	buildQualityDashboard,
 	buildWeeklyCostQualityScorecard,
 	buildSubsetTokenImpactReport,
@@ -34,13 +43,38 @@ export {
 	buildRelationshipShadowReport
 } from "./relationship-inference.js";
 export { DELEGATION_TEMPLATE_VERSION, buildDelegationContract, validateDelegationContract } from "./delegation-contracts.js";
+export {
+	MEMORY_HANDOFF_PACKET_VERSION,
+	buildMemoryHandoffPacket,
+	validateMemoryHandoffPacket
+} from "./delegation-contracts.js";
 export { createSkillExceptionRegistry } from "./skill-exceptions.js";
 export { runExceptionExpiryEnforcement } from "./exception-expiry-enforcement.js";
 export { SUBSET_POLICY_ALERT_RULES, evaluateSubsetPolicyViolationAlert } from "./subset-policy-alerts.js";
 export { createVerificationCache } from "./verification-cache.js";
 export { auditTopPromptSkillReferences } from "./prompt-skill-audit.js";
 export { detectTaskIntent, buildOrientedQuery, retrieveOrientedContext } from "./retrieval-strategy.js";
+export { buildRetrievalPlan } from "./retrieval-planner.js";
 export { createMemoryMaintenanceSampleState, normalizeMemoryMaintenanceInput, runMemoryMaintenance } from "./memory-maintenance.js";
+export {
+	DEFAULT_RETRIEVAL_QUALITY_THRESHOLDS,
+	buildRetrievalQualityReport,
+	buildRetrievalQualityDashboard,
+	evaluateRetrievalQualityGates
+} from "./retrieval-quality.js";
+export {
+	DEFAULT_MEMORY_PILOT_ACCEPTANCE_THRESHOLDS,
+	createDeterministicMemoryPilotSample,
+	buildMemoryAssistedPilotReport,
+	evaluateMemoryPilotAcceptanceGates,
+	renderMemoryPilotMarkdown
+} from "./memory-pilot-report.js";
+export {
+	normalizeRepositoryGraphPayload,
+	createRepositoryGraphRecord,
+	summarizeRepositoryGraph,
+	scoreRepositoryGraphSignals
+} from "./repository-graph.js";
 export { createRouterRuntimeAdapter } from "./runtime-adapter.js";
 export { FileStateStore } from "./persistence/file-state-store.js";
 export { IndexedSharedStateStore, TenantStateStore } from "./persistence/indexed-shared-state-store.js";

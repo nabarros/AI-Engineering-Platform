@@ -1,34 +1,10 @@
-const BUGFIX_KEYWORDS = ["bug", "bugfix", "fix", "regression", "defect", "failure"];
-const FEATURE_KEYWORDS = ["feature", "implement", "add", "build", "enhance"];
-const REVIEW_KEYWORDS = ["review", "audit", "assess", "check", "inspect"];
+import { buildRetrievalPlan, detectTaskIntent } from "./retrieval-planner.js";
 
-function includesAny(text, keywords) {
-  return keywords.some((keyword) => text.includes(keyword));
-}
+export { detectTaskIntent };
 
-export function detectTaskIntent(task) {
-  const text = [task?.domain, task?.description]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  if (includesAny(text, BUGFIX_KEYWORDS)) {
-    return "bugfix";
-  }
-  if (includesAny(text, FEATURE_KEYWORDS)) {
-    return "feature";
-  }
-  if (includesAny(text, REVIEW_KEYWORDS)) {
-    return "review";
-  }
-  return "general";
-}
-
-export function buildOrientedQuery(task) {
-  const intent = detectTaskIntent(task);
-  const domain = String(task?.domain || "general").toLowerCase();
-  const description = String(task?.description || "").toLowerCase().trim();
-  return `${intent} ${domain} ${description}`.trim();
+export function buildOrientedQuery(task, limit = 5) {
+  const plan = buildRetrievalPlan(task, limit);
+  return plan.query;
 }
 
 export function retrieveOrientedContext(memory, task, limit = 5) {
@@ -36,7 +12,10 @@ export function retrieveOrientedContext(memory, task, limit = 5) {
     return [];
   }
 
-  const intent = detectTaskIntent(task);
-  const query = buildOrientedQuery(task);
-  return memory.queryIndexedMetadata({ intent, query, limit });
+  const plan = buildRetrievalPlan(task, limit);
+  return memory.queryIndexedMetadata({
+    intent: plan.intent,
+    query: plan.query,
+    limit: plan.limit
+  });
 }

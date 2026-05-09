@@ -5,6 +5,7 @@ const DAY_IN_MS = 24 * 60 * 60 * 1000;
 export function createMemoryMaintenanceSampleState(nowMs = Date.now()) {
   const expiredAt = nowMs - DAY_IN_MS;
   const freshAt = nowMs - 2 * 60 * 60 * 1000;
+  const staleAt = nowMs - 45 * DAY_IN_MS;
 
   return {
     taskMetadata: [
@@ -49,6 +50,54 @@ export function createMemoryMaintenanceSampleState(nowMs = Date.now()) {
           provenanceScore: 1,
           expiresAt: null
         }
+      ],
+      [
+        "repo-stale-low-value",
+        {
+          key: "repo-stale-low-value",
+          payload: { ownerTeam: "platform", summary: "stale metadata" },
+          updatedAt: staleAt,
+          provenanceScore: 0.1,
+          metadata: {
+            provenance: { score: 0.1 },
+            source: { sourceType: "sample" },
+            writtenAt: staleAt,
+            updatedAt: staleAt
+          },
+          expiresAt: null
+        }
+      ]
+    ],
+    repositoryGraph: [
+      [
+        "repo-fresh",
+        {
+          key: "repo-fresh",
+          payload: {
+            symbols: ["runMemoryMaintenance"],
+            dependencies: ["memory-store.js"],
+            ownership: ["memory-platform"],
+            links: ["docs/runbooks/memory.md"],
+            summary: "Fresh graph node"
+          },
+          updatedAt: freshAt,
+          expiresAt: null
+        }
+      ],
+      [
+        "repo-stale",
+        {
+          key: "repo-stale",
+          payload: {
+            symbols: ["oldSymbol"],
+            dependencies: ["legacy.js"],
+            ownership: ["legacy-team"],
+            links: [],
+            summary: "Stale graph node"
+          },
+          updatedAt: staleAt,
+          expiresAt: null
+        }
       ]
     ]
   };
@@ -88,17 +137,26 @@ export function runMemoryMaintenance(input = null, options = {}) {
   memory.importState(state);
 
   const pruned = memory.pruneExpiredIndexedMetadata(effectiveNowMs);
+  const compaction = memory.compactAndArchive({ nowMs: effectiveNowMs });
   const reindexed = memory.reindexMetadata();
+  const graphHealth = memory.getRepositoryGraphHealthReport({ nowMs: effectiveNowMs });
   const exported = memory.exportState();
 
   return {
     generatedAt: effectiveNowMs,
     inputSource: normalizedInput ? "input" : "sample",
     pruned,
+    compaction,
     reindexed,
+    graphHealth,
     remaining: {
       taskMetadata: exported.taskMetadata.length,
-      repositoryMetadata: exported.repositoryMetadata.length
+      repositoryMetadata: exported.repositoryMetadata.length,
+      repositoryGraph: exported.repositoryGraph.length
+    },
+    archive: {
+      memoryEntries: exported.archives.memoryEntries.length,
+      indexedMetadata: exported.archives.indexedMetadata.length
     }
   };
 }

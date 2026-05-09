@@ -83,9 +83,15 @@ test("should prune expired metadata and reindex memory maintenance state determi
 
   assert.equal(summary.inputSource, "input");
   assert.equal(summary.pruned.total, 2);
+  assert.equal(summary.compaction.compactedMemoryEntries, 0);
+  assert.equal(summary.compaction.compactedIndexedEntries, 0);
   assert.equal(summary.reindexed.total, 2);
+  assert.equal(summary.graphHealth.indexName, "repositoryGraph");
   assert.equal(summary.remaining.taskMetadata, 1);
   assert.equal(summary.remaining.repositoryMetadata, 1);
+  assert.equal(summary.remaining.repositoryGraph, 0);
+  assert.equal(summary.archive.memoryEntries, 0);
+  assert.equal(summary.archive.indexedMetadata, 0);
 });
 
 test("should rank repository metadata with graph-like fields above weaker matches", () => {

@@ -1,0 +1,229 @@
+
+> ai-engineering-platform-orchestration-core@0.1.0 test
+> node --test tests/orchestration/*.test.js
+
+✔ should adapt weights toward quality when success is below target (2.074583ms)
+✔ should export and import tuner state (1.496792ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/api-security.test.js (190.846167ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/api-server.test.js (188.048167ms)
+✔ should generate large benchmark corpus (2.151208ms)
+✔ should build valid delegation contract with required fields (2.183375ms)
+✔ should reject invalid delegation contract (0.506834ms)
+✔ should build and validate memory handoff packet (0.297917ms)
+✔ should include memory handoff packet in delegation contract when provided (0.082917ms)
+✔ should persist and read state through shared state HTTP service (49.652459ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/maintenance-and-shadow.test.js (157.0405ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/memory-store.test.js (137.134ms)
+✔ should group weekly scorecard by objective and model tier with token totals, average, and pass rate (14.803917ms)
+✔ should compute multi-step reliability rates deterministically (0.337041ms)
+✔ should compute subset token impact by task class with savings rates (0.457458ms)
+✔ should build subset token impact dashboard summary from report (0.253583ms)
+✔ should execute dependency graph with concurrency (19.669ms)
+✔ should retry failing node and return failure after attempts (5.769791ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/orchestrator.test.js (110.544416ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/persistence-and-weights.test.js (123.100042ms)
+✔ should block high-risk operations without confirmation (1.405375ms)
+✔ should fail verification when test/security evidence is missing (0.255792ms)
+✔ should audit prompt skill references and flag duplicate entries (4.254542ms)
+✔ should enforce exception expiry and expose closure log through helper (0.259ms)
+✔ should infer backend specialist deterministically from backend task (0.654167ms)
+✔ should evaluate relationship shadow and flag mismatch (0.088792ms)
+✔ should track mismatch summary with bounded samples (0.092292ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/retrieval-planner.test.js (104.473625ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
+function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
+^
+
+SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+    at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
+    at #translate (node:internal/modules/esm/loader:451:20)
+    at afterLoad (node:internal/modules/esm/loader:507:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+    at afterResolve (node:internal/modules/esm/loader:603:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
+
+Node.js v25.8.2
+✖ tests/orchestration/retrieval-quality.test.js (107.007958ms)
+✔ should select backend specialist for backend domain within budget (0.804333ms)
+✔ should penalize high token cost candidates when budget is low (0.084167ms)
+✔ should apply risk budget overrides for high and critical tasks (0.667792ms)
+✔ should return applied budget in routeTask result (0.099334ms)
+✔ should isolate tenant state in shared indexed store (2.473458ms)
+✔ should grant and verify active skill exception (0.777375ms)
+✔ should expire grant and append audit events (0.128208ms)
+✔ should enforce expiry job and return closure log entries (0.14325ms)
+✔ should define minimum manifests for all active default capability ids (0.783208ms)
+✔ should infer required skills deterministically from task keywords (0.68025ms)
+✔ should allow when required skills are subset of manifest (0.427292ms)
+✔ should deny by default when required skills are missing from manifest (0.119666ms)
+✔ should allow denied skill when temporary exception is active (0.620041ms)
+✔ should resolve compiled subset using role, domain, and risk (0.053916ms)
+✔ should validate schema v2 manifests with explicit deny and expiry fields (0.055125ms)
+✔ should pass policy lint for all compiled rows (0.252542ms)
+✔ should return deterministic cached subset resolution for repeated signatures (0.106292ms)
+✔ should provide actionable preflight dry-run denial messages (0.144ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 39
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10291.306
+
+✖ failing tests:
+
+test at tests/orchestration/api-security.test.js:1:1
+✖ tests/orchestration/api-security.test.js (190.846167ms)
+  'test failed'
+
+test at tests/orchestration/api-server.test.js:1:1
+✖ tests/orchestration/api-server.test.js (188.048167ms)
+  'test failed'
+
+test at tests/orchestration/maintenance-and-shadow.test.js:1:1
+✖ tests/orchestration/maintenance-and-shadow.test.js (157.0405ms)
+  'test failed'
+
+test at tests/orchestration/memory-store.test.js:1:1
+✖ tests/orchestration/memory-store.test.js (137.134ms)
+  'test failed'
+
+test at tests/orchestration/orchestrator.test.js:1:1
+✖ tests/orchestration/orchestrator.test.js (110.544416ms)
+  'test failed'
+
+test at tests/orchestration/persistence-and-weights.test.js:1:1
+✖ tests/orchestration/persistence-and-weights.test.js (123.100042ms)
+  'test failed'
+
+test at tests/orchestration/retrieval-planner.test.js:1:1
+✖ tests/orchestration/retrieval-planner.test.js (104.473625ms)
+  'test failed'
+
+test at tests/orchestration/retrieval-quality.test.js:1:1
+✖ tests/orchestration/retrieval-quality.test.js (107.007958ms)
+  'test failed'

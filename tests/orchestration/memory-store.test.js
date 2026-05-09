@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { OrchestrationMemory } from "../../src/orchestration/memory-store.js";
+import { resolveMemoryLayer } from "../../src/orchestration/memory-contract.js";
 
 test("should require explicit approval for repository memory writes", () => {
   const memory = new OrchestrationMemory();
@@ -11,6 +12,42 @@ test("should require explicit approval for repository memory writes", () => {
 
   memory.write("repository", "architecture", { value: 1 }, { approved: true });
   assert.deepEqual(memory.read("repository", "architecture"), { value: 1 });
+});
+
+test("should keep legacy aliases mapped to layered memory contract", () => {
+  const memory = new OrchestrationMemory();
+  assert.equal(resolveMemoryLayer("session"), "working");
+  assert.equal(resolveMemoryLayer("repository"), "semantic");
+  assert.equal(resolveMemoryLayer("patterns"), "procedural");
+
+  memory.write("working", "req-1", { summary: "working-memory context" });
+  assert.deepEqual(memory.read("session", "req-1"), { summary: "working-memory context" });
+
+  memory.write("procedural", "rule-1", { action: "verify" });
+  assert.deepEqual(memory.read("patterns", "rule-1"), { action: "verify" });
+});
+
+test("should persist write-path provenance and source metadata", () => {
+  const memory = new OrchestrationMemory();
+  const writeResult = memory.write("session", "req:meta", { summary: "context" }, {
+    provenanceScore: 0.83,
+    provenanceWriter: "AIEP Context Planner",
+    provenanceStrategy: "deterministic",
+    source: {
+      sourceType: "retrieval",
+      sourceId: "req-101",
+      filePath: "src/orchestration/orchestrator.js",
+      requestId: "req-101",
+      agentId: "AIEP Context Planner",
+      tags: ["intent:bugfix"]
+    }
+  });
+
+  assert.equal(writeResult.metadata.layer, "working");
+  assert.equal(writeResult.metadata.scope, "session");
+  assert.equal(writeResult.metadata.provenance.writer, "AIEP Context Planner");
+  assert.equal(writeResult.metadata.source.sourceType, "retrieval");
+  assert.equal(typeof writeResult.metadata.updatedAt, "number");
 });
 
 test("should expire entries based on ttl", async () => {
@@ -31,7 +68,18 @@ test("should index and query task and repository metadata", () => {
   memory.indexRepositoryMetadata("agent:backend", {
     intent: "feature",
     summary: "backend specialist for feature implementation"
-  }, { provenanceScore: 0.9 });
+  }, {
+    provenanceScore: 0.9,
+    source: { sourceType: "verified" }
+  });
+
+  memory.indexRepositoryGraph("agent:backend", {
+    symbols: ["routeTask"],
+    dependencies: ["router.js"],
+    ownership: ["backend-platform"],
+    links: ["docs/ARCHITECTURE.md"],
+    summary: "backend selection graph"
+  });
 
   const matches = memory.queryIndexedMetadata({
     intent: "feature",
@@ -53,6 +101,9 @@ test("should index and query task and repository metadata", () => {
     limit: 5
   });
   assert.ok(restoredMatches.length >= 2);
+  const health = restored.getRepositoryGraphHealthReport({ nowMs: Date.UTC(2026, 4, 9) });
+  assert.equal(health.nodeCount >= 1, true);
+  assert.equal(typeof health.healthy, "boolean");
 });
 
 test("should suppress stale indexed metadata and weight by provenance", async () => {
@@ -106,4 +157,52 @@ test("should prune expired metadata and reindex deterministically", async () => 
   const reindexed = memory.reindexMetadata();
   assert.equal(reindexed.total >= 1, true);
   assert.equal(reindexed.taskMetadata >= 1, true);
+});
+
+test("should compact and archive stale low-value memory entries", () => {
+  const memory = new OrchestrationMemory();
+  const staleTimestamp = Date.UTC(2026, 0, 1);
+  const nowMs = Date.UTC(2026, 4, 9);
+
+  memory.importState({
+    session: [["stale-session", {
+      value: { summary: "old" },
+      createdAt: staleTimestamp,
+      updatedAt: staleTimestamp,
+      expiresAt: null,
+      metadata: {
+        layer: "working",
+        scope: "session",
+        writtenAt: staleTimestamp,
+        updatedAt: staleTimestamp,
+        provenance: { score: 0.1 },
+        source: { sourceType: "sample" }
+      }
+    }]],
+    taskMetadata: [["task-old", {
+      requestId: "task-old",
+      payload: { summary: "old indexed" },
+      updatedAt: staleTimestamp,
+      provenanceScore: 0.1,
+      metadata: {
+        provenance: { score: 0.1 },
+        source: { sourceType: "sample" },
+        writtenAt: staleTimestamp,
+        updatedAt: staleTimestamp
+      },
+      expiresAt: null
+    }]]
+  });
+
+  const summary = memory.compactAndArchive({
+    nowMs,
+    maxAgeMs: 30 * 24 * 60 * 60 * 1000,
+    minProvenanceScore: 0.2
+  });
+
+  assert.equal(summary.compactedMemoryEntries, 1);
+  assert.equal(summary.compactedIndexedEntries, 1);
+  const archiveSnapshot = memory.getArchiveSnapshot();
+  assert.equal(archiveSnapshot.memoryEntries.length >= 1, true);
+  assert.equal(archiveSnapshot.indexedMetadata.length >= 1, true);
 });
