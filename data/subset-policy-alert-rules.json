@@ -1,0 +1,19 @@
+{
+  "alertName": "subset-policy-violation",
+  "version": "1.0.0",
+  "description": "Pages agent-governance on-call when skill subset policy violations occur in staging or production.",
+  "environments": {
+    "staging": {
+      "severity": "high",
+      "pageOnViolation": true,
+      "routeTo": "agent-governance-oncall",
+      "runbook": "docs/phase2-skill-determinism-runbook.md"
+    },
+    "production": {
+      "severity": "critical",
+      "pageOnViolation": true,
+      "routeTo": "agent-governance-oncall",
+      "runbook": "docs/phase2-skill-determinism-runbook.md"
+    }
+  }
+}

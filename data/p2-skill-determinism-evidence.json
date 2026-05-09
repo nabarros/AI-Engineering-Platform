@@ -1,0 +1,19 @@
+{
+  "packageVersion": "1.0.0",
+  "publishedAt": "2026-05-09",
+  "scope": "Priority 2 skill determinism",
+  "artifacts": {
+    "alertRules": "data/subset-policy-alert-rules.json",
+    "runbook": "docs/phase2-skill-determinism-runbook.md",
+    "promptAuditJson": "data/prompt-skill-audit-top25.json",
+    "promptAuditMarkdown": "docs/prompt-skill-audit-top25.md",
+    "tokenImpact": "data/subset-token-impact-report.json",
+    "exceptionClosureLog": "data/skill-exception-closure-log.json",
+    "evidenceDocument": "docs/phase2-p2-skill-determinism-evidence.md"
+  },
+  "reviewNotes": {
+    "governance": "approved",
+    "operations": "approved",
+    "testEvidence": "approved"
+  }
+}

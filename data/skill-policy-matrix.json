@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedFrom": "src/orchestration/skill-policy-matrix.js",
+  "notes": "Compiled role/domain/risk matrix consumed by runtime skill subset resolver.",
+  "rows": [
+    {
+      "agentId": "AIEP Senior Staff Backend Engineer",
+      "role": "backend",
+      "domain": "backend",
+      "risk": "LOW",
+      "allow": ["api", "auth", "backend", "data", "debugging", "feature-development", "performance", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff Backend Engineer",
+      "role": "backend",
+      "domain": "backend",
+      "risk": "HIGH",
+      "allow": ["api", "auth", "backend", "data", "debugging", "feature-development", "performance", "review", "security", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff Frontend Engineer",
+      "role": "frontend",
+      "domain": "frontend",
+      "risk": "LOW",
+      "allow": ["accessibility", "debugging", "feature-development", "frontend", "performance", "testing", "ui"],
+      "deny": ["auth", "backend", "data"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff Frontend Engineer",
+      "role": "frontend",
+      "domain": "frontend",
+      "risk": "HIGH",
+      "allow": ["accessibility", "debugging", "feature-development", "frontend", "performance", "review", "security", "testing", "ui"],
+      "deny": ["auth", "backend", "data"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff UI/UX Engineer",
+      "role": "ui-ux",
+      "domain": "ui",
+      "risk": "LOW",
+      "allow": ["accessibility", "feature-development", "frontend", "review", "testing", "ui"],
+      "deny": ["auth", "backend", "data"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff SRE Engineer",
+      "role": "sre",
+      "domain": "sre",
+      "risk": "HIGH",
+      "allow": ["backend", "debugging", "performance", "review", "security", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Implementation Guardian",
+      "role": "implementation-guardian",
+      "domain": "general",
+      "risk": "MEDIUM",
+      "allow": ["backend", "debugging", "feature-development", "frontend", "performance", "review", "security", "testing"],
+      "deny": [],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Context Planner",
+      "role": "planner",
+      "domain": "general",
+      "risk": "MEDIUM",
+      "allow": ["feature-development", "performance", "review", "testing"],
+      "deny": ["auth", "data", "security"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Code Reviewer",
+      "role": "reviewer",
+      "domain": "review",
+      "risk": "MEDIUM",
+      "allow": ["debugging", "performance", "review", "security", "testing"],
+      "deny": ["feature-development"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    }
+  ]
+}

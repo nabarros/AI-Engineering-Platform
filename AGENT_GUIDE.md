@@ -164,7 +164,7 @@ Before starting any task:
 ### Adding a New API Endpoint
 
 ```
-1. Load: .ai/skills/api-design.md + docs/API_CONVENTIONS.md
+1. Load: docs/API_CONVENTIONS.md
 2. Check: Does this endpoint exist? (search codebase)
 3. Define: OpenAPI spec first (spec-first design)
 4. Implement: Route → Handler → Service → Repository
@@ -186,7 +186,7 @@ Before starting any task:
 ### Refactoring Code
 
 ```
-1. Load: .ai/skills/refactoring-rules.md
+1. Load: relevant refactoring guidance and confirm scope
 2. Confirm: Behavior-preserving only (or scope new behavior separately)
 3. Verify: Tests exist before refactoring; add if missing
 4. Refactor: Small steps; run tests after each
@@ -196,7 +196,7 @@ Before starting any task:
 ### Database Migration
 
 ```
-1. Load: .ai/skills/migration-strategy.md + docs/DATABASE_CONVENTIONS.md
+1. Load: docs/DATABASE_CONVENTIONS.md
 2. Risk classify: Schema changes are HIGH risk — require confirmation
 3. Write migration: Forward only, never modify existing migrations
 4. Write rollback: Every migration needs a rollback script

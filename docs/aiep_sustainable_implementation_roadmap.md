@@ -223,16 +223,16 @@ This is the most urgent execution backlog from the report and should be used as 
 
 ### Priority 2
 
-- [ ] Compile skill policy matrix by role, domain, and risk (O3/O5); output: policy matrix document and machine-readable config file; done when policy lints pass and matrix is approved by governance owners.
-- [ ] Refactor runtime skill resolver to consume compiled subsets only (O3); output: resolver refactor PR and compatibility adapter notes; done when direct broad skill loading paths are removed from production flow.
-- [ ] Harden skill manifest schema with explicit deny and expiry fields (O3); output: schema v2 file and migration checklist; done when all active manifests validate against schema v2 in CI.
-- [ ] Implement deterministic subset resolution cache for repeated task signatures (O3/O5); output: cache module and cache-key specification; done when repeated runs return identical subset payloads with lower latency.
-- [ ] Add subset policy violation alerting for staging and production runs (O3); output: alert rules and on-call runbook section; done when unauthorized exposure events page the owning team in test drills.
-- [ ] Audit top 25 agent prompts for unnecessary skill references (O3/O5); output: prompt audit report and remediation PR list; done when every audited prompt maps only to allowlisted skills.
-- [ ] Introduce pre-execution subset dry-run check in orchestrator pipeline (O3); output: preflight check step and failure message catalog; done when blocked runs provide actionable denial reasons before model invocation.
-- [ ] Measure subset impact on token usage per task class (O5); output: token impact analysis report and dashboard view; done when per-class savings and variance are tracked weekly.
-- [ ] Standardize exception expiry enforcement for elevated skill grants (O3); output: expiry enforcement job and exception closure log; done when expired grants are revoked automatically without manual cleanup.
-- [ ] Approve and publish P2 gate evidence package for skill determinism (O3/O5); output: evidence bundle and signed review notes; done when reviewers approve using only linked artifacts and test outputs.
+- [x] Compile skill policy matrix by role, domain, and risk (O3/O5); output: policy matrix document and machine-readable config file; done when policy lints pass and matrix is approved by governance owners.
+- [x] Refactor runtime skill resolver to consume compiled subsets only (O3); output: resolver refactor PR and compatibility adapter notes; done when direct broad skill loading paths are removed from production flow.
+- [x] Harden skill manifest schema with explicit deny and expiry fields (O3); output: schema v2 file and migration checklist; done when all active manifests validate against schema v2 in CI.
+- [x] Implement deterministic subset resolution cache for repeated task signatures (O3/O5); output: cache module and cache-key specification; done when repeated runs return identical subset payloads with lower latency.
+- [x] Add subset policy violation alerting for staging and production runs (O3); output: alert rules and on-call runbook section; done when unauthorized exposure events page the owning team in test drills.
+- [x] Audit top 25 agent prompts for unnecessary skill references (O3/O5); output: prompt audit report and remediation PR list; done when every audited prompt maps only to allowlisted skills.
+- [x] Introduce pre-execution subset dry-run check in orchestrator pipeline (O3); output: preflight check step and failure message catalog; done when blocked runs provide actionable denial reasons before model invocation.
+- [x] Measure subset impact on token usage per task class (O5); output: token impact analysis report and dashboard view; done when per-class savings and variance are tracked weekly.
+- [x] Standardize exception expiry enforcement for elevated skill grants (O3); output: expiry enforcement job and exception closure log; done when expired grants are revoked automatically without manual cleanup.
+- [x] Approve and publish P2 gate evidence package for skill determinism (O3/O5); output: evidence bundle and signed review notes; done when reviewers approve using only linked artifacts and test outputs.
 
 ### Priority 3
 
@@ -268,7 +268,7 @@ This is the most urgent execution backlog from the report and should be used as 
 - [x] Define minimum skill manifests for top agents and enforce deny-by-default loading.
 - [x] Instrument step-level token, latency, and verification telemetry.
 - [x] Launch relationship inference in shadow mode and capture false-link metrics.
-- [ ] Expand subset compiler inputs and enable pre-execution subset dry-run checks.
+- [x] Expand subset compiler inputs and enable pre-execution subset dry-run checks.
 - [ ] Audit top prompts for unnecessary skill references and remediate allowlist drift.
 - [x] Stand up memory index baseline and implement intent-aware retrieval planning.
 - [x] Add provenance scoring, stale suppression, TTL, and re-index cadence jobs.

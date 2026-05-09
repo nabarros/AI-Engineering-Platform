@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildWeeklyCostQualityScorecard } from "../../src/orchestration/metrics.js";
+import {
+  buildWeeklyCostQualityScorecard,
+  buildSubsetTokenImpactReport,
+  buildSubsetTokenImpactDashboard
+} from "../../src/orchestration/metrics.js";
 import { buildMultiStepReliabilityBenchmark } from "../../src/orchestration/benchmark.js";
 
 test("should group weekly scorecard by objective and model tier with token totals, average, and pass rate", () => {
@@ -51,4 +55,40 @@ test("should compute multi-step reliability rates deterministically", () => {
     recoveryRate: 0.3333,
     verificationFailureRate: 0.6667
   });
+});
+
+test("should compute subset token impact by task class with savings rates", () => {
+  const executions = [
+    { taskClass: "bugfix", subsetApplied: false, tokenUsage: 2200 },
+    { taskClass: "bugfix", subsetApplied: true, tokenUsage: 1700 },
+    { taskClass: "feature", subsetApplied: false, tokenUsage: 3200 },
+    { taskClass: "feature", subsetApplied: true, tokenUsage: 2800 }
+  ];
+
+  const report = buildSubsetTokenImpactReport(executions, { generatedAt: 1710000001000 });
+
+  assert.equal(report.generatedAt, 1710000001000);
+  assert.equal(report.totalExecutions, 4);
+  assert.equal(report.comparedTaskClassCount, 2);
+  assert.equal(report.byTaskClass.length, 2);
+  assert.equal(report.byTaskClass[0].taskClass, "bugfix");
+  assert.equal(report.byTaskClass[0].avgTokenSavings, 500);
+  assert.equal(report.byTaskClass[0].savingsRate, 0.2273);
+});
+
+test("should build subset token impact dashboard summary from report", () => {
+  const report = buildSubsetTokenImpactReport([
+    { taskClass: "review", subsetApplied: false, tokenUsage: 1500 },
+    { taskClass: "review", subsetApplied: true, tokenUsage: 1200 },
+    { taskClass: "feature", subsetApplied: false, tokenUsage: 2800 },
+    { taskClass: "feature", subsetApplied: true, tokenUsage: 2400 }
+  ], { generatedAt: 1710000002000 });
+
+  const dashboard = buildSubsetTokenImpactDashboard(report);
+
+  assert.equal(dashboard.generatedAt, 1710000002000);
+  assert.equal(dashboard.totalExecutions, 4);
+  assert.equal(dashboard.comparedTaskClassCount, 2);
+  assert.equal(dashboard.topSavings.length, 2);
+  assert.equal(dashboard.topSavings[0].taskClass, "feature");
 });

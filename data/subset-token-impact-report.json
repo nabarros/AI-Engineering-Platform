@@ -1,0 +1,79 @@
+{
+  "report": {
+    "generatedAt": 1778339957473,
+    "totalExecutions": 6,
+    "comparedTaskClassCount": 3,
+    "averageSavingsRate": 0.2258,
+    "totalAverageTokenSavings": 1600,
+    "byTaskClass": [
+      {
+        "taskClass": "bugfix",
+        "withSubset": {
+          "sampleCount": 1,
+          "tokenTotals": 1700,
+          "avgTokens": 1700
+        },
+        "withoutSubset": {
+          "sampleCount": 1,
+          "tokenTotals": 2200,
+          "avgTokens": 2200
+        },
+        "avgTokenSavings": 500,
+        "savingsRate": 0.2273
+      },
+      {
+        "taskClass": "feature",
+        "withSubset": {
+          "sampleCount": 1,
+          "tokenTotals": 2800,
+          "avgTokens": 2800
+        },
+        "withoutSubset": {
+          "sampleCount": 1,
+          "tokenTotals": 3500,
+          "avgTokens": 3500
+        },
+        "avgTokenSavings": 700,
+        "savingsRate": 0.2
+      },
+      {
+        "taskClass": "review",
+        "withSubset": {
+          "sampleCount": 1,
+          "tokenTotals": 1200,
+          "avgTokens": 1200
+        },
+        "withoutSubset": {
+          "sampleCount": 1,
+          "tokenTotals": 1600,
+          "avgTokens": 1600
+        },
+        "avgTokenSavings": 400,
+        "savingsRate": 0.25
+      }
+    ]
+  },
+  "dashboard": {
+    "generatedAt": 1778339957473,
+    "totalExecutions": 6,
+    "comparedTaskClassCount": 3,
+    "averageSavingsRate": 0.2258,
+    "topSavings": [
+      {
+        "taskClass": "feature",
+        "avgTokenSavings": 700,
+        "savingsRate": 0.2
+      },
+      {
+        "taskClass": "bugfix",
+        "avgTokenSavings": 500,
+        "savingsRate": 0.2273
+      },
+      {
+        "taskClass": "review",
+        "avgTokenSavings": 400,
+        "savingsRate": 0.25
+      }
+    ]
+  }
+}

@@ -157,6 +157,9 @@ test("should fail with SKILL_POLICY_BLOCKED when selected agent lacks required s
   assert.equal(result.error, "SKILL_POLICY_BLOCKED");
   assert.equal(result.lifecycleState, ORCHESTRATION_STATES.FAILED);
   assert.ok(result.policy.deniedSkills.length > 0);
+  assert.ok(Array.isArray(result.preflight.blockedReasonCodes));
+  assert.ok(result.preflight.blockedReasonCodes.length > 0);
+  assert.ok(Array.isArray(result.preflight.messages));
 });
 
 test("should include orientedContext in successful response", async () => {
@@ -256,4 +259,53 @@ test("should trigger premium fallback for low quality successful verification", 
   assert.equal(result.verification.pass, true);
   assert.equal(result.premiumFallback.trigger, true);
   assert.equal(result.premiumFallback.reason, "low_quality");
+});
+
+test("should emit subset violation paging alert in production environment", async () => {
+  const registry = [
+    {
+      id: "AIEP Context Planner",
+      domains: ["general", "planning", "risk", "strategy", "backend"],
+      maxRisk: "HIGH",
+      tokenCostTier: "LOW",
+      latencyTier: "LOW",
+      qualityScore: 0.99,
+      supportsVerificationGate: true,
+      supportsMemoryWrites: false,
+      metadata: {
+        ownerTeam: "plan",
+        skillScopes: ["planning", "risk"]
+      }
+    }
+  ];
+  const orchestrator = new AgentOrchestrator({ capabilityRegistry: registry });
+
+  const result = await orchestrator.processRequest({
+    requestId: "req-alert-001",
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Implement backend security feature"
+    },
+    budget: {
+      tokenBudgetTier: "LOW",
+      latencyBudgetTier: "LOW"
+    },
+    runtimeEnvironment: "production",
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.96
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.error, "SKILL_POLICY_BLOCKED");
+  assert.equal(result.alerts.length, 1);
+  assert.equal(result.alerts[0].alertName, "subset-policy-violation");
+  assert.equal(result.alerts[0].page, true);
+  assert.equal(result.alerts[0].severity, "critical");
 });

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AIEP Skill Manifest Schema v2",
+  "type": "object",
+  "required": ["schemaVersion", "sourcePolicyVersion", "agentId", "domain", "risk", "allow", "deny", "exception"],
+  "properties": {
+    "schemaVersion": { "const": "2.0.0" },
+    "sourcePolicyVersion": { "type": "string", "minLength": 1 },
+    "agentId": { "type": "string", "minLength": 1 },
+    "domain": { "type": "string", "minLength": 1 },
+    "risk": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+    "allow": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "deny": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "exception": {
+      "type": "object",
+      "required": ["expiresAtRequired", "maxTtlMs"],
+      "properties": {
+        "expiresAtRequired": { "type": "boolean" },
+        "maxTtlMs": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

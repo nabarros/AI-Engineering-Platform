@@ -9,6 +9,8 @@ import {
   TenantStateStore,
   HttpSharedStateStore,
   buildQualityDashboard,
+  buildSubsetTokenImpactDashboard,
+  buildSubsetTokenImpactReport,
   AdaptiveWeightTuner,
   executeTaskGraph
 } from "../orchestration/index.js";
@@ -43,6 +45,7 @@ export function createOrchestrationServer(options = {}) {
   const stateFilePath = options.stateFilePath || path.join(__dirname, "..", "..", "data", "orchestration-state.json");
   const remoteSharedStateUrl = options.sharedStateUrl || process.env.ORCHESTRATION_SHARED_STATE_URL || "";
   const remoteStateApiKey = options.sharedStateApiKey || process.env.ORCHESTRATION_STATE_API_KEY || "";
+  const runtimeEnvironment = options.runtimeEnvironment || process.env.NODE_ENV || "development";
   const sharedStateStore = options.sharedStateStore || (remoteSharedStateUrl
     ? new HttpSharedStateStore({ baseUrl: remoteSharedStateUrl, apiKey: remoteStateApiKey })
     : new IndexedSharedStateStore(stateFilePath));
@@ -120,8 +123,16 @@ export function createOrchestrationServer(options = {}) {
     }
 
     if (method === "GET" && url === "/metrics") {
+      const subsetTokenImpactReport = buildSubsetTokenImpactReport(runtime.executions);
+      const subsetTokenImpactDashboard = buildSubsetTokenImpactDashboard(subsetTokenImpactReport);
+
       return sendJson(res, 200, {
         dashboard: buildQualityDashboard(runtime.executions),
+        subsetTokenImpact: {
+          report: subsetTokenImpactReport,
+          dashboard: subsetTokenImpactDashboard
+        },
+        recentSubsetAlertsCount: runtime.executions.filter((execution) => execution.subsetViolation === true).length,
         rollingMetrics: runtime.weightTuner.getRollingMetrics(),
         tenantId,
         stateIndex: await Promise.resolve(sharedStateStore.getIndexSummary())
@@ -153,6 +164,7 @@ export function createOrchestrationServer(options = {}) {
         task: input.task,
         budget: input.budget,
         confirmation: input.confirmation === true,
+        runtimeEnvironment,
         executionEvidence: input.executionEvidence || {
           testsPassed: false,
           securityChecksPassed: false,
@@ -164,9 +176,12 @@ export function createOrchestrationServer(options = {}) {
 
       const result = await runtime.adapter.orchestrateRouting(requestPayload);
       runtime.executions.push({
+        taskClass: String(requestPayload.task?.taskClass || requestPayload.task?.class || requestPayload.task?.domain || requestPayload.task?.objective || "unspecified"),
         verificationPass: result.verification?.pass === true,
         fallbackUsed: Array.isArray(result.fallbackChain) && result.fallbackChain.length > 0,
-        tokenUsage: Number(requestPayload.executionEvidence?.tokenUsage || 0)
+        tokenUsage: Number(requestPayload.executionEvidence?.tokenUsage || 0),
+        subsetApplied: result.error !== "SKILL_POLICY_BLOCKED",
+        subsetViolation: result.error === "SKILL_POLICY_BLOCKED"
       });
       if (runtime.executions.length > 500) runtime.executions.shift();
 
@@ -200,6 +215,7 @@ export function createOrchestrationServer(options = {}) {
             task: node.task,
             budget: node.budget,
             confirmation: node.confirmation === true,
+            runtimeEnvironment,
             executionEvidence: node.executionEvidence
           };
           return runtime.adapter.orchestrateRouting(payload);

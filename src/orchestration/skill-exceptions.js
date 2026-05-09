@@ -19,20 +19,40 @@ export function createSkillExceptionRegistry() {
   }
 
   function markExpired(nowMs) {
+    const closed = [];
     for (const grant of grants) {
       if (!grant.expired && grant.expiresAt <= nowMs) {
         grant.expired = true;
+        grant.closedAt = nowMs;
+        grant.closedBy = "expiry-enforcement-job";
+        grant.closedReason = "expired";
         logEvent("expired", {
           agentId: grant.agentId,
           skill: grant.skill,
           expiresAt: grant.expiresAt
         });
+        logEvent("closed", {
+          agentId: grant.agentId,
+          skill: grant.skill,
+          closedAt: grant.closedAt,
+          closedBy: grant.closedBy,
+          closedReason: grant.closedReason
+        });
+        closed.push({
+          agentId: grant.agentId,
+          skill: grant.skill,
+          closedAt: grant.closedAt,
+          closedBy: grant.closedBy,
+          closedReason: grant.closedReason,
+          expiresAt: grant.expiresAt
+        });
       }
     }
+    return closed;
   }
 
   return {
-    grant({ agentId, skill, reason, approver, expiresAt }) {
+    grant({ agentId, skill, reason, approver, expiresAt, nowMs = Date.now() }) {
       const normalizedAgentId = normalizeAgent(agentId);
       const normalizedSkill = normalizeSkill(skill);
 
@@ -48,7 +68,7 @@ export function createSkillExceptionRegistry() {
       if (!String(approver || "").trim()) {
         throw new Error("approver is required.");
       }
-      if (typeof expiresAt !== "number" || expiresAt <= Date.now()) {
+      if (typeof expiresAt !== "number" || expiresAt <= nowMs) {
         throw new Error("expiresAt must be a future unix timestamp in milliseconds.");
       }
 
@@ -58,8 +78,11 @@ export function createSkillExceptionRegistry() {
         reason: String(reason),
         approver: String(approver),
         expiresAt,
-        grantedAt: Date.now(),
-        expired: false
+        grantedAt: nowMs,
+        expired: false,
+        closedAt: null,
+        closedBy: null,
+        closedReason: null
       };
       grants.push(record);
       logEvent("granted", {
@@ -114,6 +137,23 @@ export function createSkillExceptionRegistry() {
         timestampMs: event.timestampMs,
         payload: { ...event.payload }
       }));
+    },
+
+    enforceExpiry(nowMs = Date.now()) {
+      return {
+        enforcedAt: nowMs,
+        closed: markExpired(nowMs)
+      };
+    },
+
+    closureLog() {
+      return events
+        .filter((event) => event.type === "closed")
+        .map((event) => ({
+          type: event.type,
+          timestampMs: event.timestampMs,
+          payload: { ...event.payload }
+        }));
     }
   };
 }

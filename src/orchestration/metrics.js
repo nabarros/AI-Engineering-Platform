@@ -68,3 +68,113 @@ export function buildWeeklyCostQualityScorecard(executions, options = {}) {
     groups: grouped
   };
 }
+
+function resolveTokenUsage(run) {
+  return Number(run?.tokenUsage || (Number(run?.inputTokens || 0) + Number(run?.outputTokens || 0)) || 0);
+}
+
+function resolveTaskClass(run) {
+  return String(run?.taskClass || run?.objective || "unspecified");
+}
+
+export function buildSubsetTokenImpactReport(executions, options = {}) {
+  const items = Array.isArray(executions) ? executions : [];
+  const groups = new Map();
+
+  for (const run of items) {
+    const taskClass = resolveTaskClass(run);
+    const tokenUsage = resolveTokenUsage(run);
+    const subsetApplied = run?.subsetApplied === true;
+
+    if (!groups.has(taskClass)) {
+      groups.set(taskClass, {
+        taskClass,
+        withSubsetTokens: 0,
+        withSubsetCount: 0,
+        withoutSubsetTokens: 0,
+        withoutSubsetCount: 0
+      });
+    }
+
+    const aggregate = groups.get(taskClass);
+    if (subsetApplied) {
+      aggregate.withSubsetTokens += tokenUsage;
+      aggregate.withSubsetCount += 1;
+    } else {
+      aggregate.withoutSubsetTokens += tokenUsage;
+      aggregate.withoutSubsetCount += 1;
+    }
+  }
+
+  const byTaskClass = [...groups.values()]
+    .map((aggregate) => {
+      const avgWithSubset = aggregate.withSubsetCount > 0
+        ? Number((aggregate.withSubsetTokens / aggregate.withSubsetCount).toFixed(2))
+        : null;
+      const avgWithoutSubset = aggregate.withoutSubsetCount > 0
+        ? Number((aggregate.withoutSubsetTokens / aggregate.withoutSubsetCount).toFixed(2))
+        : null;
+      const avgSavings = avgWithSubset !== null && avgWithoutSubset !== null
+        ? Number((avgWithoutSubset - avgWithSubset).toFixed(2))
+        : null;
+      const savingsRate = avgSavings !== null && avgWithoutSubset
+        ? Number((avgSavings / avgWithoutSubset).toFixed(4))
+        : null;
+
+      return {
+        taskClass: aggregate.taskClass,
+        withSubset: {
+          sampleCount: aggregate.withSubsetCount,
+          tokenTotals: aggregate.withSubsetTokens,
+          avgTokens: avgWithSubset
+        },
+        withoutSubset: {
+          sampleCount: aggregate.withoutSubsetCount,
+          tokenTotals: aggregate.withoutSubsetTokens,
+          avgTokens: avgWithoutSubset
+        },
+        avgTokenSavings: avgSavings,
+        savingsRate
+      };
+    })
+    .sort((left, right) => left.taskClass.localeCompare(right.taskClass));
+
+  const completeComparisons = byTaskClass.filter((entry) => {
+    return entry.withSubset.sampleCount > 0 && entry.withoutSubset.sampleCount > 0 && entry.avgTokenSavings !== null;
+  });
+
+  const totalSavings = completeComparisons.reduce((sum, entry) => sum + Number(entry.avgTokenSavings || 0), 0);
+  const averageSavingsRate = completeComparisons.length > 0
+    ? Number((completeComparisons.reduce((sum, entry) => sum + Number(entry.savingsRate || 0), 0) / completeComparisons.length).toFixed(4))
+    : 0;
+
+  return {
+    generatedAt: typeof options.generatedAt === "number" ? options.generatedAt : Date.now(),
+    totalExecutions: items.length,
+    comparedTaskClassCount: completeComparisons.length,
+    averageSavingsRate,
+    totalAverageTokenSavings: Number(totalSavings.toFixed(2)),
+    byTaskClass
+  };
+}
+
+export function buildSubsetTokenImpactDashboard(report) {
+  const rows = Array.isArray(report?.byTaskClass) ? report.byTaskClass : [];
+  const topSavings = [...rows]
+    .filter((entry) => entry.avgTokenSavings !== null)
+    .sort((left, right) => Number(right.avgTokenSavings || 0) - Number(left.avgTokenSavings || 0))
+    .slice(0, 5)
+    .map((entry) => ({
+      taskClass: entry.taskClass,
+      avgTokenSavings: entry.avgTokenSavings,
+      savingsRate: entry.savingsRate
+    }));
+
+  return {
+    generatedAt: report?.generatedAt || Date.now(),
+    totalExecutions: Number(report?.totalExecutions || 0),
+    comparedTaskClassCount: Number(report?.comparedTaskClassCount || 0),
+    averageSavingsRate: Number(report?.averageSavingsRate || 0),
+    topSavings
+  };
+}

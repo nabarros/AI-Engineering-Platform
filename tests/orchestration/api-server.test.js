@@ -65,6 +65,14 @@ test("should expose health and orchestration endpoints", async () => {
 
     const metricsResponse = await fetch(`${baseUrl}/metrics`);
     assert.equal(metricsResponse.status, 200);
+    const metricsJson = await metricsResponse.json();
+    assert.ok(metricsJson.subsetTokenImpact);
+    assert.ok(metricsJson.subsetTokenImpact.report);
+    assert.ok(metricsJson.subsetTokenImpact.dashboard);
+    assert.ok(Object.hasOwn(metricsJson.subsetTokenImpact.dashboard, "topSavings"));
+    assert.ok(Object.hasOwn(metricsJson.subsetTokenImpact.dashboard, "averageSavingsRate"));
+    assert.ok(Object.hasOwn(metricsJson.subsetTokenImpact.dashboard, "comparedTaskClassCount"));
+    assert.ok(Object.hasOwn(metricsJson, "recentSubsetAlertsCount"));
 
     const graphResponse = await fetch(`${baseUrl}/orchestrate-graph`, {
       method: "POST",

@@ -1,0 +1,113 @@
+# Prompt Skill Audit (Top 25)
+
+- generatedAt: 2026-05-09T15:23:14.968Z
+- requestedCount: 25
+- auditedCount: 25
+- filesWithIssues: 0
+
+## Remediation List
+
+- No remediation required for audited prompts.
+
+## Prompt Mapping
+
+- .github/agents/aiep-code-reviewer.agent.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/agents/aiep-context-planner.agent.md
+  - role: general
+  - skillReferences: .github/skills/aiep-context-bootstrap/SKILL.md
+  - unnecessarySkillReferences: none
+- .github/agents/aiep-implementation-guardian.agent.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/agents/aiep-senior-staff-backend.agent.md
+  - role: backend
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/agents/aiep-senior-staff-frontend.agent.md
+  - role: frontend
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/agents/aiep-senior-staff-router.agent.md
+  - role: router
+  - skillReferences: .ai/skills/react-patterns.md, .ai/skills/api-design.md, .ai/skills/database-patterns.md, .ai/skills/auth-patterns.md, .ai/skills/refactoring-rules.md, .ai/skills/performance-optimization.md
+  - unnecessarySkillReferences: none
+- .github/agents/aiep-senior-staff-sre.agent.md
+  - role: sre
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/agents/aiep-senior-staff-ui-ux.agent.md
+  - role: ui-ux
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/copilot-instructions.md
+  - role: general
+  - skillReferences: .ai/skills/api-design.md, .ai/skills/react-patterns.md, .ai/skills/database-patterns.md, .ai/skills/auth-patterns.md, .ai/skills/refactoring-rules.md
+  - unnecessarySkillReferences: none
+- .github/instructions/aiep-ai-bridge.instructions.md
+  - role: general
+  - skillReferences: .ai/skills/api-design.md, .ai/skills/react-patterns.md, .ai/skills/database-patterns.md, .ai/skills/auth-patterns.md, .ai/skills/refactoring-rules.md, .ai/skills/testing-jest.md, .ai/skills/debugging-node.md, .ai/skills/migration-strategy.md, .ai/skills/performance-optimization.md
+  - unnecessarySkillReferences: none
+- .github/instructions/aiep-skill-orchestration.instructions.md
+  - role: general
+  - skillReferences: .github/skills/aiep-context-bootstrap/SKILL.md, .github/skills/aiep-senior-staff-frontend/SKILL.md, .github/skills/aiep-senior-staff-backend/SKILL.md, .github/skills/aiep-senior-staff-ui-ux/SKILL.md, .github/skills/aiep-senior-staff-sre/SKILL.md, .github/skills/aiep-safe-implementation/SKILL.md, .github/skills/aiep-pr-readiness/SKILL.md, .github/skills/aiep-memory-sync/SKILL.md
+  - unnecessarySkillReferences: none
+- .github/prompts/aiep-senior-staff-router.prompt.md
+  - role: router
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-agent-orchestration-runtime/SKILL.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-context-bootstrap/SKILL.md
+  - role: general
+  - skillReferences: .ai/skills/api-design.md, .ai/skills/react-patterns.md, .ai/skills/database-patterns.md, .ai/skills/testing-jest.md, .ai/skills/debugging-node.md, .ai/skills/auth-patterns.md, .ai/skills/refactoring-rules.md, .ai/skills/migration-strategy.md, .ai/skills/performance-optimization.md
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-memory-sync/SKILL.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-pr-readiness/SKILL.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-safe-implementation/SKILL.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-senior-staff-backend/SKILL.md
+  - role: backend
+  - skillReferences: .ai/skills/api-design.md, .ai/skills/database-patterns.md, .ai/skills/testing-jest.md
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-senior-staff-frontend/SKILL.md
+  - role: frontend
+  - skillReferences: .ai/skills/react-patterns.md, .ai/skills/testing-jest.md
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-senior-staff-sre/SKILL.md
+  - role: sre
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- .github/skills/aiep-senior-staff-ui-ux/SKILL.md
+  - role: ui-ux
+  - skillReferences: .ai/skills/react-patterns.md
+  - unnecessarySkillReferences: none
+- AGENT_GUIDE.md
+  - role: general
+  - skillReferences: .ai/skills/react-patterns.md, .ai/skills/api-design.md, .ai/skills/database-patterns.md, .ai/skills/testing-jest.md, .ai/skills/debugging-node.md, .ai/skills/auth-patterns.md, .ai/skills/refactoring-rules.md, .ai/skills/migration-strategy.md, .ai/skills/performance-optimization.md
+  - unnecessarySkillReferences: none
+- CLAUDE.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- COPILOT_INSTRUCTIONS.md
+  - role: general
+  - skillReferences: none
+  - unnecessarySkillReferences: none
+- README.md
+  - role: general
+  - skillReferences: .github/skills/aiep-agent-orchestration-runtime/SKILL.md
+  - unnecessarySkillReferences: none

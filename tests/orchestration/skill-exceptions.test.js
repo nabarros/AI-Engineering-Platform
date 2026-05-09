@@ -28,7 +28,8 @@ test("should expire grant and append audit events", () => {
     skill: "security",
     reason: "Security review handoff",
     approver: "security-lead",
-    expiresAt: now + 20
+    expiresAt: now + 20,
+    nowMs: now
   });
 
   assert.equal(registry.isSkillAllowedByException("AIEP Context Planner", "security", now + 10), true);
@@ -38,5 +39,29 @@ test("should expire grant and append audit events", () => {
   const eventTypes = events.map((event) => event.type);
   assert.ok(eventTypes.includes("granted"));
   assert.ok(eventTypes.includes("expired"));
+  assert.ok(eventTypes.includes("closed"));
   assert.ok(eventTypes.includes("checked"));
+});
+
+test("should enforce expiry job and return closure log entries", () => {
+  const registry = createSkillExceptionRegistry();
+  const now = Date.now();
+
+  registry.grant({
+    agentId: "AIEP Context Planner",
+    skill: "backend",
+    reason: "Temporary backend escalation",
+    approver: "platform-lead",
+    expiresAt: now + 5,
+    nowMs: now
+  });
+
+  const enforcement = registry.enforceExpiry(now + 10);
+  const closureLog = registry.closureLog();
+
+  assert.equal(enforcement.closed.length, 1);
+  assert.equal(enforcement.closed[0].skill, "backend");
+  assert.equal(closureLog.length, 1);
+  assert.equal(closureLog[0].payload.closedReason, "expired");
+  assert.equal(registry.listActive("AIEP Context Planner").length, 0);
 });

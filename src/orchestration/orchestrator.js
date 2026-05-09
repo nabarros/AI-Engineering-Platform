@@ -6,10 +6,11 @@ import { verifyExecution } from "./verifier.js";
 import { OrchestrationMemory } from "./memory-store.js";
 import { TraceCollector } from "./tracer.js";
 import { LearningLoop } from "./learning-loop.js";
-import { enforceSkillSubsetPolicy } from "./skill-manifests.js";
+import { runSkillSubsetDryRun } from "./skill-manifests.js";
 import { retrieveOrientedContext } from "./retrieval-strategy.js";
 import { createRelationshipShadowTracker, evaluateRelationshipShadow } from "./relationship-inference.js";
 import { createVerificationCache } from "./verification-cache.js";
+import { evaluateSubsetPolicyViolationAlert } from "./subset-policy-alerts.js";
 
 export const ORCHESTRATION_STATES = Object.freeze({
   RECEIVED: "RECEIVED",
@@ -104,7 +105,7 @@ export class AgentOrchestrator {
     }));
   }
 
-  async processRequest({ requestId, task, budget, confirmation = false, executionEvidence }) {
+  async processRequest({ requestId, task, budget, confirmation = false, executionEvidence, runtimeEnvironment = "development" }) {
     await this.initializationPromise;
 
     const tracer = new TraceCollector(requestId);
@@ -185,27 +186,52 @@ export class AgentOrchestrator {
       summary: `Selected ${route.selected.id} for ${String(task.domain || "general").toLowerCase()} tasks.`
     });
 
-    const skillPolicy = enforceSkillSubsetPolicy({
+    const subsetDryRun = runSkillSubsetDryRun({
       agentId: route.selected.id,
       task,
       exceptionRegistry: this.exceptionRegistry,
       nowMs: Date.now()
     });
-    tracer.addEvent("skill.policy.checked", {
+    tracer.addEvent("skill.preflight.checked", {
       agentId: route.selected.id,
-      allowed: skillPolicy.allowed,
-      deniedSkills: skillPolicy.deniedSkills,
-      exceptionAllowedSkills: skillPolicy.exceptionAllowedSkills
+      allowed: subsetDryRun.allowed,
+      deniedSkills: subsetDryRun.policy.deniedSkills,
+      blockedReasonCodes: subsetDryRun.blockedReasonCodes,
+      exceptionAllowedSkills: subsetDryRun.policy.exceptionAllowedSkills
     });
 
-    if (!skillPolicy.allowed) {
+    if (!subsetDryRun.allowed) {
+      const subsetViolationAlert = evaluateSubsetPolicyViolationAlert({
+        requestId,
+        environment: runtimeEnvironment,
+        selectedAgent: route.selected.id,
+        deniedSkills: subsetDryRun.policy.deniedSkills,
+        blockedReasonCodes: subsetDryRun.blockedReasonCodes,
+        timestampMs: Date.now()
+      });
+      tracer.addEvent("skill.preflight.denied", {
+        agentId: route.selected.id,
+        blockedReasonCodes: subsetDryRun.blockedReasonCodes
+      });
+      tracer.addEvent("telemetry.skill_policy.violation", {
+        environment: String(runtimeEnvironment || "development").toLowerCase(),
+        alertTriggered: subsetViolationAlert.triggered,
+        severity: subsetViolationAlert.triggered ? subsetViolationAlert.severity : null,
+        deniedSkills: subsetDryRun.policy.deniedSkills,
+        blockedReasonCodes: subsetDryRun.blockedReasonCodes
+      });
       assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.FAILED);
       lifecycleState = ORCHESTRATION_STATES.FAILED;
       return {
         ok: false,
         error: "SKILL_POLICY_BLOCKED",
-        policy: skillPolicy,
+        policy: subsetDryRun.policy,
+        preflight: {
+          blockedReasonCodes: subsetDryRun.blockedReasonCodes,
+          messages: subsetDryRun.messages
+        },
         selectedAgent: route.selected.id,
+        alerts: subsetViolationAlert.triggered ? [subsetViolationAlert] : [],
         fallbackChain: route.fallbackChain,
         lifecycleState,
         relationshipShadowSummary: this.relationshipShadowTracker.summary(),

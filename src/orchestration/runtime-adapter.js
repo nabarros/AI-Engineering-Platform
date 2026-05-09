@@ -21,10 +21,11 @@ export function createRouterRuntimeAdapter(options = {}) {
         task: input.task,
         budget: input.budget,
         confirmation: input.confirmation,
-        executionEvidence: input.executionEvidence
+        executionEvidence: input.executionEvidence,
+        runtimeEnvironment: input.runtimeEnvironment
       });
 
-      return {
+      const output = {
         selectedSpecialist: result.selectedAgent || null,
         fallbackChain: result.fallbackChain || [],
         routeScores: result.routeScores || [],
@@ -51,6 +52,20 @@ export function createRouterRuntimeAdapter(options = {}) {
         ok: result.ok,
         error: result.error || null
       };
+
+      if (result.policy) {
+        output.policy = result.policy;
+      }
+
+      if (result.preflight) {
+        output.preflight = result.preflight;
+      }
+
+      if (result.alerts) {
+        output.alerts = result.alerts;
+      }
+
+      return output;
     }
   };
 }
