@@ -1,6 +1,6 @@
 # AI Engineering Platform
 
-<video src="docs/Media/f_e_c_b_d_a_a_c_d_f_e_a_b_c_dmp_.mp4" controls width="100%"></video>
+[![Watch the demo](docs/Media/Gemini_Generated_Image_h5wlxqh5wlxqh5wl.png)](docs/Media/f_e_c_b_d_a_a_c_d_f_e_a_b_c_dmp_.mp4)
 
 > Agent orchestration platform for building, routing, validating, and operating AI-powered engineering workflows with deterministic behavior.
 
