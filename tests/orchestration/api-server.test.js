@@ -58,6 +58,10 @@ test("should expose health and orchestration endpoints", async () => {
     const orchestrateJson = await orchestrateResponse.json();
     assert.equal(orchestrateJson.data.ok, true);
     assert.ok(orchestrateJson.data.selectedSpecialist);
+    assert.ok(orchestrateJson.data.premiumFallback);
+    assert.equal(typeof orchestrateJson.data.premiumFallback.trigger, "boolean");
+    assert.ok(orchestrateJson.data.relationshipShadowSummary);
+    assert.equal(typeof orchestrateJson.data.relationshipShadowSummary.totalSamples, "number");
 
     const metricsResponse = await fetch(`${baseUrl}/metrics`);
     assert.equal(metricsResponse.status, 200);

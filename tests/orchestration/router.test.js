@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { routeTask } from "../../src/orchestration/router.js";
+import { applyRiskBudgetOverrides, routeTask } from "../../src/orchestration/router.js";
 import { DEFAULT_CAPABILITY_REGISTRY } from "../../src/orchestration/default-capability-registry.js";
 
 test("should select backend specialist for backend domain within budget", () => {
@@ -47,4 +47,29 @@ test("should penalize high token cost candidates when budget is low", () => {
   });
 
   assert.equal(result.selected.id, "efficient-agent");
+});
+
+test("should apply risk budget overrides for high and critical tasks", () => {
+  const high = applyRiskBudgetOverrides(
+    { risk: "HIGH" },
+    { tokenBudgetTier: "LOW", latencyBudgetTier: "LOW" }
+  );
+  assert.deepEqual(high, { tokenBudgetTier: "MEDIUM", latencyBudgetTier: "MEDIUM" });
+
+  const critical = applyRiskBudgetOverrides(
+    { risk: "CRITICAL" },
+    { tokenBudgetTier: "LOW", latencyBudgetTier: "MEDIUM" }
+  );
+  assert.deepEqual(critical, { tokenBudgetTier: "HIGH", latencyBudgetTier: "HIGH" });
+});
+
+test("should return applied budget in routeTask result", () => {
+  const result = routeTask({
+    task: { domain: "backend", risk: "HIGH" },
+    registry: DEFAULT_CAPABILITY_REGISTRY,
+    budget: { tokenBudgetTier: "LOW", latencyBudgetTier: "LOW" },
+    learningStats: {}
+  });
+
+  assert.deepEqual(result.appliedBudget, { tokenBudgetTier: "MEDIUM", latencyBudgetTier: "MEDIUM" });
 });

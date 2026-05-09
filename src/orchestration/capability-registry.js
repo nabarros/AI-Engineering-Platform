@@ -1,4 +1,5 @@
 const RISK_ORDER = Object.freeze({ LOW: 0, MEDIUM: 1, HIGH: 2, CRITICAL: 3 });
+export const CAPABILITY_SCHEMA_VERSION = "1.0.0";
 
 function assert(condition, message) {
   if (!condition) {
@@ -9,6 +10,19 @@ function assert(condition, message) {
 function normalizeRisk(value) {
   const risk = String(value || "MEDIUM").toUpperCase();
   return Object.hasOwn(RISK_ORDER, risk) ? risk : "MEDIUM";
+}
+
+function assertNonEmptyString(value, message) {
+  assert(typeof value === "string" && value.trim().length > 0, message);
+}
+
+function assertMetadataSchema(metadata, capabilityId) {
+  assert(metadata && typeof metadata === "object" && !Array.isArray(metadata), `Capability ${capabilityId} metadata must be an object.`);
+  assertNonEmptyString(metadata.ownerTeam, `Capability ${capabilityId} metadata.ownerTeam must be a non-empty string.`);
+  assert(Array.isArray(metadata.skillScopes) && metadata.skillScopes.length > 0, `Capability ${capabilityId} metadata.skillScopes must be a non-empty array.`);
+  for (const skillScope of metadata.skillScopes) {
+    assertNonEmptyString(skillScope, `Capability ${capabilityId} metadata.skillScopes entries must be non-empty strings.`);
+  }
 }
 
 export function validateCapabilityRegistry(registry) {
@@ -22,9 +36,28 @@ export function validateCapabilityRegistry(registry) {
     assert(["LOW", "MEDIUM", "HIGH"].includes(item.latencyTier), `Capability ${item.id} latencyTier is invalid.`);
     assert(typeof item.supportsVerificationGate === "boolean", `Capability ${item.id} supportsVerificationGate must be boolean.`);
     assert(typeof item.supportsMemoryWrites === "boolean", `Capability ${item.id} supportsMemoryWrites must be boolean.`);
+    assertMetadataSchema(item.metadata, item.id);
   }
 
   return true;
+}
+
+export function getCapabilityRegistrySchema() {
+  return {
+    version: CAPABILITY_SCHEMA_VERSION,
+    requiredFields: [
+      "id",
+      "domains",
+      "qualityScore",
+      "tokenCostTier",
+      "latencyTier",
+      "supportsVerificationGate",
+      "supportsMemoryWrites",
+      "metadata",
+      "metadata.ownerTeam",
+      "metadata.skillScopes"
+    ]
+  };
 }
 
 export function canHandleRisk(capability, requestedRisk) {

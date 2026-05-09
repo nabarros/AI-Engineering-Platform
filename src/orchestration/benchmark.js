@@ -82,3 +82,18 @@ export function evaluateWeights({ scenarios, registry, weights }) {
     utility: Number(utility.toFixed(2))
   };
 }
+
+export function buildMultiStepReliabilityBenchmark(executions) {
+  const runs = Array.isArray(executions) ? executions : [];
+  const total = runs.length;
+  const completed = runs.filter((run) => run?.completed === true).length;
+  const recovered = runs.filter((run) => run?.recovered === true).length;
+  const verificationFailures = runs.filter((run) => run?.verificationPass === false).length;
+
+  return {
+    totalRuns: total,
+    completionRate: total > 0 ? Number((completed / total).toFixed(4)) : 0,
+    recoveryRate: total > 0 ? Number((recovered / total).toFixed(4)) : 0,
+    verificationFailureRate: total > 0 ? Number((verificationFailures / total).toFixed(4)) : 0
+  };
+}
