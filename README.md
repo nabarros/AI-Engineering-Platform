@@ -1,5 +1,7 @@
 # AI Engineering Platform
 
+<video src="docs/Media/f_e_c_b_d_a_a_c_d_f_e_a_b_c_dmp_.mp4" controls width="100%"></video>
+
 > Agent orchestration platform for building, routing, validating, and operating AI-powered engineering workflows with deterministic behavior.
 
 [![Node 20+](https://img.shields.io/badge/Node-20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
@@ -167,69 +169,7 @@ Engineer -> Router -> Token Budget + Model Tier -> Specialist Agent -> Verificat
 
 ## Architecture: Full Orchestration Stack
 
-\`\`\`mermaid
-flowchart TD
-  user([Engineer / API Client]) --> api[Orchestration API]
-  api --> guard{Auth + Tenant Scope\nRate Limit + Idempotency}
-  guard --> router[Deterministic Router\nDomain · Risk · Quality · Cost · Latency Scoring]
-
-  router --> budget[Token Budget Allocator\nALLOW / TRUNCATE / DOWNGRADE / BLOCK]
-  budget --> tiering[Model Tiering Policy\nStep Type + Risk + Confidence Band]
-  tiering --> cache{Response Cache\nPolicy-Version + Context Hash}
-
-  subgraph Specialists[Specialist Pool]
-    planner[Context Planner]
-    reviewer[Code Reviewer]
-    impl[Implementation Guardian]
-    fe[Senior Frontend]
-    be[Senior Backend]
-    ux[Senior UI/UX]
-    sre[Senior SRE]
-  end
-
-  cache -->|miss| Specialists
-  cache -->|hit| verify
-
-  router --> Specialists
-
-  subgraph GraphExec[Concurrent Graph Engine]
-    a[Task Node A]
-    b[Task Node B]
-    c[Task Node C]
-    a --> b --> c
-  end
-
-  Specialists --> GraphExec
-
-  subgraph MemoryStack[Memory & Retrieval Stack - P3]
-    intent[Intent-Aware Retrieval Planner\nbugfix · feature · review · docs · general]
-    layers[Layered Memory Contract\nSession · Task · Project · Domain · Global]
-    graph[Graph-Indexed State\nrepository · component · skill · tenant]
-    compact[Compaction + Archive]
-    intent --> layers --> graph --> compact
-  end
-
-  GraphExec --> MemoryStack
-
-  subgraph CostStack[Token Economics Stack - P4]
-    forecaster[Token Forecaster\nHistorical Telemetry + Error Bounds]
-    optimizer[Cost-Quality Optimizer\nGuardrail-Based Escalation + Downgrade]
-    attribution[Spend Attribution\nPer-Team + Anomaly Detection]
-    downgrade[Downgrade Policy\nLow-Risk + High-Volume + Rollback Switch]
-    redteam[Red-Team Evaluation\nDeterministic Cost-Policy Scenarios]
-  end
-
-  GraphExec --> CostStack
-
-  GraphExec --> verify{Verification Gate\nSecurity · Tests · Contracts · Error Handling}
-  verify --> trace[Trace + Metrics]
-  verify --> tuner[Adaptive Weight Tuner\nRolling Success + Cost + Latency Feedback]
-  verify --> state[Shared Indexed State]
-
-  state --> router
-  tuner --> router
-  trace --> api
-\`\`\`
+![Full Architecture](docs/Media/Full%20Architecture.jpeg)
 
 ### Execution Model
 
@@ -247,28 +187,7 @@ flowchart TD
 
 ## 60-Second Live Flow Preview
 
-\`\`\`mermaid
-sequenceDiagram
-  participant U as User/Client
-  participant API as Orchestration API
-  participant R as Router
-  participant B as Token Budget + Model Tier
-  participant C as Response Cache
-  participant S as Specialist
-  participant V as Verification Gate
-  participant M as Shared State + Tuner
-
-  U->>API: POST /orchestrate
-  API->>API: Auth + tenant + rate-limit + idempotency
-  API->>R: Route by domain/risk/budget
-  R->>B: Resolve token budget + model tier
-  B->>C: Check response cache
-  C-->>S: Cache miss — invoke specialist
-  S->>V: Return execution evidence
-  V->>M: Persist memory + update rolling metrics
-  V-->>API: pass/fail + findings
-  API-->>U: deterministic response + trace
-\`\`\`
+![ Flow Preview](docs/Media/%20Flow%20Preview.jpeg)
 
 ### Real API Walkthrough
 
