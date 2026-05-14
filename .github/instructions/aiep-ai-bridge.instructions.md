@@ -29,10 +29,14 @@ For non-trivial tasks, load this order before implementation:
 - `.github/skills/aiep-safe-implementation/` -> executes implementation protocol defined by `.ai` governance.
 - `.github/skills/aiep-pr-readiness/` -> validates outcomes against `docs/` and `.ai` constraints.
 - `.github/skills/aiep-memory-sync/` -> handles post-task synchronization with `.ai/memory/`.
+- `.github/skills/aiep-compound-task-decomposition/` -> decomposes multi-domain tasks into ordered sub-tasks with specialist assignments.
 - `.github/prompts/aiep-senior-staff-router.prompt.md` -> routes work to role-specific `.github/agents/`.
 - `.github/agents/aiep-senior-staff-router.agent.md` -> deterministic single-specialist delegation.
 - `.github/hooks/aiep-guardrails.json` -> deterministic runtime enforcement for restricted paths and memory-write confirmation.
 - Role agents (frontend/backend/ui-ux/sre) -> apply task execution while respecting `.ai` instruction hierarchy.
+- AI/LLM tasks -> `.ai/skills/llm-engineering.md` for prompt design, model selection, RAG architecture, and inference optimization patterns.
+- Architecture tasks -> `.ai/architecture/system-design.md` for system design decisions, service boundaries, and technology selection rationale.
+- DevOps tasks -> `.ai/deployment/deployment-guide.md` for CI/CD pipelines, deployment strategies, and infrastructure provisioning procedures.
 
 ## Memory Lifecycle Protocol
 For tasks that change system state, always evaluate memory updates at completion:
@@ -55,6 +59,9 @@ Select `.ai/skills/` by task domain:
 - Debugging -> `.ai/skills/debugging-node.md`
 - Migration -> `.ai/skills/migration-strategy.md`
 - Performance -> `.ai/skills/performance-optimization.md`
+- AI/LLM -> `.ai/skills/llm-engineering.md`
+- Architecture -> `.ai/architecture/system-design.md`
+- DevOps -> `.ai/deployment/deployment-guide.md`
 
 ## Safety and Boundary Rules
 - Never modify `.ai/instructions/**`, `.github/workflows/**`, or `infra/**`.

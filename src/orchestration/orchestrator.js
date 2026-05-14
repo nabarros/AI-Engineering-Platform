@@ -1,6 +1,6 @@
 import { validateCapabilityRegistry } from "./capability-registry.js";
 import { createExecutionPlan } from "./planner.js";
-import { routeTask } from "./router.js";
+import { routeTask, routeCompoundTask, classifyTask } from "./router.js";
 import { enforcePolicy } from "./policy-engine.js";
 import { verifyExecution } from "./verifier.js";
 import { OrchestrationMemory } from "./memory-store.js";
@@ -94,7 +94,6 @@ export class AgentOrchestrator {
     this.taskClassCounts = new Map();
     this.spendEvents = [];
     this.initializationPromise = this.stateStore ? this.restoreState() : Promise.resolve();
-
   }
 
   invalidateResponseCacheByPolicyVersion(policyVersion) {
@@ -140,7 +139,16 @@ export class AgentOrchestrator {
 
     const tracer = new TraceCollector(requestId);
     let lifecycleState = ORCHESTRATION_STATES.RECEIVED;
-    tracer.addEvent("request.received", { domain: task.domain, risk: task.risk });
+    tracer.addEvent("request.received", { domain: task.domain, risk: task.risk, description: task.description });
+
+    const classification = classifyTask(task);
+    tracer.addEvent("task.classified", {
+      primaryDomain: classification.primaryDomain,
+      isCompound: classification.isCompound,
+      domainCount: classification.domainCount,
+      confidence: classification.confidence,
+      allDomains: classification.allDomains
+    });
 
     const policy = enforcePolicy(task, { confirmed: confirmation });
     assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.POLICY_CHECKED);
@@ -155,6 +163,7 @@ export class AgentOrchestrator {
         error: "POLICY_BLOCKED",
         policy,
         lifecycleState,
+        classification,
         relationshipShadowSummary: this.relationshipShadowTracker.summary(),
         trace: tracer.summary()
       };
@@ -163,7 +172,7 @@ export class AgentOrchestrator {
     const plan = createExecutionPlan(task);
     assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.PLAN_CREATED);
     lifecycleState = ORCHESTRATION_STATES.PLAN_CREATED;
-    tracer.addEvent("plan.created", { steps: plan.length });
+    tracer.addEvent("plan.created", { steps: plan.length, isCompound: classification.isCompound });
     this.memory.indexTaskMetadata(requestId, {
       requestId,
       domain: String(task.domain || "general").toLowerCase(),
@@ -213,6 +222,7 @@ export class AgentOrchestrator {
         tokenForecast,
         modelTierDecision,
         lifecycleState,
+        classification,
         relationshipShadowSummary: this.relationshipShadowTracker.summary(),
         trace: tracer.summary()
       };
@@ -227,16 +237,43 @@ export class AgentOrchestrator {
 
     const learningSnapshot = this.learning.getSnapshot();
     const activeWeights = this.weightTuner ? this.weightTuner.getWeights() : this.scoringWeights;
-    const route = routeTask({
-      task,
-      registry: this.capabilityRegistry,
-      budget: {
-        ...(budget || {}),
-        tokenBudgetTier: budgetDecision.effectiveTier
-      },
-      learningStats: learningSnapshot,
-      scoringWeights: activeWeights
-    });
+
+    let route;
+    let compoundRoute = null;
+    const effectiveBudget = {
+      ...(budget || {}),
+      tokenBudgetTier: budgetDecision.effectiveTier
+    };
+
+    if (classification.isCompound) {
+      compoundRoute = routeCompoundTask({
+        task: { ...task, domain: task.domain || classification.primaryDomain },
+        registry: this.capabilityRegistry,
+        budget: effectiveBudget,
+        learningStats: learningSnapshot,
+        scoringWeights: activeWeights
+      });
+      route = compoundRoute.routes[0]?.route || routeTask({
+        task: { ...task, domain: classification.primaryDomain },
+        registry: this.capabilityRegistry,
+        budget: effectiveBudget,
+        learningStats: learningSnapshot,
+        scoringWeights: activeWeights
+      });
+      tracer.addEvent("compound.routed", {
+        uniqueAgentsNeeded: compoundRoute.uniqueAgentsNeeded,
+        recommendedStrategy: compoundRoute.recommendedStrategy,
+        subRouteCount: compoundRoute.routes.length
+      });
+    } else {
+      route = routeTask({
+        task: { ...task, domain: task.domain || classification.primaryDomain },
+        registry: this.capabilityRegistry,
+        budget: effectiveBudget,
+        learningStats: learningSnapshot,
+        scoringWeights: activeWeights
+      });
+    }
 
     if (!route.selected) {
       assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.FAILED);
@@ -246,6 +283,7 @@ export class AgentOrchestrator {
         error: "NO_ELIGIBLE_AGENT",
         route,
         lifecycleState,
+        classification,
         relationshipShadowSummary: this.relationshipShadowTracker.summary(),
         trace: tracer.summary()
       };
@@ -256,7 +294,9 @@ export class AgentOrchestrator {
     tracer.addEvent("route.selected", {
       selectedAgent: route.selected.id,
       fallbackUsed: false,
-      fallbackChain: route.fallbackChain
+      fallbackChain: route.fallbackChain,
+      routingConfidence: route.routingConfidence,
+      needsClarification: route.needsClarification
     });
 
     const relationshipShadow = evaluateRelationshipShadow({
@@ -326,7 +366,9 @@ export class AgentOrchestrator {
     }
 
     this.memory.write("session", `${requestId}:plan`, plan, { ttlMs: 30 * 60 * 1000 });
-    this.memory.write("patterns", `${task.domain}:last-selected-agent`, { agentId: route.selected.id }, { ttlMs: 24 * 60 * 60 * 1000 });
+    this.memory.write("session", `${requestId}:classification`, classification, { ttlMs: 30 * 60 * 1000 });
+    const effectiveDomain = task.domain || classification.primaryDomain;
+    this.memory.write("patterns", `${effectiveDomain}:last-selected-agent`, { agentId: route.selected.id }, { ttlMs: 24 * 60 * 60 * 1000 });
 
     const isLowRiskTask = String(task?.risk || "MEDIUM").toUpperCase() === "LOW";
     const cacheRequest = {
@@ -505,6 +547,19 @@ export class AgentOrchestrator {
       tokenForecast,
       downgradeDecision,
       costQualityDecision,
+      routingConfidence: route.routingConfidence,
+      needsClarification: route.needsClarification,
+      classification,
+      compoundRoute: compoundRoute ? {
+        isCompound: compoundRoute.isCompound,
+        uniqueAgentsNeeded: compoundRoute.uniqueAgentsNeeded,
+        recommendedStrategy: compoundRoute.recommendedStrategy,
+        subRoutes: compoundRoute.routes.map((sr) => ({
+          domain: sr.domain,
+          confidence: sr.confidence,
+          selectedAgent: sr.route.selected?.id
+        }))
+      } : null,
       plan,
       recoveryPlan,
       fallbackSelection,

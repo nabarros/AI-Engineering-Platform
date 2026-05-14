@@ -45,6 +45,19 @@ export function applyRiskBudgetOverrides(task, budget = {}) {
   return initialBudget;
 }
 
+const DOMAIN_KEYWORDS = Object.freeze({
+  frontend: ["react", "component", "ui", "css", "tsx", "jsx", "render", "hook", "state management", "dom", "browser"],
+  backend: ["api", "endpoint", "server", "service", "database", "sql", "query", "rest", "graphql", "migration", "schema"],
+  ux: ["user journey", "interaction", "usability", "accessibility", "a11y", "wireframe", "user flow", "persona"],
+  sre: ["reliability", "sli", "slo", "incident", "monitoring", "alert", "uptime", "latency", "observability", "runbook"],
+  ai: ["llm", "model", "prompt", "embedding", "rag", "inference", "token", "fine-tune", "vector", "ai", "ml", "neural"],
+  architecture: ["system design", "service boundary", "adr", "architecture decision", "trade-off", "scalability", "component map"],
+  devops: ["ci/cd", "pipeline", "deploy", "docker", "kubernetes", "terraform", "infrastructure", "release", "environment"],
+  security: ["auth", "security", "vulnerability", "cve", "owasp", "credential", "encryption", "injection"],
+  review: ["review", "code review", "audit", "inspect"],
+  planning: ["plan", "decompose", "scope", "estimate", "roadmap"]
+});
+
 function clamp(number, min, max) {
   return Math.max(min, Math.min(number, max));
 }
@@ -80,6 +93,43 @@ function getDomainScore(taskDomain, capability) {
   return 0.2;
 }
 
+export function detectDomains(description) {
+  const text = String(description || "").toLowerCase();
+  const detected = [];
+
+  for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
+    const matchCount = keywords.filter((kw) => text.includes(kw)).length;
+    if (matchCount > 0) {
+      detected.push({ domain, confidence: clamp(matchCount / keywords.length, 0.1, 1), matchCount });
+    }
+  }
+
+  return detected.sort((a, b) => b.confidence - a.confidence);
+}
+
+export function classifyTask(task) {
+  const detectedDomains = detectDomains(task.description);
+  const explicitDomain = task.domain ? [{ domain: task.domain, confidence: 1, matchCount: 0 }] : [];
+  const allDomains = [...explicitDomain];
+
+  for (const detected of detectedDomains) {
+    if (!allDomains.find((d) => d.domain === detected.domain)) {
+      allDomains.push(detected);
+    }
+  }
+
+  const isCompound = allDomains.filter((d) => d.confidence >= 0.3).length > 1;
+  const primaryDomain = allDomains[0]?.domain || "general";
+
+  return {
+    primaryDomain,
+    allDomains,
+    isCompound,
+    domainCount: allDomains.filter((d) => d.confidence >= 0.3).length,
+    confidence: allDomains[0]?.confidence || 0
+  };
+}
+
 export function scoreCapability(capability, context) {
   const { task, budget, learningStats } = context;
   const weights = context.scoringWeights || DEFAULT_SCORING_WEIGHTS;
@@ -113,29 +163,71 @@ export function scoreCapability(capability, context) {
 export function routeTask({ task, registry, budget, learningStats = {}, scoringWeights = DEFAULT_SCORING_WEIGHTS }) {
   const safeBudget = applyRiskBudgetOverrides(task, budget);
 
-  const candidates = findCandidates(task, registry);
+  const classification = classifyTask(task);
+  const effectiveTask = { ...task, domain: task.domain || classification.primaryDomain };
+
+  const candidates = findCandidates(effectiveTask, registry);
   if (candidates.length === 0) {
     return {
       selected: null,
       fallbackChain: [],
       explanation: "No candidates matched domain and risk constraints.",
       scores: [],
-      appliedBudget: safeBudget
+      appliedBudget: safeBudget,
+      classification
     };
   }
 
   const scores = candidates
-    .map((capability) => ({ capability, score: scoreCapability(capability, { task, budget: safeBudget, learningStats, scoringWeights }) }))
+    .map((capability) => ({ capability, score: scoreCapability(capability, { task: effectiveTask, budget: safeBudget, learningStats, scoringWeights }) }))
     .sort((a, b) => b.score.totalScore - a.score.totalScore);
 
   const selected = scores[0].capability;
   const fallbackChain = scores.slice(1, 4).map((entry) => entry.capability.id);
+  const topScore = scores[0].score.totalScore;
+  const routingConfidence = clamp(topScore, 0, 1);
 
   return {
     selected,
     fallbackChain,
-    explanation: `Selected ${selected.id} based on domain, quality, learning history, and budget fitness.`,
+    explanation: `Selected ${selected.id} (confidence: ${(routingConfidence * 100).toFixed(1)}%) based on domain, quality, learning history, and budget fitness.`,
     scores: scores.map((entry) => ({ capabilityId: entry.capability.id, ...entry.score })),
-    appliedBudget: safeBudget
+    appliedBudget: safeBudget,
+    classification,
+    routingConfidence,
+    needsClarification: routingConfidence < 0.7
+  };
+}
+
+export function routeCompoundTask({ task, registry, budget, learningStats = {}, scoringWeights = DEFAULT_SCORING_WEIGHTS }) {
+  const classification = classifyTask(task);
+
+  if (!classification.isCompound) {
+    return {
+      isCompound: false,
+      routes: [routeTask({ task, registry, budget, learningStats, scoringWeights })]
+    };
+  }
+
+  const subRoutes = classification.allDomains
+    .filter((d) => d.confidence >= 0.3)
+    .map((domainEntry) => {
+      const subTask = { ...task, domain: domainEntry.domain };
+      const route = routeTask({ task: subTask, registry, budget, learningStats, scoringWeights });
+      return {
+        domain: domainEntry.domain,
+        confidence: domainEntry.confidence,
+        route
+      };
+    });
+
+  const uniqueAgents = [...new Set(subRoutes.map((sr) => sr.route.selected?.id).filter(Boolean))];
+
+  return {
+    isCompound: true,
+    classification,
+    routes: subRoutes,
+    uniqueAgentsNeeded: uniqueAgents,
+    recommendedStrategy: uniqueAgents.length <= 2 ? "sequential-peer" : "decompose-and-delegate"
   };
 }

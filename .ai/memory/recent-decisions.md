@@ -15,6 +15,22 @@ Informal decision log for recent technical choices that don't warrant a full ADR
 
 ## 2026-05 (Current Month)
 
+### Agent orchestration platform upgraded to v2 architecture
+- **Date:** 2026-05-14
+- **Decision:** Major upgrade to the multi-agent orchestration system: expanded from 8 to 11 agents, added compound task decomposition, confidence-based routing, and domain-aware planning
+- **Rationale:** Gap analysis against Ruflo reference architecture revealed critical missing capabilities: no AI/LLM specialist, no architect agent, no DevOps agent, naive planner, no compound task handling, no routing confidence scoring
+- **Key changes:**
+  - 3 new specialist agents (AI/LLM, Architect, DevOps)
+  - Router rewritten with 26-domain taxonomy, multi-tier confidence thresholds, progressive fallback
+  - Planner rewritten with dependency graph construction, domain detection, risk assessment per step
+  - Capability registry expanded with richer domain tags per agent
+  - Skill orchestration enhanced with compound task protocol, token budget awareness, conflict detection
+  - 4 new skills created (compound-task-decomposition, AI/LLM, architect, DevOps)
+  - Policy engine enhanced with 25 risk escalation triggers and AI-specific warnings
+- **Owner:** platform-architecture
+- **Tests:** 33 tests passing (19 original + 14 new)
+- **Revisit:** After production validation of compound routing accuracy
+
 ### Semantic cache threshold set to 0.97 for short prompts
 - **Date:** 2026-05-01
 - **Decision:** Apply cosine similarity threshold of 0.97 (vs global 0.95) for prompts with `estimatedTokens < 25`

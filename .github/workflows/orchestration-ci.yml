@@ -1,0 +1,97 @@
+name: Orchestration CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/orchestration/**'
+      - 'tests/orchestration/**'
+      - 'package.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/orchestration/**'
+      - 'tests/orchestration/**'
+      - 'package.json'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run orchestration tests
+        run: node --test tests/orchestration/*.test.js
+
+  benchmark:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run routing benchmark
+        run: node scripts/benchmark-orchestration.js
+
+  agent-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate agent definitions
+        run: |
+          echo "Checking agent file structure..."
+          for file in .github/agents/*.agent.md; do
+            if ! head -1 "$file" | grep -q "^---$"; then
+              echo "ERROR: $file missing YAML frontmatter"
+              exit 1
+            fi
+            if ! grep -q "^name:" "$file"; then
+              echo "ERROR: $file missing name field"
+              exit 1
+            fi
+            if ! grep -q "^tools:" "$file"; then
+              echo "ERROR: $file missing tools field"
+              exit 1
+            fi
+            echo "OK: $file"
+          done
+          echo "All agent definitions valid."
+
+      - name: Validate skill files
+        run: |
+          echo "Checking skill file structure..."
+          for file in .github/skills/*/SKILL.md; do
+            if ! head -1 "$file" | grep -q "^---$"; then
+              echo "ERROR: $file missing YAML frontmatter"
+              exit 1
+            fi
+            echo "OK: $file"
+          done
+          echo "All skill files valid."
+
+      - name: Check agent-skill cross-references
+        run: |
+          echo "Verifying skill orchestration references..."
+          INSTRUCTION=".github/instructions/aiep-skill-orchestration.instructions.md"
+          if [ ! -f "$INSTRUCTION" ]; then
+            echo "ERROR: Skill orchestration instruction file missing"
+            exit 1
+          fi
+          AGENT_COUNT=$(ls -1 .github/agents/*.agent.md | wc -l)
+          SKILL_COUNT=$(ls -1 .github/skills/*/SKILL.md | wc -l)
+          echo "Agents: $AGENT_COUNT | Skills: $SKILL_COUNT"
+          echo "Cross-reference check complete."

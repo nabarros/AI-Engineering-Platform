@@ -3,7 +3,7 @@ export function verifyExecution(evidence) {
 
   if (!evidence) {
     findings.push({ severity: "HIGH", code: "NO_EVIDENCE", message: "No execution evidence was provided for verification." });
-    return { pass: false, findings };
+    return { pass: false, findings, gateResults: {} };
   }
 
   if (evidence.testsPassed !== true) {
@@ -26,8 +26,28 @@ export function verifyExecution(evidence) {
     findings.push({ severity: "MEDIUM", code: "LOW_QUALITY_SCORE", message: "Quality score is below the required threshold (0.8)." });
   }
 
+  if (evidence.aiSafetyChecked === false) {
+    findings.push({ severity: "HIGH", code: "AI_SAFETY_UNVERIFIED", message: "AI safety checks failed or were not performed for LLM-related changes." });
+  }
+
+  if (evidence.architectureReviewed === false) {
+    findings.push({ severity: "MEDIUM", code: "ARCHITECTURE_UNREVIEWED", message: "Architecture impact was not reviewed for structural changes." });
+  }
+
+  if (typeof evidence.tokenBudgetExceeded === "boolean" && evidence.tokenBudgetExceeded) {
+    findings.push({ severity: "LOW", code: "TOKEN_BUDGET_EXCEEDED", message: "Execution exceeded the allocated token budget tier." });
+  }
+
+  const blocking = findings.filter((f) => f.severity === "CRITICAL" || f.severity === "HIGH");
+  const advisory = findings.filter((f) => f.severity === "MEDIUM" || f.severity === "LOW");
+
   return {
-    pass: findings.length === 0,
-    findings
+    pass: blocking.length === 0,
+    findings,
+    gateResults: {
+      blockingCount: blocking.length,
+      advisoryCount: advisory.length,
+      totalFindings: findings.length
+    }
   };
 }

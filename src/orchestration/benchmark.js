@@ -1,7 +1,12 @@
 import { routeTask } from "./router.js";
 
 const COST_BY_TIER = Object.freeze({ LOW: 1200, MEDIUM: 3000, HIGH: 6500 });
-const DOMAINS = ["backend", "frontend", "ux", "sre", "review", "planning", "security", "refactor", "api"];
+const DOMAINS = [
+  "backend", "frontend", "ux", "sre", "review", "planning", "security",
+  "refactor", "api", "ai", "llm", "architecture", "design", "devops",
+  "infrastructure", "deployment", "database", "ml", "inference",
+  "embeddings", "rag", "cicd", "containers", "service", "migration", "strategy"
+];
 const RISKS = ["LOW", "MEDIUM", "HIGH"];
 const TOKEN_BUDGETS = ["LOW", "MEDIUM", "HIGH"];
 const LATENCY_BUDGETS = ["LOW", "MEDIUM", "HIGH"];
@@ -15,7 +20,24 @@ const EXPECTED_BY_DOMAIN = Object.freeze({
   planning: "AIEP Context Planner",
   security: "AIEP Implementation Guardian",
   refactor: "AIEP Implementation Guardian",
-  api: "AIEP Senior Staff Backend Engineer"
+  api: "AIEP Senior Staff Backend Engineer",
+  ai: "AIEP Senior Staff AI/LLM Engineer",
+  llm: "AIEP Senior Staff AI/LLM Engineer",
+  ml: "AIEP Senior Staff AI/LLM Engineer",
+  inference: "AIEP Senior Staff AI/LLM Engineer",
+  embeddings: "AIEP Senior Staff AI/LLM Engineer",
+  rag: "AIEP Senior Staff AI/LLM Engineer",
+  architecture: "AIEP Senior Staff Architect",
+  design: "AIEP Senior Staff Architect",
+  strategy: "AIEP Senior Staff Architect",
+  devops: "AIEP Senior Staff DevOps Engineer",
+  infrastructure: "AIEP Senior Staff DevOps Engineer",
+  deployment: "AIEP Senior Staff DevOps Engineer",
+  cicd: "AIEP Senior Staff DevOps Engineer",
+  containers: "AIEP Senior Staff DevOps Engineer",
+  database: "AIEP Senior Staff Backend Engineer",
+  service: "AIEP Senior Staff Backend Engineer",
+  migration: "AIEP Senior Staff Backend Engineer"
 });
 
 export function generateScenarioCorpus() {

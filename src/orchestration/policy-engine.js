@@ -9,21 +9,36 @@ const FORBIDDEN_PATTERNS = [
   "bypass auth"
 ];
 
+const RISK_ESCALATION_TRIGGERS = Object.freeze({
+  CRITICAL: [
+    "production", "database migration", "rotate secret", "delete database",
+    "drop table", "production deployment", "destroy infrastructure"
+  ],
+  HIGH: [
+    "auth", "authorization", "schema change", "api contract",
+    "model deployment", "prompt injection", "pii", "encryption",
+    "service boundary", "breaking change"
+  ]
+});
+
 export function assessRisk(task) {
   const risk = normalizeRisk(task.risk || "MEDIUM");
   const description = String(task.description || "").toLowerCase();
 
-  if (description.includes("production") || description.includes("database migration") || description.includes("rotate secret")) {
-    return "CRITICAL";
+  for (const trigger of RISK_ESCALATION_TRIGGERS.CRITICAL) {
+    if (description.includes(trigger)) return "CRITICAL";
   }
-  if (description.includes("auth") || description.includes("authorization") || description.includes("schema")) {
-    return "HIGH";
+
+  for (const trigger of RISK_ESCALATION_TRIGGERS.HIGH) {
+    if (description.includes(trigger)) return "HIGH";
   }
+
   return risk;
 }
 
 export function enforcePolicy(task, options = {}) {
   const violations = [];
+  const warnings = [];
   const description = String(task.description || "").toLowerCase();
   const risk = assessRisk(task);
 
@@ -45,9 +60,26 @@ export function enforcePolicy(task, options = {}) {
     });
   }
 
+  if (description.includes("model") && description.includes("production")) {
+    warnings.push({
+      severity: "WARNING",
+      code: "AI_MODEL_PRODUCTION",
+      message: "Model changes targeting production require AI safety review."
+    });
+  }
+
+  if (description.includes("prompt") && (description.includes("system") || description.includes("production"))) {
+    warnings.push({
+      severity: "WARNING",
+      code: "PROMPT_PRODUCTION_CHANGE",
+      message: "System prompt changes require review for injection resistance and alignment."
+    });
+  }
+
   return {
     risk,
     allowed: violations.length === 0,
-    violations
+    violations,
+    warnings
   };
 }

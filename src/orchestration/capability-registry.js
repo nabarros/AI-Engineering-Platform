@@ -76,4 +76,58 @@ export function findCandidates(task, registry) {
   });
 }
 
+export function findBestCandidatesForCompoundTask(task, registry) {
+  const domains = Array.isArray(task.domains) ? task.domains : [task.domain || "general"];
+  const risk = normalizeRisk(task.risk || "MEDIUM");
+
+  const domainCandidates = {};
+  let coveredDomains = 0;
+
+  for (const domain of domains) {
+    const normalized = domain.toLowerCase();
+    const candidates = registry
+      .filter((cap) => {
+        const domainMatch = cap.domains.includes(normalized) || cap.domains.includes("general");
+        return domainMatch && canHandleRisk(cap, risk);
+      })
+      .sort((a, b) => {
+        const aExact = a.domains.includes(normalized) ? 1 : 0;
+        const bExact = b.domains.includes(normalized) ? 1 : 0;
+        if (bExact !== aExact) return bExact - aExact;
+        return b.qualityScore - a.qualityScore;
+      });
+
+    domainCandidates[normalized] = candidates;
+    if (candidates.length > 0) coveredDomains++;
+  }
+
+  const coverageScore = domains.length > 0 ? coveredDomains / domains.length : 0;
+
+  return {
+    domainCandidates,
+    coverageScore,
+    totalDomains: domains.length,
+    coveredDomains
+  };
+}
+
+export function getCapabilityById(id, registry) {
+  return registry.find((cap) => cap.id === id) || null;
+}
+
+export function getDomainCoverage(registry) {
+  const coverage = {};
+
+  for (const capability of registry) {
+    for (const domain of capability.domains) {
+      if (!coverage[domain]) {
+        coverage[domain] = [];
+      }
+      coverage[domain].push(capability.id);
+    }
+  }
+
+  return coverage;
+}
+
 export { RISK_ORDER, normalizeRisk };

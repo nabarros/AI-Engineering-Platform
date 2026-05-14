@@ -9,13 +9,31 @@ export function buildQualityDashboard(executions) {
   const fallbacks = executions.filter((run) => run.fallbackUsed === true).length;
   const verificationFails = executions.filter((run) => run.verificationPass === false).length;
   const totalTokens = executions.reduce((sum, run) => sum + Number(run.tokenUsage || 0), 0);
+  const compoundTasks = executions.filter((run) => run.isCompound === true).length;
+  const clarificationsNeeded = executions.filter((run) => run.needsClarification === true).length;
+
+  const agentUsage = {};
+  for (const run of executions) {
+    const agent = run.selectedAgent || "unknown";
+    agentUsage[agent] = (agentUsage[agent] || 0) + 1;
+  }
+
+  const domainDistribution = {};
+  for (const run of executions) {
+    const domain = run.primaryDomain || "unknown";
+    domainDistribution[domain] = (domainDistribution[domain] || 0) + 1;
+  }
 
   return {
     totalRuns: total,
     firstPassSuccessRate: ratio(firstPassSuccesses, total),
     fallbackRate: ratio(fallbacks, total),
     verificationFailRate: ratio(verificationFails, total),
-    avgTokenUsage: total ? Number((totalTokens / total).toFixed(2)) : 0
+    avgTokenUsage: total ? Number((totalTokens / total).toFixed(2)) : 0,
+    compoundTaskRate: ratio(compoundTasks, total),
+    clarificationRate: ratio(clarificationsNeeded, total),
+    agentUsage,
+    domainDistribution
   };
 }
 

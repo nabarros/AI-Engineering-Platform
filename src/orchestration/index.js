@@ -17,7 +17,7 @@ export {
 	buildSubsetTokenImpactReport,
 	buildSubsetTokenImpactDashboard
 } from "./metrics.js";
-export { routeTask, DEFAULT_SCORING_WEIGHTS, applyRiskBudgetOverrides } from "./router.js";
+export { routeTask, routeCompoundTask, classifyTask, detectDomains, scoreCapability, DEFAULT_SCORING_WEIGHTS, applyRiskBudgetOverrides } from "./router.js";
 export { enforcePolicy, assessRisk } from "./policy-engine.js";
 export { verifyExecution } from "./verifier.js";
 export {
@@ -93,6 +93,7 @@ export {
 	scoreRepositoryGraphSignals
 } from "./repository-graph.js";
 export { createRouterRuntimeAdapter } from "./runtime-adapter.js";
+export { createExecutionPlan } from "./planner.js";
 export { FileStateStore } from "./persistence/file-state-store.js";
 export { IndexedSharedStateStore, TenantStateStore } from "./persistence/indexed-shared-state-store.js";
 export { HttpSharedStateStore } from "./persistence/http-shared-state-store.js";
@@ -105,3 +106,6 @@ export {
 	renderCrossPriorityBenchmarkMarkdown
 } from "./cross-priority-benchmark-report.js";
 export { executeTaskGraph } from "./multi-agent-engine.js";
+export { validateCapabilityRegistry, findCandidates, canHandleRisk } from "./capability-registry.js";
+export { TraceCollector } from "./tracer.js";
+export { LearningLoop } from "./learning-loop.js";
