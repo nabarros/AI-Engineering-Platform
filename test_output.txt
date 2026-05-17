@@ -1,14 +1,14 @@
 
-> ai-engineering-platform-orchestration-core@0.1.0 test
-> node --test tests/orchestration/*.test.js
+> ai-engineering-platform-orchestration-core@0.2.0 test
+> node --test tests/orchestration/*.test.js tests/orchestration/local-deployment-detector.test.js
 
-✔ should adapt weights toward quality when success is below target (2.074583ms)
-✔ should export and import tuner state (1.496792ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✔ should adapt weights toward quality when success is below target (1.771625ms)
+✔ should export and import tuner state (1.078125ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -21,12 +21,12 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/api-security.test.js (190.846167ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✖ tests/orchestration/api-security.test.js (130.308542ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -39,18 +39,33 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/api-server.test.js (188.048167ms)
-✔ should generate large benchmark corpus (2.151208ms)
-✔ should build valid delegation contract with required fields (2.183375ms)
-✔ should reject invalid delegation contract (0.506834ms)
-✔ should build and validate memory handoff packet (0.297917ms)
-✔ should include memory handoff packet in delegation contract when provided (0.082917ms)
-✔ should persist and read state through shared state HTTP service (49.652459ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✖ tests/orchestration/api-server.test.js (115.698958ms)
+✔ should generate large benchmark corpus (2.540375ms)
+▶ detectDomains
+  ✔ should detect frontend domain from React keywords (0.520458ms)
+  ✔ should detect backend domain from API keywords (0.079625ms)
+  ✔ should detect multiple domains from compound description (0.063792ms)
+  ✔ should detect AI/LLM domain from model keywords (0.056791ms)
+  ✔ should detect DevOps domain from infrastructure keywords (0.051625ms)
+  ✔ should return empty array for generic description (0.05175ms)
+✔ detectDomains (1.4515ms)
+▶ classifyTask
+  ✔ should classify single-domain task (0.118125ms)
+  ✔ should classify compound task spanning frontend and backend (1.280125ms)
+  ✔ should prefer explicit domain over detected (0.133167ms)
+  ✔ should fallback to general when no domain detected (0.151541ms)
+✔ classifyTask (1.865708ms)
+▶ routeCompoundTask
+  ✔ should return single route for non-compound task (0.918417ms)
+  ✔ should return multiple sub-routes for compound task (0.369292ms)
+  ✔ should include routing confidence in each route (0.235375ms)
+  ✔ should include classification in route result (0.182625ms)
+✔ routeCompoundTask (1.858541ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -63,12 +78,17 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/maintenance-and-shadow.test.js (157.0405ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✖ tests/orchestration/cross-priority-benchmark-report.test.js (107.59625ms)
+✔ should build valid delegation contract with required fields (2.131375ms)
+✔ should reject invalid delegation contract (0.1935ms)
+✔ should build and validate memory handoff packet (0.28775ms)
+✔ should include memory handoff packet in delegation contract when provided (0.15375ms)
+✔ should persist and read state through shared state HTTP service (31.128583ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -81,18 +101,12 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/memory-store.test.js (137.134ms)
-✔ should group weekly scorecard by objective and model tier with token totals, average, and pass rate (14.803917ms)
-✔ should compute multi-step reliability rates deterministically (0.337041ms)
-✔ should compute subset token impact by task class with savings rates (0.457458ms)
-✔ should build subset token impact dashboard summary from report (0.253583ms)
-✔ should execute dependency graph with concurrency (19.669ms)
-✔ should retry failing node and return failure after attempts (5.769791ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✖ tests/orchestration/local-deployment-detector.test.js (111.643125ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -105,12 +119,35 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/orchestrator.test.js (110.544416ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✖ tests/orchestration/maintenance-and-shadow.test.js (89.904708ms)
+✔ should require explicit approval for repository memory writes (1.4815ms)
+✔ should keep legacy aliases mapped to layered memory contract (0.125084ms)
+✔ should persist write-path provenance and source metadata (0.076083ms)
+✔ should expire entries based on ttl (13.468333ms)
+✔ should index and query task and repository metadata (1.496375ms)
+✔ should suppress stale indexed metadata and weight by provenance (11.003834ms)
+✔ should prune expired metadata and reindex deterministically (12.060333ms)
+✔ should compact and archive stale low-value memory entries (0.554042ms)
+✔ should group weekly scorecard by objective and model tier with token totals, average, and pass rate (12.524084ms)
+✔ should compute multi-step reliability rates deterministically (0.560333ms)
+✔ should compute subset token impact by task class with savings rates (0.452458ms)
+✔ should build subset token impact dashboard summary from report (0.310792ms)
+✔ should execute dependency graph with concurrency (19.104542ms)
+✔ should retry failing node and return failure after attempts (5.862708ms)
+✔ should orchestrate request, verify evidence, and produce trace (14.079125ms)
+✔ should block policy violating request (0.179458ms)
+✔ should throw on invalid lifecycle transition (0.165458ms)
+✔ should create recovery plan and complete orchestration when verification fails (1.85525ms)
+✔ should fail with SKILL_POLICY_BLOCKED when selected agent lacks required skills (1.138ms)
+✔ should include orientedContext in successful response (0.900042ms)
+✔ should use verification cache for repeated low risk requests (0.874625ms)
+✔ should trigger premium fallback for low quality successful verification (0.293917ms)
+✔ should emit subset violation paging alert in production environment (0.391333ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -123,19 +160,21 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/persistence-and-weights.test.js (123.100042ms)
-✔ should block high-risk operations without confirmation (1.405375ms)
-✔ should fail verification when test/security evidence is missing (0.255792ms)
-✔ should audit prompt skill references and flag duplicate entries (4.254542ms)
-✔ should enforce exception expiry and expose closure log through helper (0.259ms)
-✔ should infer backend specialist deterministically from backend task (0.654167ms)
-✔ should evaluate relationship shadow and flag mismatch (0.088792ms)
-✔ should track mismatch summary with bounded samples (0.092292ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✖ tests/orchestration/p4-token-economics.test.js (91.86875ms)
+✔ should persist and restore orchestration memory and learning state (9.879542ms)
+✔ should accept custom scoring weights for routing calibration (0.29425ms)
+✔ should block high-risk operations without confirmation (0.634459ms)
+✔ should fail verification when test/security evidence is missing (0.127042ms)
+✔ should audit prompt skill references and flag duplicate entries (4.495667ms)
+✔ should enforce exception expiry and expose closure log through helper (0.244334ms)
+✔ should infer backend specialist deterministically from backend task (0.667958ms)
+✔ should evaluate relationship shadow and flag mismatch (0.09175ms)
+✔ should track mismatch summary with bounded samples (0.102084ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -148,12 +187,12 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/retrieval-planner.test.js (104.473625ms)
-file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/memory-store.js:86
-function scoreRepositoryGraphSignals(payload, intentTerm, tokens, baseScore) {
-^
+✖ tests/orchestration/retrieval-planner.test.js (99.875959ms)
+file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/src/orchestration/local-deployment-detector.js:17
+     if (this.detectionPromise) {
+     ^^
 
-SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
+SyntaxError: Unexpected token 'if'
     at compileSourceTextModule (node:internal/modules/esm/utils:354:16)
     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:91:18)
     at #translate (node:internal/modules/esm/loader:451:20)
@@ -166,64 +205,122 @@ SyntaxError: Identifier 'scoreRepositoryGraphSignals' has already been declared
     at ModuleJob.link (node:internal/modules/esm/module_job:245:17)
 
 Node.js v25.8.2
-✖ tests/orchestration/retrieval-quality.test.js (107.007958ms)
-✔ should select backend specialist for backend domain within budget (0.804333ms)
-✔ should penalize high token cost candidates when budget is low (0.084167ms)
-✔ should apply risk budget overrides for high and critical tasks (0.667792ms)
-✔ should return applied budget in routeTask result (0.099334ms)
-✔ should isolate tenant state in shared indexed store (2.473458ms)
-✔ should grant and verify active skill exception (0.777375ms)
-✔ should expire grant and append audit events (0.128208ms)
-✔ should enforce expiry job and return closure log entries (0.14325ms)
-✔ should define minimum manifests for all active default capability ids (0.783208ms)
-✔ should infer required skills deterministically from task keywords (0.68025ms)
-✔ should allow when required skills are subset of manifest (0.427292ms)
-✔ should deny by default when required skills are missing from manifest (0.119666ms)
-✔ should allow denied skill when temporary exception is active (0.620041ms)
-✔ should resolve compiled subset using role, domain, and risk (0.053916ms)
-✔ should validate schema v2 manifests with explicit deny and expiry fields (0.055125ms)
-✔ should pass policy lint for all compiled rows (0.252542ms)
-✔ should return deterministic cached subset resolution for repeated signatures (0.106292ms)
-✔ should provide actionable preflight dry-run denial messages (0.144ms)
-ℹ tests 47
-ℹ suites 0
-ℹ pass 39
-ℹ fail 8
+✖ tests/orchestration/retrieval-quality.test.js (88.519667ms)
+✔ should select backend specialist for backend domain within budget (1.0095ms)
+✔ should penalize high token cost candidates when budget is low (0.321083ms)
+✖ should apply risk budget overrides for high and critical tasks (2.044833ms)
+✖ should return applied budget in routeTask result (0.182333ms)
+✔ should isolate tenant state in shared indexed store (2.389042ms)
+✔ should grant and verify active skill exception (0.700958ms)
+✔ should expire grant and append audit events (0.107042ms)
+✔ should enforce expiry job and return closure log entries (0.089208ms)
+✔ should define minimum manifests for all active default capability ids (1.579125ms)
+✔ should infer required skills deterministically from task keywords (1.164917ms)
+✔ should allow when required skills are subset of manifest (0.881ms)
+✔ should deny by default when required skills are missing from manifest (0.413042ms)
+✔ should allow denied skill when temporary exception is active (0.604334ms)
+✔ should resolve compiled subset using role, domain, and risk (0.13425ms)
+✔ should validate schema v2 manifests with explicit deny and expiry fields (0.074584ms)
+✔ should pass policy lint for all compiled rows (0.445458ms)
+✔ should return deterministic cached subset resolution for repeated signatures (0.111167ms)
+✔ should provide actionable preflight dry-run denial messages (0.160916ms)
+ℹ tests 80
+ℹ suites 3
+ℹ pass 70
+ℹ fail 10
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 10291.306
+ℹ duration_ms 10230.561708
 
 ✖ failing tests:
 
 test at tests/orchestration/api-security.test.js:1:1
-✖ tests/orchestration/api-security.test.js (190.846167ms)
+✖ tests/orchestration/api-security.test.js (130.308542ms)
   'test failed'
 
 test at tests/orchestration/api-server.test.js:1:1
-✖ tests/orchestration/api-server.test.js (188.048167ms)
+✖ tests/orchestration/api-server.test.js (115.698958ms)
+  'test failed'
+
+test at tests/orchestration/cross-priority-benchmark-report.test.js:1:1
+✖ tests/orchestration/cross-priority-benchmark-report.test.js (107.59625ms)
+  'test failed'
+
+test at tests/orchestration/local-deployment-detector.test.js:1:1
+✖ tests/orchestration/local-deployment-detector.test.js (111.643125ms)
   'test failed'
 
 test at tests/orchestration/maintenance-and-shadow.test.js:1:1
-✖ tests/orchestration/maintenance-and-shadow.test.js (157.0405ms)
+✖ tests/orchestration/maintenance-and-shadow.test.js (89.904708ms)
   'test failed'
 
-test at tests/orchestration/memory-store.test.js:1:1
-✖ tests/orchestration/memory-store.test.js (137.134ms)
-  'test failed'
-
-test at tests/orchestration/orchestrator.test.js:1:1
-✖ tests/orchestration/orchestrator.test.js (110.544416ms)
-  'test failed'
-
-test at tests/orchestration/persistence-and-weights.test.js:1:1
-✖ tests/orchestration/persistence-and-weights.test.js (123.100042ms)
+test at tests/orchestration/p4-token-economics.test.js:1:1
+✖ tests/orchestration/p4-token-economics.test.js (91.86875ms)
   'test failed'
 
 test at tests/orchestration/retrieval-planner.test.js:1:1
-✖ tests/orchestration/retrieval-planner.test.js (104.473625ms)
+✖ tests/orchestration/retrieval-planner.test.js (99.875959ms)
   'test failed'
 
 test at tests/orchestration/retrieval-quality.test.js:1:1
-✖ tests/orchestration/retrieval-quality.test.js (107.007958ms)
+✖ tests/orchestration/retrieval-quality.test.js (88.519667ms)
   'test failed'
+
+test at tests/orchestration/router.test.js:52:1
+✖ should apply risk budget overrides for high and critical tasks (2.044833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   budgetConflicts: [
+  +     'tokenBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM budget)',
+  +     'latencyBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM latency budget)'
+  +   ],
+      latencyBudgetTier: 'MEDIUM',
+      tokenBudgetTier: 'MEDIUM'
+    }
+  
+      at TestContext.<anonymous> (file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/tests/orchestration/router.test.js:57:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { tokenBudgetTier: 'MEDIUM', latencyBudgetTier: 'MEDIUM', budgetConflicts: [ 'tokenBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM budget)', 'latencyBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM latency budget)' ] },
+    expected: { tokenBudgetTier: 'MEDIUM', latencyBudgetTier: 'MEDIUM' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/orchestration/router.test.js:66:1
+✖ should return applied budget in routeTask result (0.182333ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   budgetConflicts: [
+  +     'tokenBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM budget)',
+  +     'latencyBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM latency budget)'
+  +   ],
+      latencyBudgetTier: 'MEDIUM',
+      tokenBudgetTier: 'MEDIUM'
+    }
+  
+      at TestContext.<anonymous> (file:///Users/nunobarros/Documents/vscode/AI-Engineering-Platform/tests/orchestration/router.test.js:74:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { tokenBudgetTier: 'MEDIUM', latencyBudgetTier: 'MEDIUM', budgetConflicts: [ 'tokenBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM budget)', 'latencyBudgetTier overridden from LOW to MEDIUM (HIGH risk requires minimum MEDIUM latency budget)' ] },
+    expected: { tokenBudgetTier: 'MEDIUM', latencyBudgetTier: 'MEDIUM' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

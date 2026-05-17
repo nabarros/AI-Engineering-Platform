@@ -1,9 +1,22 @@
 import { AgentOrchestrator } from "./orchestrator.js";
 import { DEFAULT_CAPABILITY_REGISTRY } from "./default-capability-registry.js";
 import { DEFAULT_SCORING_WEIGHTS } from "./router.js";
+import { LocalDeploymentDetector } from "./local-deployment-detector.js";
 
 export function createRouterRuntimeAdapter(options = {}) {
   const weightTuner = options.weightTuner;
+  const detector = new LocalDeploymentDetector({
+    enabled: options.detectorEnabled !== false,
+    healthCheckTimeout: options.healthCheckTimeout || 200,
+    enrichmentTimeout: options.enrichmentTimeout || 500,
+    cacheTtl: options.cacheTtl || 30_000,
+    orchestrationHost: options.orchestrationHost || 'localhost',
+    orchestrationPort: options.orchestrationPort || 8787,
+    sharedStateHost: options.sharedStateHost || 'localhost',
+    sharedStatePort: options.sharedStatePort || 8790,
+    weaviateHost: options.weaviateHost || 'localhost',
+    weaviatePort: options.weaviatePort || 8080
+  });
   const orchestrator = new AgentOrchestrator({
     capabilityRegistry: options.capabilityRegistry || DEFAULT_CAPABILITY_REGISTRY,
     stateStore: options.stateStore,
@@ -15,18 +28,27 @@ export function createRouterRuntimeAdapter(options = {}) {
     tokenBudgetAllocator: options.tokenBudgetAllocator,
     tokenForecaster: options.tokenForecaster,
     downgradePolicy: options.downgradePolicy,
-    responseCache: options.responseCache
+    responseCache: options.responseCache,
+    localDeploymentDetector: detector
   });
 
   return {
     async orchestrateRouting(input) {
+      let localContext = null;
+      try {
+        localContext = await detector.detect();
+      } catch (error) {
+        console.warn('[RuntimeAdapter] Local deployment detection failed:', error.message);
+      }
+
       const result = await orchestrator.processRequest({
         requestId: input.requestId,
         task: input.task,
         budget: input.budget,
         confirmation: input.confirmation,
         executionEvidence: input.executionEvidence,
-        runtimeEnvironment: input.runtimeEnvironment
+        runtimeEnvironment: input.runtimeEnvironment,
+        localContext: localContext
       });
 
       const output = {
@@ -64,6 +86,12 @@ export function createRouterRuntimeAdapter(options = {}) {
         spendAttribution: result.spendAttribution || null,
         activeWeights: weightTuner ? weightTuner.getWeights() : (options.scoringWeights || DEFAULT_SCORING_WEIGHTS),
         rollingMetrics: weightTuner ? weightTuner.getRollingMetrics() : null,
+        localDeployment: localContext ? {
+          detected: localContext.isAvailable,
+          services: localContext.services,
+          enrichmentAvailable: !!localContext.enrichmentData,
+          enrichmentError: localContext.enrichmentError || null
+        } : null,
         ok: result.ok,
         error: result.error || null
       };

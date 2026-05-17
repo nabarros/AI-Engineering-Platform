@@ -1,4 +1,5 @@
 export { AgentOrchestrator, ORCHESTRATION_STATES, assertLifecycleTransition } from "./orchestrator.js";
+export { LocalDeploymentDetector, LocalDeploymentContext } from "./local-deployment-detector.js";
 export { DEFAULT_CAPABILITY_REGISTRY } from "./default-capability-registry.js";
 export { CAPABILITY_SCHEMA_VERSION, getCapabilityRegistrySchema } from "./capability-registry.js";
 export { OrchestrationMemory } from "./memory-store.js";

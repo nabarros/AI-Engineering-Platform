@@ -75,7 +75,8 @@ export class AgentOrchestrator {
     tokenBudgetAllocator = null,
     tokenForecaster = null,
     downgradePolicy = null,
-    responseCache = null
+    responseCache = null,
+    localDeploymentDetector = null
   }) {
     validateCapabilityRegistry(capabilityRegistry);
     this.capabilityRegistry = capabilityRegistry;
@@ -91,6 +92,7 @@ export class AgentOrchestrator {
     this.tokenForecaster = tokenForecaster || createTokenForecaster();
     this.downgradePolicy = downgradePolicy || createDowngradePolicy();
     this.responseCache = responseCache || createResponseCache();
+    this.localDeploymentDetector = localDeploymentDetector;
     this.taskClassCounts = new Map();
     this.spendEvents = [];
     this.initializationPromise = this.stateStore ? this.restoreState() : Promise.resolve();
@@ -134,7 +136,66 @@ export class AgentOrchestrator {
     }));
   }
 
-  async processRequest({ requestId, task, budget, confirmation = false, executionEvidence, runtimeEnvironment = "development" }) {
+  _adjustCandidatesWithLocalContext(route, localContext) {
+    if (!localContext || !localContext.enrichmentData || !route.scores || route.scores.length === 0) {
+      return route;
+    }
+
+    const { routerMemory, capabilityRegistry: localCapabilities } = localContext.enrichmentData;
+    const adjustedScores = route.scores.map(scoreEntry => {
+      const capability = route.scores[0].capabilityId === scoreEntry.capabilityId ? route.selected : null;
+      let adjustedComponents = { ...scoreEntry.components };
+
+      // Boost domain score if capability is found in local registry
+      if (localCapabilities && Array.isArray(localCapabilities)) {
+        const localCapFound = localCapabilities.find(c => c.id === scoreEntry.capabilityId);
+        if (localCapFound) {
+          adjustedComponents.domainScore = 1.0;
+        }
+      }
+
+      // Update learning score from local router memory success rates
+      if (routerMemory && routerMemory.successRates && routerMemory.successRates[scoreEntry.capabilityId]) {
+        adjustedComponents.learningScore = routerMemory.successRates[scoreEntry.capabilityId];
+      }
+
+      // Recalculate total score with adjusted components
+      const weights = this.scoringWeights || { domain: 0.35, quality: 0.25, learning: 0.2, cost: 0.12, latency: 0.08 };
+      const adjustedTotalScore = (
+        adjustedComponents.domainScore * weights.domain +
+        adjustedComponents.qualityScore * weights.quality +
+        adjustedComponents.learningScore * weights.learning +
+        adjustedComponents.costScore * weights.cost +
+        adjustedComponents.latencyScore * weights.latency
+      );
+
+      return {
+        ...scoreEntry,
+        components: adjustedComponents,
+        totalScore: Number(adjustedTotalScore.toFixed(4)),
+        localContextApplied: true,
+        localSuccessRate: routerMemory?.successRates?.[scoreEntry.capabilityId] || null
+      };
+    });
+
+    // Re-sort by total score
+    adjustedScores.sort((a, b) => b.totalScore - a.totalScore);
+
+    // Update selected to top candidate after re-sorting
+    const selectedId = adjustedScores[0].capabilityId;
+    const selectedCapability = route.selected.id === selectedId ? route.selected : null;
+
+    return {
+      ...route,
+      scores: adjustedScores,
+      selected: selectedCapability,
+      routingConfidence: Math.min(1, adjustedScores[0].totalScore),
+      scoreGap: adjustedScores.length > 1 ? Number((adjustedScores[0].totalScore - adjustedScores[1].totalScore).toFixed(4)) : 0,
+      explanation: `Selected ${selectedId} with local deployment enrichment (confidence: ${(Math.min(1, adjustedScores[0].totalScore) * 100).toFixed(1)}%)`
+    };
+  }
+
+  async processRequest({ requestId, task, budget, confirmation = false, executionEvidence, runtimeEnvironment = "development", localContext = null }) {
     await this.initializationPromise;
 
     const tracer = new TraceCollector(requestId);
@@ -279,6 +340,27 @@ export class AgentOrchestrator {
         learningStats: learningSnapshot,
         scoringWeights: activeWeights
       });
+    }
+
+    // Apply local deployment context if available
+    if (localContext && localContext.isAvailable && localContext.enrichmentData) {
+      const adjustedRoute = this._adjustCandidatesWithLocalContext(route, localContext);
+      tracer.addLocalDetectionEvent(localContext);
+      tracer.addLocalEnrichmentEvent(localContext.enrichmentData, null);
+      const adjustmentSummary = {
+        domainScoresImproved: adjustedRoute.scores.filter((s, i) => s.totalScore > (route.scores[i]?.totalScore || 0)).length,
+        learningScoresUpdated: adjustedRoute.scores.filter(s => s.localSuccessRate !== null).length,
+        maxDomainBoost: Math.max(...adjustedRoute.scores.map(s => s.components.domainScore - (route.scores.find(r => r.capabilityId === s.capabilityId)?.components.domainScore || 0))),
+        avgLearningAdjustment: adjustedRoute.scores.reduce((sum, s) => sum + (s.components.learningScore - (route.scores.find(r => r.capabilityId === s.capabilityId)?.components.learningScore || 0)), 0) / adjustedRoute.scores.length
+      };
+      tracer.addLocalScoreAdjustmentEvent(adjustedRoute.scores.length, adjustmentSummary);
+      route = adjustedRoute;
+    } else if (localContext) {
+      tracer.addLocalDetectionEvent(localContext);
+      if (localContext.enrichmentError) {
+        tracer.addLocalEnrichmentEvent(null, new Error(localContext.enrichmentError));
+      }
+      tracer.addLocalFallbackEvent(localContext.isAvailable ? 'UNAVAILABLE_ENRICHMENT' : 'LOCAL_DEPLOYMENT_UNAVAILABLE');
     }
 
     if (!route.selected) {
