@@ -116,6 +116,7 @@ show_status() {
   echo ""
   echo "  📡 Orchestration API:     http://localhost:8787"
   echo "  📊 Shared State Service:  http://localhost:8790"
+  echo "  🧠 Router Knowledge MCP:  http://localhost:8791"
   echo "  🐘 PostgreSQL:            localhost:5432"
   echo "  🔴 Redis:                 localhost:6379"
   echo "  🔍 Weaviate:              http://localhost:8080"
@@ -136,6 +137,13 @@ check_service_health() {
     log_success "Orchestration API is healthy"
   else
     log_warning "Orchestration API is not responding"
+  fi
+
+  # Router Knowledge MCP
+  if curl -s http://localhost:8791/health > /dev/null 2>&1; then
+    log_success "Router Knowledge MCP is healthy"
+  else
+    log_warning "Router Knowledge MCP is not responding"
   fi
   
   # PostgreSQL
@@ -347,6 +355,7 @@ ${YELLOW}EXAMPLES:${NC}
 ${YELLOW}SERVICE ENDPOINTS:${NC}
   Orchestration API:    http://localhost:8787
   Shared State Service: http://localhost:8790
+  Router Knowledge MCP: http://localhost:8791
   PostgreSQL:           localhost:5432
   Redis:                localhost:6379
   Weaviate:             http://localhost:8080

@@ -211,3 +211,50 @@ Use this quick check to confirm full functionality:
 8. `.github/skills/aiep-memory-sync/SKILL.md`
 9. `.github/hooks/aiep-guardrails.json`
 10. `.github/hooks/scripts/pretool-guardrails.cjs`
+
+---
+
+## 12. Connect the Router Knowledge MCP Server
+
+The Router Knowledge MCP server lets the router agent store and retrieve routing decisions locally, saving tokens on semantically similar tasks.
+
+### Start the server
+
+```bash
+# From the AI-Engineering-Platform directory
+bash scripts/deploy-local-docker.sh --redeploy
+# Or MCP only
+docker compose up -d mcp
+# Server listens on http://localhost:8791
+```
+
+### Register in VS Code settings
+
+Add to `.vscode/settings.json` or your user settings JSON:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "aiep-router-knowledge": {
+        "url": "http://localhost:8791",
+        "type": "http"
+      }
+    }
+  }
+}
+```
+
+### Verify the connection
+
+Open Copilot Chat and run any router prompt. The routing report will include a `route.knowledge_hit` or `route.knowledge_miss` trace event showing whether the local store was consulted.
+
+### Requirements
+
+- Docker stack must be running with Weaviate and MCP (`docker compose up -d weaviate mcp` minimum).
+- `OPENAI_API_KEY` must be set in `.env` for Weaviate's `text2vec-openai` vectorizer to auto-embed prompts.
+- If the server is unreachable, routing proceeds normally — the knowledge store is always non-blocking.
+
+### Disable the knowledge store
+
+Pass `enabled: false` via the `ROUTER_KNOWLEDGE_ENABLED=false` environment variable, or leave the MCP server stopped. Routing is unaffected either way.

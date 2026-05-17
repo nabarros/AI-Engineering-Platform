@@ -38,6 +38,7 @@ bash scripts/deploy-local-docker.sh --fresh
 | **Redis** | localhost:6379 |
 | **Weaviate Vector DB** | http://localhost:8080 |
 | **Kafka** | localhost:9092 |
+| **Router Knowledge MCP** | http://localhost:8791 |
 
 ```bash
 # Verify all services are healthy
@@ -244,7 +245,8 @@ Engineer -> Router -> Token Budget + Model Tier -> Specialist Agent -> Verificat
 # 1) Start shared state + orchestration API
 npm run start:shared-state-service
 ORCHESTRATION_SHARED_STATE_URL=http://127.0.0.1:8790 npm run start:orchestration-api
-
+# 3) Ensure MCP is running in Docker (if not already started by deploy script)
+docker compose up -d mcp
 # 2) Send one orchestration request
 curl -s -X POST http://127.0.0.1:8787/orchestrate \
   -H "Content-Type: application/json" \
@@ -304,6 +306,57 @@ The router selects one primary specialist per request using deterministic scorin
 - [Agent Orchestration Diagram](docs/AGENT_ORCHESTRATION.md)
 - [Agent Directory](.github/agents/README.md)
 - [AGENT_GUIDE.md](AGENT_GUIDE.md) for prompt examples
+
+---
+
+## Router Knowledge Store
+
+The Router Knowledge Store enables the AIEP router agent to **consult and persist routing decisions locally**, saving external LLM tokens on semantically similar tasks.
+
+### How it works
+
+1. Before routing, the agent performs a semantic lookup (`aiep_knowledge_lookup`) against a local Weaviate index.
+2. On a cache hit (cosine similarity ≥ 0.88), the stored routing decision is reused — no external LLM call.
+3. After routing, the result is stored asynchronously (`aiep_knowledge_store`) — fire-and-forget, never blocking.
+4. A circuit breaker (opens after 3 failures, resets after 30 s) ensures AIEP unavailability never blocks routing.
+
+### Start the MCP server
+
+```bash
+bash scripts/deploy-local-docker.sh --redeploy
+# Or start MCP only
+docker compose up -d mcp
+# Listens on http://localhost:8791
+```
+
+### Register in VS Code
+
+Add to your VS Code settings (`.vscode/settings.json` or user settings):
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "aiep-router-knowledge": {
+        "url": "http://localhost:8791",
+        "type": "http"
+      }
+    }
+  }
+}
+```
+
+### Knowledge store REST endpoints (via Orchestration API)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/v1/router/knowledge/lookup` | Semantic search for matching routing decision |
+| `POST` | `/v1/router/knowledge/store` | Persist a routing decision (async) |
+| `GET`  | `/v1/router/knowledge/health` | Circuit breaker and schema status |
+
+Requires `OPENAI_API_KEY` set in `.env` for Weaviate's `text2vec-openai` vectorizer. Without it, lookup/store are silently skipped.
+
+For the full setup guide, see [docs/VSCODE_COPILOT_SETUP.md](./docs/VSCODE_COPILOT_SETUP.md).
 
 ---
 

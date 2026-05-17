@@ -57,7 +57,7 @@ If Kafka or Weaviate restart unexpectedly, increase Docker Desktop memory in **S
 
 ## Architecture Overview
 
-The local stack runs six containers, all on the `aiep-network` bridge:
+The local stack runs seven containers (including the optional MCP service), all on the `aiep-network` bridge:
 
 | Container | Purpose | Host Port(s) |
 |---|---|---|
@@ -67,6 +67,7 @@ The local stack runs six containers, all on the `aiep-network` bridge:
 | `aiep-weaviate` | Weaviate 1.24 — vector database | 8080, 50051 |
 | `kafka` | Apache Kafka 3.6 — event streaming | 9092 |
 | `zookeeper` | Kafka coordinator | 2181 |
+| `aiep-mcp` *(optional)* | Router Knowledge MCP server — VS Code knowledge tool | 8791 |
 
 ### Data persistence
 
@@ -180,6 +181,7 @@ Copy [.env.example](.env.example) to `.env` and adjust as needed. **Never commit
 | `ORCHESTRATION_PORT` | `8787` | Orchestration API port |
 | `ORCHESTRATION_STATE_PORT` | `8790` | Shared state service port |
 | `ORCHESTRATION_STATE_API_KEY` | *(generated)* | API key for state service calls |
+| `MCP_KNOWLEDGE_PORT` | `8791` | Port for the Router Knowledge MCP server |
 
 **Data layer**
 
@@ -231,6 +233,27 @@ bash scripts/deploy-local-docker.sh --redeploy --no-build
 ---
 
 ## Development Workflow
+
+### Starting the Router Knowledge MCP server
+
+The MCP server starts automatically as part of the Docker stack when you run either:
+
+```bash
+bash scripts/deploy-local-docker.sh --fresh
+bash scripts/deploy-local-docker.sh --redeploy
+```
+
+For MCP-only lifecycle operations:
+
+```bash
+# Start only MCP
+docker compose up -d mcp
+
+# Stop only MCP
+docker compose stop mcp
+```
+
+VS Code continues to connect through `http://localhost:8791`, and routing remains non-blocking if MCP is down.
 
 ### Inner loop (code changes only)
 

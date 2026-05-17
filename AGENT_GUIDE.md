@@ -58,6 +58,24 @@ ON DEMAND (when explicitly relevant):
 
 ---
 
+## 2.5 Local Router Knowledge Store
+
+When the AIEP stack is running locally with the MCP server active, the router agent automatically consults and stores routing decisions in a local Weaviate index before dispatching to external LLMs.
+
+- **Pre-routing**: semantic lookup via `aiep_knowledge_lookup` (500 ms timeout, fail-open)
+- **Post-routing**: async store via `aiep_knowledge_store` (fire-and-forget)
+- **Benefit**: cache hits return 0 external LLM tokens
+
+Start the MCP server before using the router:
+
+```bash
+docker compose up -d mcp
+```
+
+See [docs/VSCODE_COPILOT_SETUP.md §12](./docs/VSCODE_COPILOT_SETUP.md) and [README.md — Router Knowledge Store](./README.md) for full setup.
+
+---
+
 ## 3. Technology Stack
 
 | Layer | Technology | Notes |

@@ -179,6 +179,35 @@ services:
     stdin_open: true
     tty: true
 
+  # Router Knowledge MCP Server
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aiep-mcp
+    depends_on:
+      weaviate:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      MCP_KNOWLEDGE_PORT: ${MCP_KNOWLEDGE_PORT:-8791}
+      WEAVIATE_URL: http://weaviate:8080
+    command: ["npm", "run", "start:mcp-server"]
+    ports:
+      - "8791:8791"
+    volumes:
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8791/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 5
+    networks:
+      - aiep-network
+    restart: unless-stopped
+
 networks:
   aiep-network:
     driver: bridge
