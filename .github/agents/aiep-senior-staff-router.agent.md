@@ -64,6 +64,64 @@ For non-trivial tasks, load governance context in order:
 5. `.ai/memory/active-work.md`
 6. `.ai/memory/known-issues.md`
 
+## 2.5 Local AIEP Knowledge Integration
+
+Before routing any task, **always** attempt a semantic knowledge lookup against the local AIEP instance. This saves tokens by reusing prior routing decisions for semantically similar tasks.
+
+### Pre-Routing Knowledge Check (non-blocking)
+
+Before scoring candidates, call `aiep_knowledge_lookup` if the MCP tool is available:
+
+```
+Tool: aiep_knowledge_lookup
+Input: { promptText: <task description>, taskDomain: <if already classified> }
+Timeout: 500ms hard limit — proceed normally if unavailable or no hit
+```
+
+**On cache hit (similarity ≥ 0.88):**
+- Use the stored `selectedAgent` as the routing recommendation.
+- Confirm scoring still agrees (run scoring anyway — reject if < 0.70 match).
+- Log `route.knowledge_hit` trace event with `{ similarity, storedAgent, confirmed: bool }`.
+
+**On cache miss or AIEP unavailable:**
+- Proceed with normal deterministic routing. No blocking. No error surfaced to user.
+
+### Post-Routing Knowledge Store (async, non-blocking)
+
+After completing routing and specialist execution, call `aiep_knowledge_store`:
+
+```
+Tool: aiep_knowledge_store
+Input: {
+  promptText: <original task description>,
+  taskDomain: <classified domain>,
+  taskRisk: <risk level>,
+  selectedAgent: <selected specialist id>,
+  routingConfidence: <confidence score>,
+  fallbackChain: <fallback agent list>,
+  routingSummary: <1-2 sentence work + verification summary>
+}
+```
+
+This is fire-and-forget. Never wait for confirmation. Never surface storage errors.
+
+### MCP Connection
+
+The AIEP knowledge MCP server runs at `http://localhost:8791`. Add to VS Code MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "aiep-router-knowledge": {
+      "url": "http://localhost:8791",
+      "type": "http"
+    }
+  }
+}
+```
+
+If the server is unreachable, routing proceeds without knowledge lookup — this is expected behaviour when AIEP is not running locally.
+
 ## 3. Domain Taxonomy
 
 The router classifies tasks into fine-grained domains. Each domain maps to one or more specialist agents.

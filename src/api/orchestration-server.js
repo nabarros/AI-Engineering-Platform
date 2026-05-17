@@ -15,6 +15,7 @@ import {
   executeTaskGraph
 } from "../orchestration/index.js";
 import { createAuthGuard, IdempotencyCache, SlidingWindowRateLimiter } from "./security-controls.js";
+import { getRouterKnowledgeStore } from "../services/router-knowledge-store.js";
 
 function safeJsonParse(raw) {
   try {
@@ -233,6 +234,35 @@ export function createOrchestrationServer(options = {}) {
         data: graphResult,
         meta: { tenantId }
       });
+    }
+
+    // ── Router Knowledge routes ──────────────────────────────────────────
+    if (method === "POST" && url === "/v1/router/knowledge/lookup") {
+      const promptText = input?.promptText;
+      if (!promptText || typeof promptText !== "string") {
+        return sendJson(res, 400, { error: "promptText is required", code: "VALIDATION_ERROR" });
+      }
+      const store = getRouterKnowledgeStore();
+      const hit = await store.lookup(promptText, {
+        taskDomain: input?.taskDomain,
+        taskRisk: input?.taskRisk
+      });
+      return sendJson(res, 200, { data: hit, hit: hit !== null });
+    }
+
+    if (method === "POST" && url === "/v1/router/knowledge/store") {
+      const entry = input;
+      if (!entry?.promptText || !entry?.selectedAgent) {
+        return sendJson(res, 400, { error: "promptText and selectedAgent are required", code: "VALIDATION_ERROR" });
+      }
+      const store = getRouterKnowledgeStore();
+      store.store(entry);
+      return sendJson(res, 202, { data: { queued: true } });
+    }
+
+    if (method === "GET" && url === "/v1/router/knowledge/health") {
+      const store = getRouterKnowledgeStore();
+      return sendJson(res, 200, { data: store.healthStatus() });
     }
 
     return sendJson(res, 404, {
