@@ -240,9 +240,15 @@ export class AgentOrchestrator {
 
     let route;
     let compoundRoute = null;
+    // For routing, use the user's requested budget tier if provided
+    // The model tier decision is for token allocation, not agent selection
+    const routingBudget = budget?.tokenBudgetTier
+      ? budget.tokenBudgetTier  // User explicitly requested this tier
+      : (budgetDecision.effectiveTier || "MEDIUM");  // Fall back to budget decision
+    
     const effectiveBudget = {
       ...(budget || {}),
-      tokenBudgetTier: budgetDecision.effectiveTier
+      tokenBudgetTier: routingBudget
     };
 
     if (classification.isCompound) {

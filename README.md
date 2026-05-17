@@ -10,6 +10,55 @@
 [![Security Guardrails](https://img.shields.io/badge/Security-Guardrails-f97316?style=for-the-badge)](./docs/SECURITY_RULES.md)
 [![P0–P4 Implemented](https://img.shields.io/badge/Roadmap-P0–P4%20Implemented-7c3aed?style=for-the-badge)](./docs/reports/aiep_sustainable_implementation_roadmap.md)
 
+## 🚀 Quick Start with Docker
+
+Get AIEP running locally in seconds with Docker Compose:
+
+```bash
+# 1. Copy environment template
+cp .env.example .env
+
+# 2. (Optional) Edit .env for your LLM API keys
+# Open .env and add:
+#   - OPENAI_API_KEY=sk-...
+#   - ANTHROPIC_API_KEY=...
+# Or keep defaults for local-only testing
+
+# 3. Start all services (fresh deployment)
+bash scripts/deploy-local-docker.sh --fresh
+```
+
+**Wait for health checks** (~30-60 seconds), then access:
+
+| Service | URL / Port |
+|---------|-----------|
+| **Orchestration API** | http://localhost:8787 |
+| **Shared State Service** | http://localhost:8790 |
+| **PostgreSQL** | localhost:5432 |
+| **Redis** | localhost:6379 |
+| **Weaviate Vector DB** | http://localhost:8080 |
+| **Kafka** | localhost:9092 |
+
+```bash
+# Verify all services are healthy
+bash scripts/deploy-local-docker.sh --status
+
+# Stream logs from all services
+bash scripts/deploy-local-docker.sh --logs
+
+# Restart without rebuilding images
+bash scripts/deploy-local-docker.sh --redeploy --no-build
+
+# Stop all services and clean up
+bash scripts/deploy-local-docker.sh --down
+```
+
+For the complete local Docker Desktop setup guide (service topology, LLM keys, troubleshooting), see [docs/DOCKER_DESKTOP_LOCAL_SETUP.md](./docs/DOCKER_DESKTOP_LOCAL_SETUP.md).
+
+For CI/CD and production deployment, see [docs/DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md).
+
+---
+
 ## Quick Navigation
 
 - [Start Here: VS Code + GitHub Copilot Setup](#start-here-vs-code--github-copilot-setup)
@@ -223,7 +272,7 @@ curl -s -X POST http://127.0.0.1:8787/orchestrate \
 
 The router selects one primary specialist per request using deterministic scoring across domain, risk, quality, cost, and latency.
 
-**8 routing-system agents (Router + 7 specialists):**
+**11 routing-system agents (Router + 10 specialists):**
 - **Router** — Entry point and deterministic specialist selection
 - **Context Planner** — Pre-execution planning, risk scoping, context loading
 - **Code Reviewer** — Review-first, security audit, quality validation
@@ -232,6 +281,9 @@ The router selects one primary specialist per request using deterministic scorin
 - **Senior Frontend** — React/TS UI, state management, accessibility
 - **Senior UI/UX** — User journeys, interaction design, design systems
 - **Senior SRE** — Observability, incident readiness, SLI/SLO, release safety
+- **Senior AI/LLM** — LLM integration, prompt engineering, RAG pipelines, model evaluation
+- **Senior Architect** — System design, ADRs, service boundaries, API contracts
+- **Senior DevOps** — CI/CD, containerisation, infrastructure-as-code, release management
 
 **How it works:**
 1. Request routed by deterministic scoring (domain → quality → history → cost → latency)
@@ -502,6 +554,8 @@ tests/orchestration/         Orchestration test suite (81 defined test cases)
 - [Engineering Standards](./docs/ENGINEERING_STANDARDS.md)
 - [Error Handling](./docs/ERROR_HANDLING.md)
 - [Deployment Guide](./docs/DEPLOYMENT_GUIDE.md)
+- [Docker Desktop Local Setup](./docs/DOCKER_DESKTOP_LOCAL_SETUP.md) — complete guide for running AIEP locally on Docker Desktop
+- [Router Behavior Audit](./docs/ROUTER_BEHAVIOR_AUDIT.md) — scoring model, fixed edge cases, remaining recommendations
 - [Context Loading Strategy](./docs/CONTEXT_LOADING_STRATEGY.md)
 - [Retrieval Strategy](./docs/RETRIEVAL_STRATEGY.md)
 

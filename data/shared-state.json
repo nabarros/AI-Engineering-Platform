@@ -1,0 +1,2608 @@
+{
+  "namespaces": {
+    "default": {
+      "memory": {
+        "session": [
+          [
+            "api-1779039809556:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Add a new REST endpoint for listing users with pagination.",
+                  "dependsOn": [],
+                  "domain": "backend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "API contract tests pass.",
+                    "No N+1 queries detected.",
+                    "Error handling covers edge cases."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779039809562,
+              "updatedAt": 1779039809562,
+              "expiresAt": 1779041609562,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039809562,
+                "updatedAt": 1779039809562,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039809556:classification",
+            {
+              "value": {
+                "primaryDomain": "backend",
+                "allDomains": [
+                  {
+                    "domain": "backend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779039809562,
+              "updatedAt": 1779039809562,
+              "expiresAt": 1779041609562,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039809562,
+                "updatedAt": 1779039809562,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039840069:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Build a React component for displaying user profiles.",
+                  "dependsOn": [],
+                  "domain": "frontend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Visual regression tests pass.",
+                    "Accessibility audit passes (WCAG 2.1 AA).",
+                    "Cross-browser rendering verified."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779039840070,
+              "updatedAt": 1779039840070,
+              "expiresAt": 1779041640070,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039840070,
+                "updatedAt": 1779039840070,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039840069:classification",
+            {
+              "value": {
+                "primaryDomain": "frontend",
+                "allDomains": [
+                  {
+                    "domain": "frontend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779039840070,
+              "updatedAt": 1779039840070,
+              "expiresAt": 1779041640070,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039840070,
+                "updatedAt": 1779039840070,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039847434:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Build a React component for displaying user profiles.",
+                  "dependsOn": [],
+                  "domain": "frontend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Visual regression tests pass.",
+                    "Accessibility audit passes (WCAG 2.1 AA).",
+                    "Cross-browser rendering verified."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779039847434,
+              "updatedAt": 1779039847434,
+              "expiresAt": 1779041647434,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039847434,
+                "updatedAt": 1779039847434,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039847434:classification",
+            {
+              "value": {
+                "primaryDomain": "frontend",
+                "allDomains": [
+                  {
+                    "domain": "frontend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779039847435,
+              "updatedAt": 1779039847435,
+              "expiresAt": 1779041647435,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039847435,
+                "updatedAt": 1779039847435,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041051950:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Add REST endpoint for user listing.",
+                  "dependsOn": [],
+                  "domain": "backend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "API contract tests pass.",
+                    "No N+1 queries detected.",
+                    "Error handling covers edge cases."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779041051965,
+              "updatedAt": 1779041051965,
+              "expiresAt": 1779042851965,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041051965,
+                "updatedAt": 1779041051965,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041051950:classification",
+            {
+              "value": {
+                "primaryDomain": "backend",
+                "allDomains": [
+                  {
+                    "domain": "backend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779041051965,
+              "updatedAt": 1779041051965,
+              "expiresAt": 1779042851965,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041051965,
+                "updatedAt": 1779041051965,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041062242:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Set up CI/CD pipeline with Docker.",
+                  "dependsOn": [],
+                  "domain": "devops",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Infrastructure changes are idempotent.",
+                    "Rollback procedure documented.",
+                    "Health checks pass post-deploy."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779041062243,
+              "updatedAt": 1779041062243,
+              "expiresAt": 1779042862243,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041062242:classification",
+            {
+              "value": {
+                "primaryDomain": "devops",
+                "allDomains": [
+                  {
+                    "domain": "devops",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779041062243,
+              "updatedAt": 1779041062243,
+              "expiresAt": 1779042862243,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045245679:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Design API endpoint.",
+                  "dependsOn": [],
+                  "domain": "backend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "API contract tests pass.",
+                    "No N+1 queries detected.",
+                    "Error handling covers edge cases."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779045245680,
+              "updatedAt": 1779045245680,
+              "expiresAt": 1779047045680,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045245680,
+                "updatedAt": 1779045245680,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045245679:classification",
+            {
+              "value": {
+                "primaryDomain": "backend",
+                "allDomains": [
+                  {
+                    "domain": "backend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779045245681,
+              "updatedAt": 1779045245681,
+              "expiresAt": 1779047045681,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045245681,
+                "updatedAt": 1779045245681,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045255534:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Optimize prompt engineering.",
+                  "dependsOn": [],
+                  "domain": "ai",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Model output validated against golden set.",
+                    "Latency within SLA bounds.",
+                    "Fallback behavior tested."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779045255535,
+              "updatedAt": 1779045255535,
+              "expiresAt": 1779047055535,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045255535,
+                "updatedAt": 1779045255535,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045255534:classification",
+            {
+              "value": {
+                "primaryDomain": "ai",
+                "allDomains": [
+                  {
+                    "domain": "ai",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779045255535,
+              "updatedAt": 1779045255535,
+              "expiresAt": 1779047055535,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045255535,
+                "updatedAt": 1779045255535,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ]
+        ],
+        "repository": [],
+        "patterns": [
+          [
+            "backend:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Implementation Guardian"
+              },
+              "createdAt": 1779039809562,
+              "updatedAt": 1779045245681,
+              "expiresAt": 1779131645681,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779039809562,
+                "updatedAt": 1779045245681,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "frontend:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Senior Staff Frontend Engineer"
+              },
+              "createdAt": 1779039840070,
+              "updatedAt": 1779039847435,
+              "expiresAt": 1779126247435,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779039840070,
+                "updatedAt": 1779039847435,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "devops:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Senior Staff DevOps Engineer"
+              },
+              "createdAt": 1779041062243,
+              "updatedAt": 1779041062243,
+              "expiresAt": 1779127462243,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "ai:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Senior Staff AI/LLM Engineer"
+              },
+              "createdAt": 1779045255535,
+              "updatedAt": 1779045255535,
+              "expiresAt": 1779131655535,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779045255535,
+                "updatedAt": 1779045255535,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ]
+        ],
+        "working": [
+          [
+            "api-1779039809556:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Add a new REST endpoint for listing users with pagination.",
+                  "dependsOn": [],
+                  "domain": "backend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "API contract tests pass.",
+                    "No N+1 queries detected.",
+                    "Error handling covers edge cases."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779039809562,
+              "updatedAt": 1779039809562,
+              "expiresAt": 1779041609562,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039809562,
+                "updatedAt": 1779039809562,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039809556:classification",
+            {
+              "value": {
+                "primaryDomain": "backend",
+                "allDomains": [
+                  {
+                    "domain": "backend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779039809562,
+              "updatedAt": 1779039809562,
+              "expiresAt": 1779041609562,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039809562,
+                "updatedAt": 1779039809562,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039840069:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Build a React component for displaying user profiles.",
+                  "dependsOn": [],
+                  "domain": "frontend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Visual regression tests pass.",
+                    "Accessibility audit passes (WCAG 2.1 AA).",
+                    "Cross-browser rendering verified."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779039840070,
+              "updatedAt": 1779039840070,
+              "expiresAt": 1779041640070,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039840070,
+                "updatedAt": 1779039840070,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039840069:classification",
+            {
+              "value": {
+                "primaryDomain": "frontend",
+                "allDomains": [
+                  {
+                    "domain": "frontend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779039840070,
+              "updatedAt": 1779039840070,
+              "expiresAt": 1779041640070,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039840070,
+                "updatedAt": 1779039840070,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039847434:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Build a React component for displaying user profiles.",
+                  "dependsOn": [],
+                  "domain": "frontend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Visual regression tests pass.",
+                    "Accessibility audit passes (WCAG 2.1 AA).",
+                    "Cross-browser rendering verified."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779039847434,
+              "updatedAt": 1779039847434,
+              "expiresAt": 1779041647434,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039847434,
+                "updatedAt": 1779039847434,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779039847434:classification",
+            {
+              "value": {
+                "primaryDomain": "frontend",
+                "allDomains": [
+                  {
+                    "domain": "frontend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779039847435,
+              "updatedAt": 1779039847435,
+              "expiresAt": 1779041647435,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779039847435,
+                "updatedAt": 1779039847435,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041051950:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Add REST endpoint for user listing.",
+                  "dependsOn": [],
+                  "domain": "backend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "API contract tests pass.",
+                    "No N+1 queries detected.",
+                    "Error handling covers edge cases."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779041051965,
+              "updatedAt": 1779041051965,
+              "expiresAt": 1779042851965,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041051965,
+                "updatedAt": 1779041051965,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041051950:classification",
+            {
+              "value": {
+                "primaryDomain": "backend",
+                "allDomains": [
+                  {
+                    "domain": "backend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779041051965,
+              "updatedAt": 1779041051965,
+              "expiresAt": 1779042851965,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041051965,
+                "updatedAt": 1779041051965,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041062242:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Set up CI/CD pipeline with Docker.",
+                  "dependsOn": [],
+                  "domain": "devops",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Infrastructure changes are idempotent.",
+                    "Rollback procedure documented.",
+                    "Health checks pass post-deploy."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779041062243,
+              "updatedAt": 1779041062243,
+              "expiresAt": 1779042862243,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779041062242:classification",
+            {
+              "value": {
+                "primaryDomain": "devops",
+                "allDomains": [
+                  {
+                    "domain": "devops",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779041062243,
+              "updatedAt": 1779041062243,
+              "expiresAt": 1779042862243,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045245679:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Design API endpoint.",
+                  "dependsOn": [],
+                  "domain": "backend",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "API contract tests pass.",
+                    "No N+1 queries detected.",
+                    "Error handling covers edge cases."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779045245680,
+              "updatedAt": 1779045245680,
+              "expiresAt": 1779047045680,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045245680,
+                "updatedAt": 1779045245680,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045245679:classification",
+            {
+              "value": {
+                "primaryDomain": "backend",
+                "allDomains": [
+                  {
+                    "domain": "backend",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779045245681,
+              "updatedAt": 1779045245681,
+              "expiresAt": 1779047045681,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045245681,
+                "updatedAt": 1779045245681,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045255534:plan",
+            {
+              "value": [
+                {
+                  "id": "step-1",
+                  "title": "Optimize prompt engineering.",
+                  "dependsOn": [],
+                  "domain": "ai",
+                  "risk": "MEDIUM",
+                  "acceptanceCriteria": [
+                    "Model output validated against golden set.",
+                    "Latency within SLA bounds.",
+                    "Fallback behavior tested."
+                  ],
+                  "estimatedComplexity": "medium"
+                }
+              ],
+              "createdAt": 1779045255535,
+              "updatedAt": 1779045255535,
+              "expiresAt": 1779047055535,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045255535,
+                "updatedAt": 1779045255535,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "api-1779045255534:classification",
+            {
+              "value": {
+                "primaryDomain": "ai",
+                "allDomains": [
+                  {
+                    "domain": "ai",
+                    "confidence": 1,
+                    "matchCount": 0
+                  }
+                ],
+                "isCompound": false,
+                "domainCount": 1,
+                "confidence": 1
+              },
+              "createdAt": 1779045255535,
+              "updatedAt": 1779045255535,
+              "expiresAt": 1779047055535,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "session",
+                "layer": "working",
+                "writtenAt": 1779045255535,
+                "updatedAt": 1779045255535,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ]
+        ],
+        "episodic": [],
+        "semantic": [],
+        "procedural": [
+          [
+            "backend:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Implementation Guardian"
+              },
+              "createdAt": 1779039809562,
+              "updatedAt": 1779045245681,
+              "expiresAt": 1779131645681,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779039809562,
+                "updatedAt": 1779045245681,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "frontend:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Senior Staff Frontend Engineer"
+              },
+              "createdAt": 1779039840070,
+              "updatedAt": 1779039847435,
+              "expiresAt": 1779126247435,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779039840070,
+                "updatedAt": 1779039847435,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "devops:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Senior Staff DevOps Engineer"
+              },
+              "createdAt": 1779041062243,
+              "updatedAt": 1779041062243,
+              "expiresAt": 1779127462243,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ],
+          [
+            "ai:last-selected-agent",
+            {
+              "value": {
+                "agentId": "AIEP Senior Staff AI/LLM Engineer"
+              },
+              "createdAt": 1779045255535,
+              "updatedAt": 1779045255535,
+              "expiresAt": 1779131655535,
+              "metadata": {
+                "contractVersion": "1.0.0",
+                "scope": "patterns",
+                "layer": "procedural",
+                "writtenAt": 1779045255535,
+                "updatedAt": 1779045255535,
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                }
+              }
+            }
+          ]
+        ],
+        "taskMetadata": [
+          [
+            "api-1779039809556",
+            {
+              "requestId": "api-1779039809556",
+              "payload": {
+                "requestId": "api-1779039809556",
+                "domain": "backend",
+                "risk": "LOW",
+                "description": "Add a new REST endpoint for listing users with pagination",
+                "planSteps": 1
+              },
+              "updatedAt": 1779039809559,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039809559,
+                "updatedAt": 1779039809559
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779039816305",
+            {
+              "requestId": "api-1779039816305",
+              "payload": {
+                "requestId": "api-1779039816305",
+                "domain": "backend",
+                "risk": "LOW",
+                "description": "Add a new REST endpoint for listing users with pagination",
+                "planSteps": 1
+              },
+              "updatedAt": 1779039816306,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039816306,
+                "updatedAt": 1779039816306
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779039830756",
+            {
+              "requestId": "api-1779039830756",
+              "payload": {
+                "requestId": "api-1779039830756",
+                "domain": "backend",
+                "risk": "LOW",
+                "description": "Add a new REST endpoint for listing users with pagination",
+                "planSteps": 1
+              },
+              "updatedAt": 1779039830756,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039830756,
+                "updatedAt": 1779039830756
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779039840069",
+            {
+              "requestId": "api-1779039840069",
+              "payload": {
+                "requestId": "api-1779039840069",
+                "domain": "frontend",
+                "risk": "LOW",
+                "description": "Build a React component for displaying user profiles",
+                "planSteps": 1
+              },
+              "updatedAt": 1779039840069,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039840069,
+                "updatedAt": 1779039840069
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779039847434",
+            {
+              "requestId": "api-1779039847434",
+              "payload": {
+                "requestId": "api-1779039847434",
+                "domain": "frontend",
+                "risk": "LOW",
+                "description": "Build a React component for displaying user profiles",
+                "planSteps": 1
+              },
+              "updatedAt": 1779039847434,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039847434,
+                "updatedAt": 1779039847434
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779041051950",
+            {
+              "requestId": "api-1779041051950",
+              "payload": {
+                "requestId": "api-1779041051950",
+                "domain": "backend",
+                "risk": "LOW",
+                "description": "Add REST endpoint for user listing",
+                "planSteps": 1
+              },
+              "updatedAt": 1779041051964,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779041051964,
+                "updatedAt": 1779041051964
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779041055658",
+            {
+              "requestId": "api-1779041055658",
+              "payload": {
+                "requestId": "api-1779041055658",
+                "domain": "frontend",
+                "risk": "LOW",
+                "description": "Build React component for user profiles",
+                "planSteps": 1
+              },
+              "updatedAt": 1779041055659,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779041055659,
+                "updatedAt": 1779041055659
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779041058968",
+            {
+              "requestId": "api-1779041058968",
+              "payload": {
+                "requestId": "api-1779041058968",
+                "domain": "ai",
+                "risk": "LOW",
+                "description": "Design RAG pipeline for semantic search",
+                "planSteps": 1
+              },
+              "updatedAt": 1779041058969,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779041058969,
+                "updatedAt": 1779041058969
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779041062242",
+            {
+              "requestId": "api-1779041062242",
+              "payload": {
+                "requestId": "api-1779041062242",
+                "domain": "devops",
+                "risk": "LOW",
+                "description": "Set up CI/CD pipeline with Docker",
+                "planSteps": 1
+              },
+              "updatedAt": 1779041062243,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779045242883",
+            {
+              "requestId": "api-1779045242883",
+              "payload": {
+                "requestId": "api-1779045242883",
+                "domain": "frontend",
+                "risk": "LOW",
+                "description": "Build a React component",
+                "planSteps": 1
+              },
+              "updatedAt": 1779045242886,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779045242886,
+                "updatedAt": 1779045242886
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779045245679",
+            {
+              "requestId": "api-1779045245679",
+              "payload": {
+                "requestId": "api-1779045245679",
+                "domain": "backend",
+                "risk": "LOW",
+                "description": "Design API endpoint",
+                "planSteps": 1
+              },
+              "updatedAt": 1779045245680,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779045245680,
+                "updatedAt": 1779045245680
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779045252358",
+            {
+              "requestId": "api-1779045252358",
+              "payload": {
+                "requestId": "api-1779045252358",
+                "domain": "backend",
+                "risk": "LOW",
+                "description": "Design API endpoint",
+                "planSteps": 1
+              },
+              "updatedAt": 1779045252359,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779045252359,
+                "updatedAt": 1779045252359
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "api-1779045255534",
+            {
+              "requestId": "api-1779045255534",
+              "payload": {
+                "requestId": "api-1779045255534",
+                "domain": "ai",
+                "risk": "LOW",
+                "description": "Optimize prompt engineering",
+                "planSteps": 1
+              },
+              "updatedAt": 1779045255534,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779045255534,
+                "updatedAt": 1779045255534
+              },
+              "expiresAt": null
+            }
+          ]
+        ],
+        "repositoryMetadata": [
+          [
+            "agent:AIEP Senior Staff Backend Engineer",
+            {
+              "key": "agent:AIEP Senior Staff Backend Engineer",
+              "payload": {
+                "specialistId": "AIEP Senior Staff Backend Engineer",
+                "domain": "backend",
+                "summary": "Selected AIEP Senior Staff Backend Engineer for backend tasks."
+              },
+              "updatedAt": 1779039809561,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039809561,
+                "updatedAt": 1779039809561
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "agent:AIEP Senior Staff Architect",
+            {
+              "key": "agent:AIEP Senior Staff Architect",
+              "payload": {
+                "specialistId": "AIEP Senior Staff Architect",
+                "domain": "backend",
+                "summary": "Selected AIEP Senior Staff Architect for backend tasks."
+              },
+              "updatedAt": 1779041051965,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779041051965,
+                "updatedAt": 1779041051965
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "agent:AIEP Senior Staff UI/UX Engineer",
+            {
+              "key": "agent:AIEP Senior Staff UI/UX Engineer",
+              "payload": {
+                "specialistId": "AIEP Senior Staff UI/UX Engineer",
+                "domain": "frontend",
+                "summary": "Selected AIEP Senior Staff UI/UX Engineer for frontend tasks."
+              },
+              "updatedAt": 1779039840070,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039840070,
+                "updatedAt": 1779039840070
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "agent:AIEP Senior Staff Frontend Engineer",
+            {
+              "key": "agent:AIEP Senior Staff Frontend Engineer",
+              "payload": {
+                "specialistId": "AIEP Senior Staff Frontend Engineer",
+                "domain": "frontend",
+                "summary": "Selected AIEP Senior Staff Frontend Engineer for frontend tasks."
+              },
+              "updatedAt": 1779039847434,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779039847434,
+                "updatedAt": 1779039847434
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "agent:AIEP Code Reviewer",
+            {
+              "key": "agent:AIEP Code Reviewer",
+              "payload": {
+                "specialistId": "AIEP Code Reviewer",
+                "domain": "backend",
+                "summary": "Selected AIEP Code Reviewer for backend tasks."
+              },
+              "updatedAt": 1779045252359,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779045252359,
+                "updatedAt": 1779045252359
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "agent:AIEP Senior Staff DevOps Engineer",
+            {
+              "key": "agent:AIEP Senior Staff DevOps Engineer",
+              "payload": {
+                "specialistId": "AIEP Senior Staff DevOps Engineer",
+                "domain": "devops",
+                "summary": "Selected AIEP Senior Staff DevOps Engineer for devops tasks."
+              },
+              "updatedAt": 1779041062243,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779041062243,
+                "updatedAt": 1779041062243
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "agent:AIEP Implementation Guardian",
+            {
+              "key": "agent:AIEP Implementation Guardian",
+              "payload": {
+                "specialistId": "AIEP Implementation Guardian",
+                "domain": "backend",
+                "summary": "Selected AIEP Implementation Guardian for backend tasks."
+              },
+              "updatedAt": 1779045245680,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779045245680,
+                "updatedAt": 1779045245680
+              },
+              "expiresAt": null
+            }
+          ],
+          [
+            "agent:AIEP Senior Staff AI/LLM Engineer",
+            {
+              "key": "agent:AIEP Senior Staff AI/LLM Engineer",
+              "payload": {
+                "specialistId": "AIEP Senior Staff AI/LLM Engineer",
+                "domain": "ai",
+                "summary": "Selected AIEP Senior Staff AI/LLM Engineer for ai tasks."
+              },
+              "updatedAt": 1779045255535,
+              "provenanceScore": 1,
+              "sourceMetadata": {
+                "sourceType": "unknown",
+                "sourceId": null,
+                "filePath": null,
+                "symbol": null,
+                "requestId": null,
+                "agentId": null,
+                "tags": []
+              },
+              "metadata": {
+                "provenance": {
+                  "score": 1,
+                  "confidence": 1,
+                  "writer": null,
+                  "strategy": null
+                },
+                "source": {
+                  "sourceType": "unknown",
+                  "sourceId": null,
+                  "filePath": null,
+                  "symbol": null,
+                  "requestId": null,
+                  "agentId": null,
+                  "tags": []
+                },
+                "writtenAt": 1779045255535,
+                "updatedAt": 1779045255535
+              },
+              "expiresAt": null
+            }
+          ]
+        ],
+        "repositoryGraph": [],
+        "archives": {
+          "memoryEntries": [],
+          "indexedMetadata": []
+        }
+      },
+      "learning": [
+        [
+          "AIEP Senior Staff Backend Engineer",
+          {
+            "runs": 1,
+            "successes": 0,
+            "totalLatencyMs": 0,
+            "totalTokens": 0,
+            "lastRunAt": 1779039809563,
+            "recentOutcomes": [
+              {
+                "success": false,
+                "timestamp": 1779039809563
+              }
+            ]
+          }
+        ],
+        [
+          "AIEP Senior Staff UI/UX Engineer",
+          {
+            "runs": 1,
+            "successes": 0,
+            "totalLatencyMs": 0,
+            "totalTokens": 0,
+            "lastRunAt": 1779039840070,
+            "recentOutcomes": [
+              {
+                "success": false,
+                "timestamp": 1779039840070
+              }
+            ]
+          }
+        ],
+        [
+          "AIEP Senior Staff Frontend Engineer",
+          {
+            "runs": 1,
+            "successes": 0,
+            "totalLatencyMs": 0,
+            "totalTokens": 0,
+            "lastRunAt": 1779039847435,
+            "recentOutcomes": [
+              {
+                "success": false,
+                "timestamp": 1779039847435
+              }
+            ]
+          }
+        ],
+        [
+          "AIEP Senior Staff Architect",
+          {
+            "runs": 1,
+            "successes": 0,
+            "totalLatencyMs": 0,
+            "totalTokens": 0,
+            "lastRunAt": 1779041051966,
+            "recentOutcomes": [
+              {
+                "success": false,
+                "timestamp": 1779041051966
+              }
+            ]
+          }
+        ],
+        [
+          "AIEP Senior Staff DevOps Engineer",
+          {
+            "runs": 1,
+            "successes": 0,
+            "totalLatencyMs": 0,
+            "totalTokens": 0,
+            "lastRunAt": 1779041062243,
+            "recentOutcomes": [
+              {
+                "success": false,
+                "timestamp": 1779041062243
+              }
+            ]
+          }
+        ],
+        [
+          "AIEP Implementation Guardian",
+          {
+            "runs": 1,
+            "successes": 0,
+            "totalLatencyMs": 0,
+            "totalTokens": 0,
+            "lastRunAt": 1779045245682,
+            "recentOutcomes": [
+              {
+                "success": false,
+                "timestamp": 1779045245682
+              }
+            ]
+          }
+        ],
+        [
+          "AIEP Senior Staff AI/LLM Engineer",
+          {
+            "runs": 1,
+            "successes": 0,
+            "totalLatencyMs": 0,
+            "totalTokens": 0,
+            "lastRunAt": 1779045255535,
+            "recentOutcomes": [
+              {
+                "success": false,
+                "timestamp": 1779045255535
+              }
+            ]
+          }
+        ]
+      ],
+      "weightTuner": {
+        "windowSize": 50,
+        "targetSuccessRate": 0.92,
+        "targetAvgTokens": 2800,
+        "targetAvgLatencyMs": 450,
+        "adjustmentStep": 0.03,
+        "weights": {
+          "domain": 0.35,
+          "quality": 0.25,
+          "learning": 0.2,
+          "cost": 0.12,
+          "latency": 0.08
+        },
+        "history": [
+          {
+            "success": false,
+            "tokenUsage": 0,
+            "latencyMs": 0
+          },
+          {
+            "success": false,
+            "tokenUsage": 0,
+            "latencyMs": 0
+          },
+          {
+            "success": false,
+            "tokenUsage": 0,
+            "latencyMs": 0
+          },
+          {
+            "success": false,
+            "tokenUsage": 0,
+            "latencyMs": 0
+          },
+          {
+            "success": false,
+            "tokenUsage": 0,
+            "latencyMs": 0
+          },
+          {
+            "success": false,
+            "tokenUsage": 0,
+            "latencyMs": 0
+          },
+          {
+            "success": false,
+            "tokenUsage": 0,
+            "latencyMs": 0
+          }
+        ]
+      },
+      "updatedAt": 1779045255535
+    }
+  },
+  "index": {
+    "tenants": {
+      "default": {
+        "updatedAt": 1779045255555,
+        "memoryEntries": 57,
+        "learningEntries": 7
+      }
+    },
+    "updatedAt": 1779045255555
+  }
+}

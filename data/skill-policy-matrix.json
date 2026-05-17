@@ -52,6 +52,15 @@
       "agentId": "AIEP Senior Staff SRE Engineer",
       "role": "sre",
       "domain": "sre",
+      "risk": "LOW",
+      "allow": ["backend", "debugging", "performance", "review", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff SRE Engineer",
+      "role": "sre",
+      "domain": "sre",
       "risk": "HIGH",
       "allow": ["backend", "debugging", "performance", "review", "security", "testing"],
       "deny": ["accessibility", "frontend", "ui"],
@@ -82,6 +91,60 @@
       "risk": "MEDIUM",
       "allow": ["debugging", "performance", "review", "security", "testing"],
       "deny": ["feature-development"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff Architect",
+      "role": "architect",
+      "domain": "general",
+      "risk": "LOW",
+      "allow": ["api", "architecture", "design", "feature-development", "performance", "review", "security", "system-design", "testing"],
+      "deny": ["accessibility"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff Architect",
+      "role": "architect",
+      "domain": "general",
+      "risk": "HIGH",
+      "allow": ["api", "architecture", "auth", "data", "design", "feature-development", "performance", "review", "security", "system-design", "testing"],
+      "deny": ["accessibility"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff AI/LLM Engineer",
+      "role": "ai-llm",
+      "domain": "ai",
+      "risk": "LOW",
+      "allow": ["api", "debugging", "embeddings", "feature-development", "inference", "llm", "performance", "rag", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff AI/LLM Engineer",
+      "role": "ai-llm",
+      "domain": "ai",
+      "risk": "HIGH",
+      "allow": ["api", "debugging", "embeddings", "feature-development", "inference", "llm", "performance", "rag", "review", "security", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff DevOps Engineer",
+      "role": "devops",
+      "domain": "devops",
+      "risk": "LOW",
+      "allow": ["cicd", "containers", "debugging", "deployment", "feature-development", "infrastructure", "performance", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
+      "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
+    },
+    {
+      "agentId": "AIEP Senior Staff DevOps Engineer",
+      "role": "devops",
+      "domain": "devops",
+      "risk": "HIGH",
+      "allow": ["cicd", "containers", "debugging", "deployment", "feature-development", "infrastructure", "performance", "review", "security", "testing"],
+      "deny": ["accessibility", "frontend", "ui"],
       "exception": { "expiresAtRequired": true, "maxTtlMs": 604800000 }
     }
   ]

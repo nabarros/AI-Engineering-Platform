@@ -15,7 +15,7 @@ Routing decisions are grounded in the programmatic contracts defined by the orch
 ### 1.1 Capability Registry Contract
 Use the capability contract semantics from `src/orchestration/default-capability-registry.js`:
 - Each specialist declares: `domains`, `maxRisk`, `tokenCostTier`, `latencyTier`, `qualityScore`, `supportsVerificationGate`, `supportsMemoryWrites`.
-- Domain matching follows `src/orchestration/capability-registry.js`: exact domain match scores 1.0, "general" fallback scores 0.7, no match scores 0.2.
+- Domain matching follows `src/orchestration/capability-registry.js`: exact domain match scores 1.0, "general" fallback scores 0.7, no match scores 0.05 (hard-penalised to prevent mismatched agents winning on quality/learning alone).
 - Risk eligibility is gated by `canHandleRisk`: a specialist can only be selected if its `maxRisk` covers the task risk level.
 
 ### 1.2 Scoring Contract

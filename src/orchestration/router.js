@@ -2,6 +2,26 @@ import { findCandidates } from "./capability-registry.js";
 
 const COST_WEIGHTS = Object.freeze({ LOW: 1, MEDIUM: 2, HIGH: 3 });
 const LATENCY_WEIGHTS = Object.freeze({ LOW: 1, MEDIUM: 2, HIGH: 3 });
+
+// Penalty multipliers — cost penalised slightly harder than latency because
+// token overruns directly affect billing; latency overruns degrade UX but
+// are recoverable. Expose as named constants so tests can assert stability.
+export const COST_OVERRUN_PENALTY = 0.45;
+export const LATENCY_OVERRUN_PENALTY = 0.4;
+
+// Score gap below which two candidates are considered ambiguous / tied.
+export const NEAR_TIE_THRESHOLD = 0.03;
+
+// Default learning success rate for capabilities with no observed history.
+// Conservative prior avoids inflating new/unproven specialists.
+export const DEFAULT_LEARNING_PRIOR = 0.6;
+
+// Maximum unique agents produced by a compound routing plan.
+export const MAX_COMPOUND_AGENTS = 4;
+
+// Valid budget tier values for input validation.
+const VALID_TIERS = new Set(["LOW", "MEDIUM", "HIGH"]);
+const VALID_RISKS = new Set(["LOW", "MEDIUM", "HIGH", "CRITICAL"]);
 export const DEFAULT_SCORING_WEIGHTS = Object.freeze({
   domain: 0.35,
   quality: 0.25,
@@ -23,22 +43,38 @@ function maxTier(left, right) {
 
 export function applyRiskBudgetOverrides(task, budget = {}) {
   const risk = String(task?.risk || "MEDIUM").toUpperCase();
-  const initialBudget = {
-    tokenBudgetTier: String(budget?.tokenBudgetTier || "MEDIUM").toUpperCase(),
-    latencyBudgetTier: String(budget?.latencyBudgetTier || "MEDIUM").toUpperCase()
-  };
+  const requestedToken = String(budget?.tokenBudgetTier || "MEDIUM").toUpperCase();
+  const requestedLatency = String(budget?.latencyBudgetTier || "MEDIUM").toUpperCase();
+  const initialBudget = { tokenBudgetTier: requestedToken, latencyBudgetTier: requestedLatency };
+  const budgetConflicts = [];
 
   if (risk === "CRITICAL") {
+    if (requestedToken !== "HIGH") {
+      budgetConflicts.push(`tokenBudgetTier overridden from ${requestedToken} to HIGH (CRITICAL risk requires HIGH budget)`);
+    }
+    if (requestedLatency !== "HIGH") {
+      budgetConflicts.push(`latencyBudgetTier overridden from ${requestedLatency} to HIGH (CRITICAL risk requires HIGH latency budget)`);
+    }
     return {
       tokenBudgetTier: "HIGH",
-      latencyBudgetTier: "HIGH"
+      latencyBudgetTier: "HIGH",
+      ...(budgetConflicts.length > 0 && { budgetConflicts })
     };
   }
 
   if (risk === "HIGH") {
+    const effectiveToken = maxTier(requestedToken, "MEDIUM");
+    const effectiveLatency = maxTier(requestedLatency, "MEDIUM");
+    if (effectiveToken !== requestedToken) {
+      budgetConflicts.push(`tokenBudgetTier overridden from ${requestedToken} to ${effectiveToken} (HIGH risk requires minimum MEDIUM budget)`);
+    }
+    if (effectiveLatency !== requestedLatency) {
+      budgetConflicts.push(`latencyBudgetTier overridden from ${requestedLatency} to ${effectiveLatency} (HIGH risk requires minimum MEDIUM latency budget)`);
+    }
     return {
-      tokenBudgetTier: maxTier(initialBudget.tokenBudgetTier, "MEDIUM"),
-      latencyBudgetTier: maxTier(initialBudget.latencyBudgetTier, "MEDIUM")
+      tokenBudgetTier: effectiveToken,
+      latencyBudgetTier: effectiveLatency,
+      ...(budgetConflicts.length > 0 && { budgetConflicts })
     };
   }
 
@@ -67,7 +103,7 @@ function scoreCostFitness(tokenBudgetTier, capabilityTier) {
   const cost = COST_WEIGHTS[capabilityTier] || 2;
   if (cost <= budget) return 1;
   const delta = cost - budget;
-  return clamp(1 - delta * 0.45, 0, 1);
+  return clamp(1 - delta * COST_OVERRUN_PENALTY, 0, 1);
 }
 
 function scoreLatencyFitness(latencyBudgetTier, capabilityTier) {
@@ -75,13 +111,13 @@ function scoreLatencyFitness(latencyBudgetTier, capabilityTier) {
   const latency = LATENCY_WEIGHTS[capabilityTier] || 2;
   if (latency <= budget) return 1;
   const delta = latency - budget;
-  return clamp(1 - delta * 0.4, 0, 1);
+  return clamp(1 - delta * LATENCY_OVERRUN_PENALTY, 0, 1);
 }
 
 function getLearningSuccessRate(learningStats, capabilityId) {
   const stats = learningStats?.[capabilityId];
   if (!stats || typeof stats.successRate !== "number") {
-    return 0.75;
+    return DEFAULT_LEARNING_PRIOR;
   }
   return clamp(stats.successRate, 0, 1);
 }
@@ -90,7 +126,41 @@ function getDomainScore(taskDomain, capability) {
   const domain = String(taskDomain || "general").toLowerCase();
   if (capability.domains.includes(domain)) return 1;
   if (capability.domains.includes("general")) return 0.7;
-  return 0.2;
+  // Hard-penalise domain mismatches — a specialist with no domain overlap should
+  // almost never beat a domain-matched agent regardless of quality/learning scores.
+  return 0.05;
+}
+
+// Validate that task, registry, and budget are structurally usable before routing.
+// Returns null when valid; returns a structured error string when invalid.
+function validateRouteInputs(task, registry, budget) {
+  if (!task || typeof task !== "object") return "task must be a non-null object";
+  if (!task.description && !task.domain) return "task must have at least a description or domain";
+  if (task.risk && !VALID_RISKS.has(String(task.risk).toUpperCase())) {
+    return `task.risk "${task.risk}" is not valid; must be one of LOW, MEDIUM, HIGH, CRITICAL`;
+  }
+  if (!Array.isArray(registry) || registry.length === 0) return "registry must be a non-empty array";
+  if (budget) {
+    const tok = budget.tokenBudgetTier ? String(budget.tokenBudgetTier).toUpperCase() : null;
+    const lat = budget.latencyBudgetTier ? String(budget.latencyBudgetTier).toUpperCase() : null;
+    if (tok && !VALID_TIERS.has(tok)) return `budget.tokenBudgetTier "${budget.tokenBudgetTier}" is invalid; must be LOW, MEDIUM, or HIGH`;
+    if (lat && !VALID_TIERS.has(lat)) return `budget.latencyBudgetTier "${budget.latencyBudgetTier}" is invalid; must be LOW, MEDIUM, or HIGH`;
+  }
+  return null;
+}
+
+// Deterministic tie-breaker for two equally-scored candidates.
+// Priority: higher domainScore → higher qualityScore → lower cost tier → lower latency tier → lexicographic id.
+function tieBreakCompare(a, b) {
+  const sc = (entry) => entry.score.components;
+  const diff = (fn) => fn(sc(b)) - fn(sc(a)); // b-a so larger wins
+  return (
+    diff((c) => c.domainScore) ||
+    diff((c) => c.qualityScore) ||
+    (COST_WEIGHTS[a.capability.tokenCostTier] || 2) - (COST_WEIGHTS[b.capability.tokenCostTier] || 2) || // lower cost wins
+    (LATENCY_WEIGHTS[a.capability.latencyTier] || 2) - (LATENCY_WEIGHTS[b.capability.latencyTier] || 2) || // lower latency wins
+    a.capability.id.localeCompare(b.capability.id) // stable lexicographic fallback
+  );
 }
 
 export function detectDomains(description) {
@@ -161,6 +231,21 @@ export function scoreCapability(capability, context) {
 }
 
 export function routeTask({ task, registry, budget, learningStats = {}, scoringWeights = DEFAULT_SCORING_WEIGHTS }) {
+  const validationError = validateRouteInputs(task, registry, budget);
+  if (validationError) {
+    return {
+      selected: null,
+      fallbackChain: [],
+      explanation: `Routing failed: ${validationError}`,
+      scores: [],
+      appliedBudget: null,
+      classification: null,
+      routingConfidence: 0,
+      needsClarification: true,
+      error: validationError
+    };
+  }
+
   const safeBudget = applyRiskBudgetOverrides(task, budget);
 
   const classification = classifyTask(task);
@@ -180,12 +265,23 @@ export function routeTask({ task, registry, budget, learningStats = {}, scoringW
 
   const scores = candidates
     .map((capability) => ({ capability, score: scoreCapability(capability, { task: effectiveTask, budget: safeBudget, learningStats, scoringWeights }) }))
-    .sort((a, b) => b.score.totalScore - a.score.totalScore);
+    .sort((a, b) => {
+      const scoreDiff = b.score.totalScore - a.score.totalScore;
+      if (Math.abs(scoreDiff) > 1e-6) return scoreDiff;
+      return tieBreakCompare(a, b);
+    });
 
   const selected = scores[0].capability;
   const fallbackChain = scores.slice(1, 4).map((entry) => entry.capability.id);
   const topScore = scores[0].score.totalScore;
+  const runnerUpScore = scores[1]?.score.totalScore ?? 0;
   const routingConfidence = clamp(topScore, 0, 1);
+  const scoreGap = topScore - runnerUpScore;
+  const isNearTie = scores.length > 1 && scoreGap < NEAR_TIE_THRESHOLD;
+
+  // Surface budget conflicts produced by applyRiskBudgetOverrides so callers
+  // are aware that their requested budget was silently adjusted.
+  const budgetConflicts = safeBudget.budgetConflicts;
 
   return {
     selected,
@@ -195,7 +291,10 @@ export function routeTask({ task, registry, budget, learningStats = {}, scoringW
     appliedBudget: safeBudget,
     classification,
     routingConfidence,
-    needsClarification: routingConfidence < 0.7
+    scoreGap: Number(scoreGap.toFixed(4)),
+    needsClarification: routingConfidence < 0.7 || isNearTie,
+    ...(isNearTie && { nearTieWarning: `Score gap to runner-up is ${scoreGap.toFixed(4)} (below ${NEAR_TIE_THRESHOLD} threshold); consider providing more task context.` }),
+    ...(budgetConflicts && budgetConflicts.length > 0 && { budgetConflicts })
   };
 }
 
@@ -209,17 +308,22 @@ export function routeCompoundTask({ task, registry, budget, learningStats = {}, 
     };
   }
 
-  const subRoutes = classification.allDomains
-    .filter((d) => d.confidence >= 0.3)
-    .map((domainEntry) => {
-      const subTask = { ...task, domain: domainEntry.domain };
-      const route = routeTask({ task: subTask, registry, budget, learningStats, scoringWeights });
-      return {
-        domain: domainEntry.domain,
-        confidence: domainEntry.confidence,
-        route
-      };
-    });
+  const eligibleDomains = classification.allDomains.filter((d) => d.confidence >= 0.3);
+
+  // Enforce agent cap: if too many domains are detected, keep the highest-confidence
+  // ones and note that lower-confidence domains are folded into sequential execution.
+  const cappedDomains = eligibleDomains.slice(0, MAX_COMPOUND_AGENTS);
+  const droppedDomains = eligibleDomains.slice(MAX_COMPOUND_AGENTS);
+
+  const subRoutes = cappedDomains.map((domainEntry) => {
+    const subTask = { ...task, domain: domainEntry.domain };
+    const route = routeTask({ task: subTask, registry, budget, learningStats, scoringWeights });
+    return {
+      domain: domainEntry.domain,
+      confidence: domainEntry.confidence,
+      route
+    };
+  });
 
   const uniqueAgents = [...new Set(subRoutes.map((sr) => sr.route.selected?.id).filter(Boolean))];
 
@@ -228,6 +332,9 @@ export function routeCompoundTask({ task, registry, budget, learningStats = {}, 
     classification,
     routes: subRoutes,
     uniqueAgentsNeeded: uniqueAgents,
-    recommendedStrategy: uniqueAgents.length <= 2 ? "sequential-peer" : "decompose-and-delegate"
+    recommendedStrategy: uniqueAgents.length <= 2 ? "sequential-peer" : "decompose-and-delegate",
+    ...(droppedDomains.length > 0 && {
+      agentCapWarning: `Compound task exceeded MAX_COMPOUND_AGENTS (${MAX_COMPOUND_AGENTS}). ${droppedDomains.length} lower-confidence domain(s) were dropped: ${droppedDomains.map((d) => d.domain).join(", ")}. Increase MAX_COMPOUND_AGENTS or decompose the task.`
+    })
   };
 }

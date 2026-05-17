@@ -76,43 +76,65 @@ const COMPILED_ROWS = [
   ...buildRiskRows({
     agentId: "AIEP Senior Staff UI/UX Engineer",
     role: "ui-ux",
+    domain: "ux",
+    allow: ["ux", "ui", "frontend", "accessibility", "feature-development", "review"],
+    deny: ["backend", "data", "auth"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Senior Staff UI/UX Engineer",
+    role: "ui-ux",
     domain: "ui",
-    allow: ["ui", "frontend", "accessibility", "feature-development", "review"],
+    allow: ["ux", "ui", "frontend", "accessibility", "feature-development", "review"],
     deny: ["backend", "data", "auth"]
   }),
   ...buildRiskRows({
     agentId: "AIEP Senior Staff UI/UX Engineer",
     role: "ui-ux",
     domain: "general",
-    allow: ["ui", "frontend", "accessibility", "feature-development", "review"],
+    allow: ["ux", "ui", "frontend", "accessibility", "feature-development", "review"],
     deny: ["backend", "data", "auth"]
   }),
   ...buildRiskRows({
     agentId: "AIEP Senior Staff SRE Engineer",
     role: "sre",
     domain: "sre",
-    allow: ["backend", "performance", "debugging", "security", "review"],
+    allow: ["sre", "backend", "performance", "debugging", "security", "review", "observability", "incident", "monitoring"],
     deny: ["ui", "frontend", "accessibility"]
   }),
   ...buildRiskRows({
     agentId: "AIEP Senior Staff SRE Engineer",
     role: "sre",
     domain: "general",
-    allow: ["performance", "debugging", "review", "security"],
+    allow: ["sre", "performance", "debugging", "review", "security", "observability"],
     deny: ["ui", "frontend", "accessibility"]
   }),
   ...buildRiskRows({
     agentId: "AIEP Implementation Guardian",
     role: "implementation-guardian",
+    domain: "implementation",
+    allow: ["implementation", "backend", "frontend", "feature-development", "debugging", "review", "security", "performance", "refactor", "patterns"],
+    deny: []
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Implementation Guardian",
+    role: "implementation-guardian",
     domain: "general",
-    allow: ["backend", "frontend", "feature-development", "debugging", "review", "security", "performance"],
+    allow: ["implementation", "backend", "frontend", "feature-development", "debugging", "review", "security", "performance"],
     deny: []
   }),
   ...buildRiskRows({
     agentId: "AIEP Context Planner",
     role: "planner",
+    domain: "planning",
+    allow: ["planning", "review", "feature-development", "performance", "decomposition", "strategy"],
+    deny: ["auth", "data", "security"],
+    highRiskAllow: ["review"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Context Planner",
+    role: "planner",
     domain: "general",
-    allow: ["review", "feature-development", "performance"],
+    allow: ["planning", "review", "feature-development", "performance"],
     deny: ["auth", "data", "security"],
     highRiskAllow: ["review"]
   }),
@@ -129,6 +151,54 @@ const COMPILED_ROWS = [
     domain: "general",
     allow: ["review", "testing", "debugging", "security", "performance"],
     deny: ["feature-development"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Senior Staff Architect",
+    role: "architect",
+    domain: "architecture",
+    allow: ["architecture", "design", "system-design", "api", "backend", "frontend", "devops", "ai", "llm", "feature-development", "debugging", "performance"],
+    deny: ["accessibility", "ui"],
+    highRiskAllow: ["auth", "data", "security", "review"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Senior Staff Architect",
+    role: "architect",
+    domain: "general",
+    allow: ["api", "architecture", "backend", "design", "system-design", "feature-development", "performance", "security", "review", "ai", "llm", "devops", "deployment", "frontend"],
+    deny: ["accessibility"],
+    highRiskAllow: ["auth", "data", "security", "review"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Senior Staff AI/LLM Engineer",
+    role: "ai-llm",
+    domain: "ai",
+    allow: ["llm", "rag", "embeddings", "inference", "api", "feature-development", "debugging", "performance", "ai"],
+    deny: ["accessibility", "frontend", "ui"],
+    highRiskAllow: ["security", "review"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Senior Staff AI/LLM Engineer",
+    role: "ai-llm",
+    domain: "general",
+    allow: ["llm", "rag", "embeddings", "inference", "feature-development", "debugging", "performance"],
+    deny: ["accessibility", "frontend", "ui"],
+    highRiskAllow: ["security", "review"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Senior Staff DevOps Engineer",
+    role: "devops",
+    domain: "devops",
+    allow: ["cicd", "containers", "deployment", "infrastructure", "feature-development", "debugging", "performance", "devops"],
+    deny: ["accessibility", "frontend", "ui"],
+    highRiskAllow: ["security", "review"]
+  }),
+  ...buildRiskRows({
+    agentId: "AIEP Senior Staff DevOps Engineer",
+    role: "devops",
+    domain: "general",
+    allow: ["cicd", "deployment", "infrastructure", "feature-development", "debugging", "performance"],
+    deny: ["accessibility", "frontend", "ui"],
+    highRiskAllow: ["security", "review"]
   })
 ];
 

@@ -1,0 +1,192 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16.3-alpine3.19
+    container_name: aiep-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-aiep_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-aiep_password}
+      POSTGRES_DB: ${DB_NAME:-aiep_dev}
+      POSTGRES_INITDB_ARGS: "-c log_statement=all"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-aiep_user} -d ${DB_NAME:-aiep_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aiep-network
+    restart: unless-stopped
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7.2-alpine3.19
+    container_name: aiep-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-aiep_redis_secret}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aiep-network
+    restart: unless-stopped
+
+  # Weaviate Vector Database
+  weaviate:
+    image: semitechnologies/weaviate:1.24.3
+    container_name: aiep-weaviate
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_APIKEY_ENABLED: "false"
+      PERSISTENCE_DATA_PATH: /var/lib/weaviate
+      DEFAULT_VECTORIZER_MODULE: text2vec-openai
+      ENABLE_MODULES: text2vec-openai,qna-openai
+      OPENAI_APIKEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8080/v1/.well-known/ready > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
+    networks:
+      - aiep-network
+    restart: unless-stopped
+
+  # Zookeeper (Kafka coordinator)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: aiep-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - aiep-network
+    restart: unless-stopped
+
+  # Kafka Message Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: aiep-kafka
+    depends_on:
+      zookeeper:
+        condition: service_started
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 24
+    ports:
+      - "9092:9092"
+    networks:
+      - aiep-network
+    restart: unless-stopped
+
+  # AI Engineering Platform - Orchestration API + Shared State Service
+  aiep:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aiep-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      # Node.js
+      NODE_ENV: ${NODE_ENV:-development}
+
+      # Orchestration API
+      ORCHESTRATION_PORT: 8787
+      ORCHESTRATION_HOST: 0.0.0.0
+
+      # Shared State Service
+      ORCHESTRATION_STATE_PORT: 8790
+      ORCHESTRATION_STATE_HOST: 0.0.0.0
+      ORCHESTRATION_SHARED_STATE_URL: http://localhost:8790
+
+      # Database
+      DATABASE_URL: postgres://${DB_USER:-aiep_user}:${DB_PASSWORD:-aiep_password}@postgres:5432/${DB_NAME:-aiep_dev}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-aiep_user}
+      DB_PASSWORD: ${DB_PASSWORD:-aiep_password}
+      DB_NAME: ${DB_NAME:-aiep_dev}
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-aiep_redis_secret}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-aiep_redis_secret}@redis:6379/0
+
+      # Weaviate
+      WEAVIATE_HOST: weaviate
+      WEAVIATE_PORT: 8080
+      WEAVIATE_URL: http://weaviate:8080
+
+      # Kafka
+      KAFKA_BROKERS: kafka:29092
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+
+      # AI Services
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4-turbo}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-3-opus}
+
+      # Logging & Observability
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      DEBUG: ${DEBUG:-}
+
+    ports:
+      - "8787:8787"  # Orchestration API
+      - "8790:8790"  # Shared State Service
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8787/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 5
+    networks:
+      - aiep-network
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+networks:
+  aiep-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  weaviate_data:
+    driver: local
