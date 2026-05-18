@@ -315,9 +315,9 @@ The Router Knowledge Store enables the AIEP router agent to **consult and persis
 
 ### How it works
 
-1. Before routing, the agent performs a semantic lookup (`aiep_knowledge_lookup`) against a local Weaviate index.
-2. On a cache hit (cosine similarity ≥ 0.88), the stored routing decision is reused — no external LLM call.
-3. After routing, the result is stored asynchronously (`aiep_knowledge_store`) — fire-and-forget, never blocking.
+1. Store requests are durably persisted to the local store first.
+2. Embedding/index enrichment runs asynchronously (local embeddings first, OpenAI optional).
+3. Lookup uses vector search when available, with lexical fallback otherwise.
 4. A circuit breaker (opens after 3 failures, resets after 30 s) ensures AIEP unavailability never blocks routing.
 
 ### Start the MCP server
@@ -354,7 +354,14 @@ Add to your VS Code settings (`.vscode/settings.json` or user settings):
 | `POST` | `/v1/router/knowledge/store` | Persist a routing decision (async) |
 | `GET`  | `/v1/router/knowledge/health` | Circuit breaker and schema status |
 
-Requires `OPENAI_API_KEY` set in `.env` for Weaviate's `text2vec-openai` vectorizer. Without it, lookup/store are silently skipped.
+No API key is required for local persistence and lexical retrieval. OpenAI is optional for higher-quality embeddings when configured. Anthropic is optional for lexical re-scoring when enabled.
+
+```bash
+# Optional provider setup (only if you want enrichment)
+OPENAI_API_KEY=...
+ANTHROPIC_API_KEY=...
+ROUTER_KNOWLEDGE_ANTHROPIC_SCORING_ENABLED=true
+```
 
 For the full setup guide, see [docs/VSCODE_COPILOT_SETUP.md](./docs/VSCODE_COPILOT_SETUP.md).
 

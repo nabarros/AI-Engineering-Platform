@@ -194,6 +194,18 @@ Copy [.env.example](.env.example) to `.env` and adjust as needed. **Never commit
 
 **LLM services** — see section below.
 
+**Router Knowledge Store (MCP)**
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `ROUTER_KNOWLEDGE_WEAVIATE_INDEX_ENABLED` | `true` | Enable async vector indexing when available |
+| `ROUTER_KNOWLEDGE_EMBEDDING_ORDER` | `local,openai` | Embedding provider order (local-first) |
+| `ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_URL` | `http://host.docker.internal:11434/api/embeddings` | Local embedding endpoint |
+| `ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_MODEL` | `nomic-embed-text` | Local embedding model name |
+| `ROUTER_KNOWLEDGE_OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI embedding model for optional enrichment |
+| `ROUTER_KNOWLEDGE_ANTHROPIC_SCORING_ENABLED` | `false` | Enable optional Anthropic lexical re-scoring |
+| `ROUTER_KNOWLEDGE_LOCAL_STORE_PATH` | *(empty)* | Optional custom path for local durable store |
+
 ### Security checklist
 
 - [ ] Replace all default passwords before sharing with teammates
@@ -254,6 +266,7 @@ docker compose stop mcp
 ```
 
 VS Code continues to connect through `http://localhost:8791`, and routing remains non-blocking if MCP is down.
+Without any API keys, the system still records prompts locally and performs lexical lookup fallback.
 
 ### Inner loop (code changes only)
 

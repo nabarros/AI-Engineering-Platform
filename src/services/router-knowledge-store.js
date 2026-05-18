@@ -1,26 +1,69 @@
 /**
  * RouterKnowledgeStore
  *
- * Semantic knowledge store for the AIEP router agent.
- * Persists routing decisions in Weaviate and enables semantic lookup
- * before dispatching to external LLMs, saving tokens on similar tasks.
- *
- * Design principles:
- * - FAIL OPEN: if AIEP or Weaviate is unreachable, routing continues normally
- * - ASYNC WRITE: store() never blocks the caller
- * - CIRCUIT BREAKER: opens after 3 consecutive failures, resets after 30s
- * - SEMANTIC SEARCH: Weaviate nearText via text2vec-openai module
+ * Local-first router knowledge storage:
+ * - Always persists records to local disk (no API key required)
+ * - Optionally computes embeddings (local first, OpenAI fallback)
+ * - Optionally indexes in Weaviate using explicit vectors (vectorizer: none)
+ * - Falls back to lexical lookup when vector lookup is unavailable
  */
 
+import fs from "node:fs";
+import path from "node:path";
 import http from "node:http";
 import https from "node:https";
+import { randomUUID } from "node:crypto";
+import { fileURLToPath } from "node:url";
 
-const WEAVIATE_CLASS = "RouterKnowledge";
+const WEAVIATE_CLASS = "RouterKnowledgeV2";
 const SIMILARITY_THRESHOLD = 0.88;
-const LOOKUP_TIMEOUT_MS = 500;
-const STORE_TIMEOUT_MS = 1000;
+const LOOKUP_TIMEOUT_MS = 700;
+const STORE_TIMEOUT_MS = 1200;
 const CIRCUIT_BREAKER_THRESHOLD = 3;
 const CIRCUIT_BREAKER_RESET_MS = 30_000;
+const LEXICAL_THRESHOLD = 0.18;
+
+function asBoolean(value, defaultValue = false) {
+  if (value === undefined || value === null || value === "") return defaultValue;
+  const normal = String(value).trim().toLowerCase();
+  return normal === "1" || normal === "true" || normal === "yes" || normal === "on";
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenize(value) {
+  const parts = normalizeText(value).split(" ");
+  return parts.filter((token) => token.length >= 3);
+}
+
+function jaccardScore(aTokens, bTokens) {
+  if (aTokens.length === 0 || bTokens.length === 0) return 0;
+  const aSet = new Set(aTokens);
+  const bSet = new Set(bTokens);
+  let intersection = 0;
+  for (const token of aSet) {
+    if (bSet.has(token)) intersection += 1;
+  }
+  const union = new Set([...aSet, ...bSet]).size;
+  return union === 0 ? 0 : intersection / union;
+}
+
+function resolveDefaultStoragePath() {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  return path.join(__dirname, "..", "..", "data", "router-knowledge-store.json");
+}
+
+function ensureDirectory(filePath) {
+  const directory = path.dirname(filePath);
+  fs.mkdirSync(directory, { recursive: true });
+}
 
 // ── Minimal HTTP helper ──────────────────────────────────────────────────────
 
@@ -107,78 +150,30 @@ class CircuitBreaker {
   }
 }
 
-// ── Weaviate Schema Bootstrap ────────────────────────────────────────────────
+// ── Weaviate schema for explicit vectors ─────────────────────────────────────
 
 async function ensureSchema(weaviateUrl) {
-  // Check if class already exists
   const existing = await httpRequest(`${weaviateUrl}/v1/schema/${WEAVIATE_CLASS}`, {
     timeoutMs: 3000
   });
 
   if (existing.status === 200) return { ok: true, created: false };
 
-  // Create the class with text2vec-openai auto-vectorizer on promptText
   const classSchema = {
     class: WEAVIATE_CLASS,
-    description: "Routing decisions made by the AIEP router agent, indexed for semantic retrieval.",
-    vectorizer: "text2vec-openai",
-    moduleConfig: {
-      "text2vec-openai": {
-        model: "text-embedding-3-small",
-        type: "text"
-      }
-    },
+    description: "Router decisions indexed with app-provided vectors.",
+    vectorizer: "none",
     properties: [
-      {
-        name: "promptText",
-        dataType: ["text"],
-        description: "The full user prompt / task description",
-        moduleConfig: {
-          "text2vec-openai": { skip: false }
-        }
-      },
-      {
-        name: "taskDomain",
-        dataType: ["text"],
-        description: "Classified primary domain (e.g. backend, frontend, review)",
-        moduleConfig: { "text2vec-openai": { skip: true } }
-      },
-      {
-        name: "taskRisk",
-        dataType: ["text"],
-        description: "Risk level: LOW | MEDIUM | HIGH | CRITICAL",
-        moduleConfig: { "text2vec-openai": { skip: true } }
-      },
-      {
-        name: "selectedAgent",
-        dataType: ["text"],
-        description: "Agent selected by the router",
-        moduleConfig: { "text2vec-openai": { skip: true } }
-      },
-      {
-        name: "routingConfidence",
-        dataType: ["number"],
-        description: "Router confidence score 0-1",
-        moduleConfig: { "text2vec-openai": { skip: true } }
-      },
-      {
-        name: "fallbackChain",
-        dataType: ["text"],
-        description: "JSON-serialised fallback agent list",
-        moduleConfig: { "text2vec-openai": { skip: true } }
-      },
-      {
-        name: "routingSummary",
-        dataType: ["text"],
-        description: "Human-readable routing rationale / work summary",
-        moduleConfig: { "text2vec-openai": { skip: false } }
-      },
-      {
-        name: "createdAt",
-        dataType: ["text"],
-        description: "ISO 8601 timestamp",
-        moduleConfig: { "text2vec-openai": { skip: true } }
-      }
+      { name: "recordId", dataType: ["text"], description: "Local record id" },
+      { name: "promptText", dataType: ["text"], description: "Original prompt text" },
+      { name: "taskDomain", dataType: ["text"], description: "Classified task domain" },
+      { name: "taskRisk", dataType: ["text"], description: "Task risk level" },
+      { name: "selectedAgent", dataType: ["text"], description: "Selected specialist" },
+      { name: "routingConfidence", dataType: ["number"], description: "Routing confidence" },
+      { name: "fallbackChain", dataType: ["text"], description: "JSON fallback list" },
+      { name: "routingSummary", dataType: ["text"], description: "Routing summary" },
+      { name: "createdAt", dataType: ["text"], description: "ISO timestamp" },
+      { name: "embeddingProvider", dataType: ["text"], description: "local|openai|none" }
     ]
   };
 
@@ -192,29 +187,99 @@ async function ensureSchema(weaviateUrl) {
     return { ok: true, created: true };
   }
 
-  return { ok: false, error: `Schema creation returned HTTP ${created.status}`, body: created.body };
+  return {
+    ok: false,
+    error: `Schema creation returned HTTP ${created.status}`,
+    body: created.body
+  };
 }
 
 // ── RouterKnowledgeStore ─────────────────────────────────────────────────────
 
 export class RouterKnowledgeStore {
-  /**
-   * @param {object} options
-   * @param {string} [options.weaviateUrl]   Default: http://localhost:8080
-   * @param {number} [options.similarityThreshold]  Default: 0.88
-   * @param {boolean} [options.enabled]  Default: true — set false to disable entirely
-   */
   constructor(options = {}) {
     this.weaviateUrl = (options.weaviateUrl || process.env.WEAVIATE_URL || "http://localhost:8080").replace(/\/$/, "");
     this.similarityThreshold = options.similarityThreshold ?? SIMILARITY_THRESHOLD;
     this.enabled = options.enabled !== false;
+
+    this.localStorePath = options.localStorePath || process.env.ROUTER_KNOWLEDGE_LOCAL_STORE_PATH || resolveDefaultStoragePath();
+    this.weaviateIndexEnabled = options.weaviateIndexEnabled ?? asBoolean(process.env.ROUTER_KNOWLEDGE_WEAVIATE_INDEX_ENABLED, true);
+
+    this.localEmbeddingUrl = options.localEmbeddingUrl || process.env.ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_URL || "http://host.docker.internal:11434/api/embeddings";
+    this.localEmbeddingModel = options.localEmbeddingModel || process.env.ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_MODEL || "nomic-embed-text";
+    this.openAiEmbeddingModel = options.openAiEmbeddingModel || process.env.ROUTER_KNOWLEDGE_OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
+
+    const embeddingOrderRaw =
+      options.embeddingProviderOrder ??
+      process.env.ROUTER_KNOWLEDGE_EMBEDDING_ORDER ??
+      "local,openai";
+    const embeddingOrderList = Array.isArray(embeddingOrderRaw)
+      ? embeddingOrderRaw
+      : String(embeddingOrderRaw).split(",");
+    this.embeddingProviderOrder = embeddingOrderList
+      .map((item) => String(item).trim().toLowerCase())
+      .filter(Boolean);
+
+    this.anthropicScoringEnabled = options.anthropicScoringEnabled ?? asBoolean(process.env.ROUTER_KNOWLEDGE_ANTHROPIC_SCORING_ENABLED, false);
+
     this.circuitBreaker = new CircuitBreaker();
     this._schemaReady = false;
     this._schemaInitPromise = null;
+
+    ensureDirectory(this.localStorePath);
+    this._ensureLocalStoreFile();
   }
 
-  // Lazy schema init — only runs once, on first real operation
+  _ensureLocalStoreFile() {
+    if (fs.existsSync(this.localStorePath)) return;
+    this._writeLocalStore({ version: 1, records: [] });
+  }
+
+  _readLocalStore() {
+    try {
+      const raw = fs.readFileSync(this.localStorePath, "utf8");
+      const parsed = JSON.parse(raw || "{}");
+      if (!Array.isArray(parsed.records)) {
+        return { version: 1, records: [] };
+      }
+      return parsed;
+    } catch {
+      return { version: 1, records: [] };
+    }
+  }
+
+  _writeLocalStore(state) {
+    const tempPath = `${this.localStorePath}.tmp`;
+    fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), "utf8");
+    fs.renameSync(tempPath, this.localStorePath);
+  }
+
+  _appendLocalRecord(record) {
+    const state = this._readLocalStore();
+    state.records.push(record);
+    this._writeLocalStore(state);
+  }
+
+  _patchLocalRecord(recordId, patch) {
+    const state = this._readLocalStore();
+    const index = state.records.findIndex((record) => record.id === recordId);
+    if (index < 0) return;
+    state.records[index] = { ...state.records[index], ...patch, updatedAt: new Date().toISOString() };
+    this._writeLocalStore(state);
+  }
+
+  _loadFilteredRecords(filters = {}) {
+    const state = this._readLocalStore();
+    return state.records.filter((record) => {
+      if (filters.taskDomain && String(record.taskDomain) !== String(filters.taskDomain)) return false;
+      if (filters.taskRisk && String(record.taskRisk) !== String(filters.taskRisk)) return false;
+      return true;
+    });
+  }
+
+  // Lazy schema init — only runs once, on first vector operation
   async _ensureSchema() {
+    if (!this.weaviateIndexEnabled) return false;
     if (this._schemaReady) return true;
     if (this._schemaInitPromise) return this._schemaInitPromise;
 
@@ -238,134 +303,106 @@ export class RouterKnowledgeStore {
     return this._schemaInitPromise;
   }
 
-  /**
-   * Semantic lookup: find the closest routing decision for a given prompt.
-   * Returns null on miss, timeout, or circuit-open — never throws.
-   *
-   * @param {string} promptText
-   * @param {object} [filters]  optional { taskDomain, taskRisk }
-   * @returns {Promise<object|null>} matched RouterKnowledge object or null
-   */
   async lookup(promptText, filters = {}) {
     if (!this.enabled || this.circuitBreaker.isOpen) return null;
     if (!promptText || typeof promptText !== "string") return null;
 
     try {
-      const schemaReady = await this._ensureSchema();
-      if (!schemaReady) return null;
-
-      const whereFilter = this._buildWhereFilter(filters);
-
-      const graphqlQuery = {
-        query: `{
-          Get {
-            ${WEAVIATE_CLASS}(
-              nearText: {
-                concepts: ${JSON.stringify([promptText])}
-                certainty: ${this.similarityThreshold}
-              }
-              limit: 1
-              ${whereFilter ? `where: ${whereFilter}` : ""}
-            ) {
-              promptText
-              taskDomain
-              taskRisk
-              selectedAgent
-              routingConfidence
-              fallbackChain
-              routingSummary
-              createdAt
-              _additional { certainty id }
-            }
-          }
-        }`
-      };
-
-      const response = await httpRequest(`${this.weaviateUrl}/v1/graphql`, {
-        method: "POST",
-        body: graphqlQuery,
-        timeoutMs: LOOKUP_TIMEOUT_MS
-      });
-
-      if (response.status !== 200) {
-        this.circuitBreaker.recordFailure();
-        return null;
-      }
-
-      const results = response.body?.data?.Get?.[WEAVIATE_CLASS];
-      if (!Array.isArray(results) || results.length === 0) {
+      const vectorHit = await this._lookupByVector(promptText, filters);
+      if (vectorHit) {
         this.circuitBreaker.recordSuccess();
-        return null;
+        return { ...vectorHit, source: "vector" };
       }
 
-      const hit = results[0];
-      const certainty = hit._additional?.certainty ?? 0;
-
-      if (certainty < this.similarityThreshold) {
-        this.circuitBreaker.recordSuccess();
-        return null;
-      }
-
+      const lexicalHit = await this._lookupLexical(promptText, filters);
       this.circuitBreaker.recordSuccess();
-      return {
-        promptText: hit.promptText,
-        taskDomain: hit.taskDomain,
-        taskRisk: hit.taskRisk,
-        selectedAgent: hit.selectedAgent,
-        routingConfidence: hit.routingConfidence,
-        fallbackChain: hit.fallbackChain ? JSON.parse(hit.fallbackChain) : [],
-        routingSummary: hit.routingSummary,
-        createdAt: hit.createdAt,
-        similarity: certainty,
-        weaviateId: hit._additional?.id
-      };
-    } catch (err) {
+      return lexicalHit ? { ...lexicalHit, source: "lexical" } : null;
+    } catch {
       this.circuitBreaker.recordFailure();
-      // Fail open — never propagate errors to caller
-      return null;
+      return this._lookupLexical(promptText, filters);
     }
   }
 
-  /**
-   * Asynchronously store a routing decision. Fire-and-forget — never blocks caller.
-   *
-   * @param {object} entry
-   * @param {string} entry.promptText
-   * @param {string} entry.taskDomain
-   * @param {string} entry.taskRisk
-   * @param {string} entry.selectedAgent
-   * @param {number} entry.routingConfidence
-   * @param {string[]} entry.fallbackChain
-   * @param {string} entry.routingSummary
-   */
   store(entry) {
     if (!this.enabled || this.circuitBreaker.isOpen) return;
     if (!entry?.promptText || !entry?.selectedAgent) return;
 
-    // Intentional fire-and-forget — setImmediate defers past current call stack
+    const record = {
+      id: randomUUID(),
+      promptText: String(entry.promptText),
+      taskDomain: String(entry.taskDomain || "general"),
+      taskRisk: String(entry.taskRisk || "MEDIUM"),
+      selectedAgent: String(entry.selectedAgent),
+      routingConfidence: Number(entry.routingConfidence) || 0,
+      fallbackChain: Array.isArray(entry.fallbackChain) ? entry.fallbackChain : [],
+      routingSummary: String(entry.routingSummary || ""),
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+      embeddingStatus: "pending",
+      embeddingProvider: "none",
+      embedding: null,
+      weaviateIndexed: false,
+      lastError: null
+    };
+
+    // Local-first durability: this write succeeds even when all providers are unavailable.
+    this._appendLocalRecord(record);
+
     setImmediate(() => {
-      this._storeAsync(entry).catch((err) => {
-        // Silently swallow — store failure must never surface to caller
-        console.warn("[RouterKnowledgeStore] Async store failed:", err.message);
+      this._storeAsync(record).catch((err) => {
+        this._patchLocalRecord(record.id, {
+          embeddingStatus: "failed",
+          lastError: String(err?.message || err)
+        });
       });
     });
   }
 
-  async _storeAsync(entry) {
+  async _storeAsync(record) {
+    const embeddingResult = await this._embedText(record.promptText);
+
+    if (!embeddingResult.embedding || embeddingResult.embedding.length === 0) {
+      this._patchLocalRecord(record.id, {
+        embeddingStatus: "skipped",
+        embeddingProvider: embeddingResult.provider,
+        lastError: embeddingResult.error || "No embedding provider available"
+      });
+      return;
+    }
+
+    this._patchLocalRecord(record.id, {
+      embeddingStatus: "ready",
+      embeddingProvider: embeddingResult.provider,
+      embedding: embeddingResult.embedding,
+      lastError: null
+    });
+
+    if (!this.weaviateIndexEnabled) return;
+
     const schemaReady = await this._ensureSchema();
-    if (!schemaReady) return;
+    if (!schemaReady) {
+      this._patchLocalRecord(record.id, {
+        weaviateIndexed: false,
+        lastError: "Weaviate schema unavailable"
+      });
+      return;
+    }
 
     const object = {
       class: WEAVIATE_CLASS,
+      id: record.id,
+      vector: embeddingResult.embedding,
       properties: {
-        promptText: String(entry.promptText),
-        taskDomain: String(entry.taskDomain || "general"),
-        taskRisk: String(entry.taskRisk || "MEDIUM"),
-        selectedAgent: String(entry.selectedAgent),
-        routingConfidence: Number(entry.routingConfidence) || 0,
-        fallbackChain: JSON.stringify(Array.isArray(entry.fallbackChain) ? entry.fallbackChain : []),
-        routingSummary: String(entry.routingSummary || ""),
-        createdAt: new Date().toISOString()
+        recordId: record.id,
+        promptText: record.promptText,
+        taskDomain: record.taskDomain,
+        taskRisk: record.taskRisk,
+        selectedAgent: record.selectedAgent,
+        routingConfidence: record.routingConfidence,
+        fallbackChain: JSON.stringify(record.fallbackChain),
+        routingSummary: record.routingSummary,
+        createdAt: record.createdAt,
+        embeddingProvider: embeddingResult.provider
       }
     };
 
@@ -376,20 +413,309 @@ export class RouterKnowledgeStore {
     });
 
     if (response.status === 200 || response.status === 201) {
+      this._patchLocalRecord(record.id, { weaviateIndexed: true, lastError: null });
       this.circuitBreaker.recordSuccess();
-    } else {
-      this.circuitBreaker.recordFailure();
+      return;
+    }
+
+    this._patchLocalRecord(record.id, {
+      weaviateIndexed: false,
+      lastError: `Weaviate index failed with HTTP ${response.status}`
+    });
+    this.circuitBreaker.recordFailure();
+  }
+
+  async _lookupByVector(promptText, filters) {
+    if (!this.weaviateIndexEnabled) return null;
+
+    const queryEmbedding = await this._embedText(promptText);
+    if (!queryEmbedding.embedding || queryEmbedding.embedding.length === 0) return null;
+
+    const schemaReady = await this._ensureSchema();
+    if (!schemaReady) return null;
+
+    const whereFilter = this._buildWhereFilter(filters);
+    const graphqlQuery = {
+      query: `{
+        Get {
+          ${WEAVIATE_CLASS}(
+            nearVector: {
+              vector: ${JSON.stringify(queryEmbedding.embedding)}
+              certainty: ${this.similarityThreshold}
+            }
+            limit: 1
+            ${whereFilter ? `where: ${whereFilter}` : ""}
+          ) {
+            recordId
+            promptText
+            taskDomain
+            taskRisk
+            selectedAgent
+            routingConfidence
+            fallbackChain
+            routingSummary
+            createdAt
+            embeddingProvider
+            _additional { certainty id }
+          }
+        }
+      }`
+    };
+
+    const response = await httpRequest(`${this.weaviateUrl}/v1/graphql`, {
+      method: "POST",
+      body: graphqlQuery,
+      timeoutMs: LOOKUP_TIMEOUT_MS
+    });
+
+    if (response.status !== 200) return null;
+
+    const results = response.body?.data?.Get?.[WEAVIATE_CLASS];
+    if (!Array.isArray(results) || results.length === 0) return null;
+
+    const hit = results[0];
+    const certainty = Number(hit?._additional?.certainty || 0);
+    if (certainty < this.similarityThreshold) return null;
+
+    return {
+      recordId: hit.recordId || hit._additional?.id || null,
+      promptText: hit.promptText,
+      taskDomain: hit.taskDomain,
+      taskRisk: hit.taskRisk,
+      selectedAgent: hit.selectedAgent,
+      routingConfidence: hit.routingConfidence,
+      fallbackChain: hit.fallbackChain ? JSON.parse(hit.fallbackChain) : [],
+      routingSummary: hit.routingSummary,
+      createdAt: hit.createdAt,
+      similarity: certainty,
+      embeddingProvider: hit.embeddingProvider || queryEmbedding.provider,
+      weaviateId: hit._additional?.id
+    };
+  }
+
+  async _lookupLexical(promptText, filters) {
+    const query = String(promptText);
+    const queryTokens = tokenize(query);
+    const normalizedQuery = normalizeText(query);
+
+    const records = this._loadFilteredRecords(filters).slice(-2000);
+    if (records.length === 0) return null;
+
+    const scored = records
+      .map((record) => {
+        const text = `${record.promptText} ${record.routingSummary || ""}`;
+        const normalizedText = normalizeText(text);
+        const tokenScore = jaccardScore(queryTokens, tokenize(text));
+
+        let containsBonus = 0;
+        if (normalizedText.includes(normalizedQuery) || normalizedQuery.includes(normalizedText)) {
+          containsBonus = 0.2;
+        }
+
+        const domainBonus = filters.taskDomain && record.taskDomain === filters.taskDomain ? 0.05 : 0;
+        const riskBonus = filters.taskRisk && record.taskRisk === filters.taskRisk ? 0.05 : 0;
+
+        const score = Math.min(1, tokenScore + containsBonus + domainBonus + riskBonus);
+
+        return { record, score };
+      })
+      .sort((a, b) => b.score - a.score);
+
+    const shortlist = scored.slice(0, 5);
+    const anthropicBest = await this._anthropicRescoreIfEnabled(query, shortlist);
+    const best = anthropicBest || shortlist[0];
+
+    if (!best || best.score < LEXICAL_THRESHOLD) return null;
+
+    return {
+      recordId: best.record.id,
+      promptText: best.record.promptText,
+      taskDomain: best.record.taskDomain,
+      taskRisk: best.record.taskRisk,
+      selectedAgent: best.record.selectedAgent,
+      routingConfidence: best.record.routingConfidence,
+      fallbackChain: best.record.fallbackChain || [],
+      routingSummary: best.record.routingSummary,
+      createdAt: best.record.createdAt,
+      similarity: best.score,
+      embeddingProvider: best.record.embeddingProvider || "none"
+    };
+  }
+
+  async _anthropicRescoreIfEnabled(query, shortlist) {
+    if (!this.anthropicScoringEnabled || shortlist.length === 0) return null;
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) return null;
+
+    const model = process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-20241022";
+
+    try {
+      let best = null;
+      for (const candidate of shortlist) {
+        const response = await httpRequest("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          timeoutMs: 900,
+          headers: {
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01"
+          },
+          body: {
+            model,
+            max_tokens: 12,
+            temperature: 0,
+            messages: [
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text:
+                      "Return only a number between 0 and 1 for semantic similarity.\n" +
+                      `Query: ${query}\n` +
+                      `Candidate: ${candidate.record.promptText}\n` +
+                      `Summary: ${candidate.record.routingSummary || ""}`
+                  }
+                ]
+              }
+            ]
+          }
+        });
+
+        if (response.status !== 200) continue;
+        const text = String(response.body?.content?.[0]?.text || "").trim();
+        const parsed = Number(text.replace(/[^0-9.]/g, ""));
+        if (!Number.isFinite(parsed)) continue;
+
+        const mergedScore = Math.max(candidate.score, Math.min(parsed, 1));
+        if (!best || mergedScore > best.score) {
+          best = { record: candidate.record, score: mergedScore };
+        }
+      }
+      return best;
+    } catch {
+      return null;
     }
   }
 
-  /** Returns current circuit breaker status and schema state for health endpoint */
+  async _embedText(text) {
+    const normalized = String(text || "").trim();
+    if (!normalized) {
+      return { provider: "none", embedding: null, error: "Empty text" };
+    }
+
+    const providerErrors = [];
+
+    for (const provider of this.embeddingProviderOrder) {
+      if (provider === "local") {
+        const local = await this._embedWithLocalProvider(normalized);
+        if (local.embedding) return local;
+        providerErrors.push(local.error || "local embedding unavailable");
+      }
+
+      if (provider === "openai") {
+        const openAi = await this._embedWithOpenAi(normalized);
+        if (openAi.embedding) return openAi;
+        providerErrors.push(openAi.error || "openai embedding unavailable");
+      }
+    }
+
+    return {
+      provider: "none",
+      embedding: null,
+      error: providerErrors.join("; ") || "No configured embedding provider"
+    };
+  }
+
+  async _embedWithLocalProvider(text) {
+    try {
+      const response = await httpRequest(this.localEmbeddingUrl, {
+        method: "POST",
+        timeoutMs: 1200,
+        body: {
+          model: this.localEmbeddingModel,
+          prompt: text
+        }
+      });
+
+      if (response.status !== 200) {
+        return { provider: "local", embedding: null, error: `Local embedding HTTP ${response.status}` };
+      }
+
+      const vector = response.body?.embedding;
+      if (!Array.isArray(vector) || vector.length === 0) {
+        return { provider: "local", embedding: null, error: "Local embedding response missing vector" };
+      }
+
+      return { provider: "local", embedding: vector, error: null };
+    } catch (err) {
+      return { provider: "local", embedding: null, error: err.message };
+    }
+  }
+
+  async _embedWithOpenAi(text) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return { provider: "openai", embedding: null, error: "OPENAI_API_KEY not set" };
+    }
+
+    try {
+      const response = await httpRequest("https://api.openai.com/v1/embeddings", {
+        method: "POST",
+        timeoutMs: 2000,
+        headers: {
+          authorization: `Bearer ${apiKey}`
+        },
+        body: {
+          model: this.openAiEmbeddingModel,
+          input: text
+        }
+      });
+
+      if (response.status !== 200) {
+        return { provider: "openai", embedding: null, error: `OpenAI embedding HTTP ${response.status}` };
+      }
+
+      const vector = response.body?.data?.[0]?.embedding;
+      if (!Array.isArray(vector) || vector.length === 0) {
+        return { provider: "openai", embedding: null, error: "OpenAI response missing embedding vector" };
+      }
+
+      return { provider: "openai", embedding: vector, error: null };
+    } catch (err) {
+      return { provider: "openai", embedding: null, error: err.message };
+    }
+  }
+
   healthStatus() {
+    const state = this._readLocalStore();
+    const records = state.records || [];
+    const pending = records.filter((item) => item.embeddingStatus === "pending").length;
+    const ready = records.filter((item) => item.embeddingStatus === "ready").length;
+    const failed = records.filter((item) => item.embeddingStatus === "failed").length;
+    const skipped = records.filter((item) => item.embeddingStatus === "skipped").length;
+
     return {
       enabled: this.enabled,
       schemaReady: this._schemaReady,
       circuitBreaker: this.circuitBreaker.toJSON(),
       weaviateUrl: this.weaviateUrl,
-      similarityThreshold: this.similarityThreshold
+      similarityThreshold: this.similarityThreshold,
+      localStore: {
+        path: this.localStorePath,
+        records: records.length,
+        pending,
+        ready,
+        failed,
+        skipped
+      },
+      providers: {
+        embeddingOrder: this.embeddingProviderOrder,
+        localEmbeddingUrl: this.localEmbeddingUrl,
+        localEmbeddingModel: this.localEmbeddingModel,
+        openAiEmbeddingModel: this.openAiEmbeddingModel,
+        anthropicScoringEnabled: this.anthropicScoringEnabled
+      }
     };
   }
 
@@ -400,7 +726,7 @@ export class RouterKnowledgeStore {
       clauses.push(`{
         path: ["taskDomain"]
         operator: Equal
-        valueText: "${String(filters.taskDomain).replace(/"/g, "")}"
+        valueText: "${String(filters.taskDomain).replace(/"/g, "")}" 
       }`);
     }
 
@@ -408,7 +734,7 @@ export class RouterKnowledgeStore {
       clauses.push(`{
         path: ["taskRisk"]
         operator: Equal
-        valueText: "${String(filters.taskRisk).replace(/"/g, "")}"
+        valueText: "${String(filters.taskRisk).replace(/"/g, "")}" 
       }`);
     }
 
@@ -419,7 +745,6 @@ export class RouterKnowledgeStore {
   }
 }
 
-// Singleton factory — re-used across routes so circuit breaker state is shared
 let _instance = null;
 export function getRouterKnowledgeStore(options) {
   if (!_instance) {

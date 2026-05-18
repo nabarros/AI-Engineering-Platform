@@ -48,8 +48,8 @@ services:
       QUERY_DEFAULTS_LIMIT: 25
       AUTHENTICATION_APIKEY_ENABLED: "false"
       PERSISTENCE_DATA_PATH: /var/lib/weaviate
-      DEFAULT_VECTORIZER_MODULE: text2vec-openai
-      ENABLE_MODULES: text2vec-openai,qna-openai
+      DEFAULT_VECTORIZER_MODULE: none
+      ENABLE_MODULES: ""
       OPENAI_APIKEY: ${OPENAI_API_KEY:-}
     ports:
       - "8080:8080"
@@ -57,7 +57,7 @@ services:
     volumes:
       - weaviate_data:/var/lib/weaviate
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:8080/v1/.well-known/ready > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/v1/.well-known/ready > /dev/null || exit 1"]
       interval: 30s
       timeout: 10s
       start_period: 30s
@@ -168,7 +168,7 @@ services:
       - ./data:/app/data
       - ./src:/app/src
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8787/ || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8787/health || exit 1"]
       interval: 30s
       timeout: 10s
       start_period: 15s
@@ -192,14 +192,21 @@ services:
       NODE_ENV: ${NODE_ENV:-development}
       MCP_KNOWLEDGE_PORT: ${MCP_KNOWLEDGE_PORT:-8791}
       WEAVIATE_URL: http://weaviate:8080
+      ROUTER_KNOWLEDGE_WEAVIATE_INDEX_ENABLED: ${ROUTER_KNOWLEDGE_WEAVIATE_INDEX_ENABLED:-true}
+      ROUTER_KNOWLEDGE_EMBEDDING_ORDER: ${ROUTER_KNOWLEDGE_EMBEDDING_ORDER:-local,openai}
+      ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_URL: ${ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_URL:-http://host.docker.internal:11434/api/embeddings}
+      ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_MODEL: ${ROUTER_KNOWLEDGE_LOCAL_EMBEDDING_MODEL:-nomic-embed-text}
+      ROUTER_KNOWLEDGE_OPENAI_EMBEDDING_MODEL: ${ROUTER_KNOWLEDGE_OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      ROUTER_KNOWLEDGE_ANTHROPIC_SCORING_ENABLED: ${ROUTER_KNOWLEDGE_ANTHROPIC_SCORING_ENABLED:-false}
     command: ["npm", "run", "start:mcp-server"]
     ports:
       - "8791:8791"
     volumes:
+      - ./data:/app/data
       - ./src:/app/src
       - ./scripts:/app/scripts
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8791/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8791/health || exit 1"]
       interval: 30s
       timeout: 10s
       start_period: 15s

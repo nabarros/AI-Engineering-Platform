@@ -252,7 +252,9 @@ Open Copilot Chat and run any router prompt. The routing report will include a `
 ### Requirements
 
 - Docker stack must be running with Weaviate and MCP (`docker compose up -d weaviate mcp` minimum).
-- `OPENAI_API_KEY` must be set in `.env` for Weaviate's `text2vec-openai` vectorizer to auto-embed prompts.
+- No API key is required for local persistence + lexical lookup.
+- Optional: set `OPENAI_API_KEY` for embedding enrichment.
+- Optional: set `ANTHROPIC_API_KEY` and `ROUTER_KNOWLEDGE_ANTHROPIC_SCORING_ENABLED=true` for lexical re-scoring.
 - If the server is unreachable, routing proceeds normally — the knowledge store is always non-blocking.
 
 ### Disable the knowledge store
