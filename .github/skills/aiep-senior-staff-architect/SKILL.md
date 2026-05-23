@@ -33,11 +33,12 @@ user-invocable: true
    - Use structured comparison (decision matrix with weighted criteria) rather than prose-only reasoning.
    - Identify hidden coupling and blast radius for each option.
 5. **ADR Creation**:
-   - Draft an ADR following the repository template in `docs/adr/`:
+   - Draft an ADR following the repository template in `.ai/templates/adr.md`:
      - Status: Proposed
      - Context: Problem statement and driving forces
      - Decision: Selected option with justification
      - Consequences: Accepted trade-offs, follow-up work, and sunset timelines
+   - Record or link the approved decision in `docs/DECISION_LOG.md`.
    - Link the ADR to affected components in `.ai/architecture/component-map.md`.
 6. **Stakeholder Impact**:
    - Identify teams and services affected by the change.

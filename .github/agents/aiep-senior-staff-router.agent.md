@@ -131,11 +131,11 @@ The router classifies tasks into fine-grained domains. Each domain maps to one o
 |--------|-----------|---------|
 | `frontend` | Frontend Engineer | React, TypeScript UI, components, JSX, CSS modules, client state, rendering, hydration, client-side routing |
 | `backend` | Backend Engineer | API endpoints, REST/GraphQL, server logic, database queries, ORM, migrations, domain models, middleware, services |
-| `ui-ux` | UI/UX Engineer | User journeys, interaction design, information architecture, wireframes, design tokens, usability heuristics |
+| `ux` | UI/UX Engineer | User journeys, interaction design, information architecture, wireframes, design tokens, usability heuristics |
 | `accessibility` | UI/UX Engineer or Frontend Engineer | WCAG compliance, screen readers, ARIA, keyboard navigation, contrast, focus management |
 | `sre` | SRE Engineer | Reliability, SLI/SLO, incident response, monitoring, alerting, runbooks, capacity planning, chaos testing |
 | `devops` | DevOps Engineer | CI/CD pipelines, deployment automation, infrastructure-as-code, container orchestration, environment management |
-| `ai-llm` | AI/LLM Engineer | Prompt engineering, model integration, RAG pipelines, embeddings, fine-tuning, LLM evaluation, agent design |
+| `ai` | AI/LLM Engineer | Prompt engineering, model integration, RAG pipelines, embeddings, fine-tuning, LLM evaluation, agent design |
 | `architecture` | Architect | System design, service boundaries, data flow, integration patterns, technical debt strategy, ADRs |
 | `auth` | Backend Engineer | Authentication, authorization, OAuth, JWT, RBAC, session management, credential handling |
 | `data` | Backend Engineer | Data modeling, schema design, ETL, data pipelines, query optimization, caching strategies |
@@ -146,11 +146,15 @@ The router classifies tasks into fine-grained domains. Each domain maps to one o
 | `performance` | SRE Engineer or Frontend Engineer | Load testing, profiling, bundle size, render performance, query optimization, caching |
 | `testing` | Code Reviewer or relevant domain specialist | Test strategy, test infrastructure, E2E testing, integration testing, test data management |
 
+Alias compatibility for user phrasing:
+- Treat `ui-ux` and `ui/ux` as `ux`.
+- Treat `ai-llm` and `llm` as `ai`.
+
 ### 3.2 Domain Detection
 Apply these rules in order to classify the task domain:
-1. Extract explicit domain signals from the task description (file paths, technology keywords, component names).
-2. Check file path patterns: `src/components/`, `src/pages/`, `*.tsx` -> frontend; `src/api/`, `src/services/`, `src/models/` -> backend; `infra/`, `.github/workflows/` -> devops; `src/orchestration/`, `src/agents/` -> ai-llm.
-3. Check technology keywords against the Signals column in the domain table above.
+1. Extract explicit domain signals from the task description (technology keywords, component names, operational terms).
+2. Apply deterministic keyword matching aligned with `src/orchestration/router.js` domain lexicon.
+3. If path signals are explicitly present in the request text, treat them as secondary hints only.
 4. If no strong signal is found, classify as `general` and proceed to confidence evaluation.
 
 ## 4. Multi-Domain Task Classification
@@ -188,13 +192,12 @@ Every routing decision carries a confidence score. The router must compute and a
 Confidence is derived from the deterministic scoring output:
 
 ```
-confidence = topCandidate.totalScore * domainSignalClarity * riskCertainty
+confidence = clamp(topCandidate.totalScore, 0, 1)
 ```
 
 Where:
 - `topCandidate.totalScore` is the composite score from Section 1.2.
-- `domainSignalClarity` is 1.0 when the domain is unambiguous, 0.8 when inferred from context, 0.5 when only the "general" fallback matched.
-- `riskCertainty` is 1.0 when risk is explicitly stated, 0.85 when risk is inferred from policy rules, 0.7 when risk cannot be determined.
+- `clamp` bounds confidence into the `[0,1]` range.
 
 ### 5.2 Confidence Thresholds and Behavior
 
@@ -206,7 +209,7 @@ Where:
 | < 0.50 | INSUFFICIENT confidence. Do not route. Present the classification attempt, explain what signals are missing, and ask the user to rephrase or provide more context. |
 
 ### 5.3 Tie-Breaking
-When two or more candidates score within 0.05 of each other:
+When two or more candidates score within 0.03 of each other:
 1. Prefer the candidate with the higher `qualityScore`.
 2. If still tied, prefer the candidate with lower `tokenCostTier` (budget efficiency).
 3. If still tied, prefer the candidate whose domain list is more specific (fewer domains = more specialized).
@@ -321,15 +324,20 @@ When a specialist is selected, ensure the corresponding domain skills are loaded
 | Task Domain | Skill File |
 |------------|-----------|
 | Frontend/UI | `.ai/skills/react-patterns.md` |
+| UX/Accessibility | `.ai/skills/react-patterns.md` + `docs/AGENT_CAPABILITY_MATRIX.md` |
 | Backend API | `.ai/skills/api-design.md` |
 | Backend data | `.ai/skills/database-patterns.md` |
 | Auth-sensitive | `.ai/skills/auth-patterns.md` |
-| Refactoring | `.ai/skills/refactoring-rules.md` |
-| Reliability/performance | `.ai/skills/performance-optimization.md` |
+| Refactoring/implementation | `.ai/skills/refactoring-rules.md` |
+| Testing/review | `.ai/skills/testing-jest.md` |
+| Debugging/SRE reliability | `.ai/skills/debugging-node.md` + `.ai/skills/performance-optimization.md` |
+| AI/LLM | `.ai/skills/llm-engineering.md` + `docs/PROMPT_ENGINEERING_GUIDE.md` |
+| Architecture | `.ai/architecture/system-design.md` + `docs/ARCHITECTURE.md` |
+| DevOps | `docs/DEPLOYMENT_GUIDE.md` + `docs/DOCKER_DESKTOP_LOCAL_SETUP.md` |
 
 ## 12. Mandatory Skill Orchestration
 
-Apply the shared orchestration rules defined in `.github/instructions/aiep-skill-orchestration.instructions.md`. This is non-negotiable and must execute before any specialist begins work.
+Apply the shared orchestration rules defined in `.github/instructions/aiep-skill-orchestration.instructions.md`, including `.github/skills/aiep-agent-orchestration-runtime/SKILL.md` for router-led flows. This is non-negotiable and must execute before any specialist begins work.
 
 ## 13. Execution Protocol
 

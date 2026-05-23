@@ -30,6 +30,13 @@ export const DEFAULT_SCORING_WEIGHTS = Object.freeze({
   latency: 0.08
 });
 
+const DOMAIN_ALIASES = Object.freeze({
+  "ui-ux": "ux",
+  "ui/ux": "ux",
+  "ai-llm": "ai",
+  llm: "ai"
+});
+
 function tierRank(tier) {
   const normalized = String(tier || "MEDIUM").toUpperCase();
   return COST_WEIGHTS[normalized] || COST_WEIGHTS.MEDIUM;
@@ -123,12 +130,17 @@ function getLearningSuccessRate(learningStats, capabilityId) {
 }
 
 function getDomainScore(taskDomain, capability) {
-  const domain = String(taskDomain || "general").toLowerCase();
+  const domain = normalizeDomain(taskDomain);
   if (capability.domains.includes(domain)) return 1;
   if (capability.domains.includes("general")) return 0.7;
   // Hard-penalise domain mismatches — a specialist with no domain overlap should
   // almost never beat a domain-matched agent regardless of quality/learning scores.
   return 0.05;
+}
+
+export function normalizeDomain(domain) {
+  const normalized = String(domain || "general").toLowerCase().trim();
+  return DOMAIN_ALIASES[normalized] || normalized;
 }
 
 // Validate that task, registry, and budget are structurally usable before routing.
@@ -179,7 +191,9 @@ export function detectDomains(description) {
 
 export function classifyTask(task) {
   const detectedDomains = detectDomains(task.description);
-  const explicitDomain = task.domain ? [{ domain: task.domain, confidence: 1, matchCount: 0 }] : [];
+  const explicitDomain = task.domain
+    ? [{ domain: normalizeDomain(task.domain), confidence: 1, matchCount: 0 }]
+    : [];
   const allDomains = [...explicitDomain];
 
   for (const detected of detectedDomains) {
@@ -249,7 +263,10 @@ export function routeTask({ task, registry, budget, learningStats = {}, scoringW
   const safeBudget = applyRiskBudgetOverrides(task, budget);
 
   const classification = classifyTask(task);
-  const effectiveTask = { ...task, domain: task.domain || classification.primaryDomain };
+  const effectiveTask = {
+    ...task,
+    domain: normalizeDomain(task.domain || classification.primaryDomain)
+  };
 
   const candidates = findCandidates(effectiveTask, registry);
   if (candidates.length === 0) {

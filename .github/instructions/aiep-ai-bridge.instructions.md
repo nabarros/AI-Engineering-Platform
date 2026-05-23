@@ -33,7 +33,7 @@ For non-trivial tasks, load this order before implementation:
 - `.github/prompts/aiep-senior-staff-router.prompt.md` -> routes work to role-specific `.github/agents/`.
 - `.github/agents/aiep-senior-staff-router.agent.md` -> deterministic single-specialist delegation.
 - `.github/hooks/aiep-guardrails.json` -> deterministic runtime enforcement for restricted paths and memory-write confirmation.
-- Role agents (frontend/backend/ui-ux/sre) -> apply task execution while respecting `.ai` instruction hierarchy.
+- Role agents (frontend/backend/ui-ux/sre/ai-llm/architect/devops) -> apply task execution while respecting `.ai` instruction hierarchy.
 - AI/LLM tasks -> `.ai/skills/llm-engineering.md` for prompt design, model selection, RAG architecture, and inference optimization patterns.
 - Architecture tasks -> `.ai/architecture/system-design.md` for system design decisions, service boundaries, and technology selection rationale.
 - DevOps tasks -> `.ai/deployment/deployment-guide.md` for CI/CD pipelines, deployment strategies, and infrastructure provisioning procedures.

@@ -200,52 +200,21 @@ Start: What is the task?
 - [ ] **Evaluation metrics logged** — Quality, latency, and cost metrics emitted for monitoring and alerting
 - [ ] **No hardcoded keys/endpoints** — API keys, model endpoints, and provider secrets are externalized
 
-## Structured Output Template
-
-```markdown
-### AI/LLM Engineering Review
-
-**Risk Level:** [LOW | MEDIUM | HIGH | CRITICAL]
-**Model Behavior Assumptions:** [e.g., "GPT-4o returns valid JSON for this prompt >99% of the time"]
-
-#### Model Selection Rationale
-| Criterion       | Selected Model | Alternative Considered | Justification            |
-|-----------------|----------------|------------------------|--------------------------|
-| Primary task    | gpt-4o         | gpt-4o-mini            | Accuracy requirement     |
-| Fallback        | gpt-4o-mini    | —                      | Cost/latency tradeoff    |
-
-#### Prompt Diff Summary
-- **Template changed:** `qa-system-v2` → `qa-system-v3`
-- **Key modifications:** Added output format constraint, tightened grounding instructions
-- **Regression test result:** 94.2% match (threshold: 90%)
-
-#### Token Usage & Cost Impact
-| Metric              | Before    | After     | Delta    |
-|---------------------|-----------|-----------|----------|
-| Avg input tokens     | 1,200     | 1,350     | +12.5%   |
-| Avg output tokens    | 480       | 320       | −33.3%   |
-| Est. cost/1k reqs    | $3.40     | $3.10     | −8.8%    |
-
-#### Evaluation Results
-- **Quality score:** 94.2% (baseline: 91.8%)
-- **P95 latency:** 1,240ms (budget: 2,000ms)
-- **Hallucination rate:** 1.2% (threshold: 3%)
-
-#### Residual Risks & Follow-ups
-- [ ] Monitor hallucination rate for 48h post-deploy
-- [ ] Evaluate cost trend after 10k requests
-```
+## Output Contract
+Use the shared response structure from `.github/skills/aiep-safe-implementation/SKILL.md` and include:
+1. Risk and model-behavior assumptions.
+2. Model/prompt architecture rationale.
+3. Files changed and rationale (include prompt diff summary if applicable).
+4. Evaluation evidence (quality, latency, token/cost impact).
+5. Residual risks and follow-ups.
 
 ## Required Workflow
-1. Classify risk level (LOW, MEDIUM, HIGH, CRITICAL) with explicit attention to model behavior unpredictability and user-facing impact.
-2. Apply `.github/instructions/aiep-skill-orchestration.instructions.md`.
-3. Load required governance context and AI-relevant skills: `.ai/skills/performance-optimization.md`, `.ai/skills/llm-engineering.md` (when available).
-4. Evaluate model selection against cost, latency, capability, and context-window constraints for the specific use case.
-5. Implement changes with deterministic fallbacks, structured output parsing, and graceful degradation when model responses are malformed or unavailable.
-6. Add/update evaluation tests: prompt regression tests, output quality assertions, and latency/token-usage benchmarks.
-7. Run targeted validation (tests, lint, integration checks against model stubs).
-8. Self-review for prompt injection vectors, hallucination risk, token waste, and cost regression.
-9. Evaluate memory impact when model configurations, prompt templates, or RAG pipeline state changes.
+1. Apply shared orchestration in `.github/instructions/aiep-skill-orchestration.instructions.md`.
+2. Load mandatory governance context plus AI-relevant skills/docs (`.ai/skills/llm-engineering.md`, `.ai/skills/performance-optimization.md`, `docs/PROMPT_ENGINEERING_GUIDE.md`, `docs/RETRIEVAL_STRATEGY.md`).
+3. Classify risk with explicit model-behavior uncertainty and user-facing blast radius.
+4. Implement deterministic fallback, schema-validated output handling, and graceful degradation for malformed/unavailable model responses.
+5. Add/update evaluation tests (prompt regression, quality, latency/token budget).
+6. Return concise findings-first outcome with cost/quality trade-offs and residual risks.
 
 ## Constraints
 - No unreviewed prompt changes deployed to production; all prompt modifications require explicit review and regression testing.
@@ -265,8 +234,4 @@ Start: What is the task?
 7. Merge peer output into one consolidated AI/LLM engineering result.
 
 ## Output Format
-1. Risk level, model behavior assumptions, and safety considerations.
-2. Model/prompt architecture rationale and cost/quality trade-off analysis.
-3. Files changed and why, with prompt diff summaries where applicable.
-4. Evaluation results: quality metrics, latency benchmarks, token usage.
-5. Residual risks, hallucination surface, and follow-ups.
+Return concise findings-first output aligned with the Output Contract above.

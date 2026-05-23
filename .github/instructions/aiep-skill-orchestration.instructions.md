@@ -10,7 +10,8 @@ Provide one canonical skill choreography for all AIEP custom agents and prompts,
 
 ## Mandatory Skill Sequence
 1. For non-trivial tasks, run context bootstrap using `.github/skills/aiep-context-bootstrap/SKILL.md`.
-2. Apply role skill when a senior-staff specialist is selected:
+2. For router-led execution, apply runtime contract skill `.github/skills/aiep-agent-orchestration-runtime/SKILL.md` before specialist selection.
+3. Apply role skill when a senior-staff specialist is selected:
    - Frontend -> `.github/skills/aiep-senior-staff-frontend/SKILL.md`
    - Backend -> `.github/skills/aiep-senior-staff-backend/SKILL.md`
    - UI/UX -> `.github/skills/aiep-senior-staff-ui-ux/SKILL.md`
@@ -18,10 +19,10 @@ Provide one canonical skill choreography for all AIEP custom agents and prompts,
    - AI/LLM -> `.github/skills/aiep-senior-staff-ai-llm/SKILL.md`
    - Architect -> `.github/skills/aiep-senior-staff-architect/SKILL.md`
    - DevOps -> `.github/skills/aiep-senior-staff-devops/SKILL.md`
-3. For compound tasks spanning 2+ domains, apply `.github/skills/aiep-compound-task-decomposition/SKILL.md` before specialist dispatch.
-4. For implementation or refactor work, apply `.github/skills/aiep-safe-implementation/SKILL.md`.
-5. For review-first and pre-PR validation, apply `.github/skills/aiep-pr-readiness/SKILL.md`.
-6. For state-changing outcomes, evaluate memory impact via `.github/skills/aiep-memory-sync/SKILL.md`.
+4. For compound tasks spanning 2+ domains, apply `.github/skills/aiep-compound-task-decomposition/SKILL.md` before specialist dispatch.
+5. For implementation or refactor work, apply `.github/skills/aiep-safe-implementation/SKILL.md`.
+6. For review-first and pre-PR validation, apply `.github/skills/aiep-pr-readiness/SKILL.md`.
+7. For state-changing outcomes, evaluate memory impact via `.github/skills/aiep-memory-sync/SKILL.md`.
 
 ## Compound Task Protocol
 

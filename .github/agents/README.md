@@ -6,25 +6,28 @@ Catalog of all specialist agents in the AIEP router orchestration system. Determ
 
 ## Agent Roster
 
-Complete roster of all 8 specialist agents with domain focus, risk ceiling, and typical invocation pattern.
+Complete roster of all 11 agents (router + 10 specialists) with domain focus, risk ceiling, and typical invocation pattern.
 
 | # | Agent | Role | Domain | Risk Ceiling | Token Tier |
 |---|---|---|---|---|---|
 | 1 | **[Router](aiep-senior-staff-router.agent.md)** | Orchestration & routing | Meta (all domains) | LOW–HIGH | Any |
-| 2 | **[Context Planner](aiep-context-planner.agent.md)** | Planning & context loading | Planning/discovery | LOW | Any |
-| 3 | **[Code Reviewer](aiep-code-reviewer.agent.md)** | Code review & quality gates | QA/review | LOW–MEDIUM | Low–Med |
-| 4 | **[Implementation Guardian](aiep-implementation-guardian.agent.md)** | Safe coding & refactoring | Implementation | MEDIUM–HIGH | Any |
-| 5 | **[Senior Backend Engineer](aiep-senior-staff-backend.agent.md)** | API design & services | Backend | MEDIUM–HIGH | Medium–Prem |
-| 6 | **[Senior Frontend Engineer](aiep-senior-staff-frontend.agent.md)** | React/TS UI & state | Frontend | MEDIUM–HIGH | Medium–Prem |
+| 2 | **[Context Planner](aiep-context-planner.agent.md)** | Planning & context loading | Planning/discovery | HIGH | Low |
+| 3 | **[Code Reviewer](aiep-code-reviewer.agent.md)** | Code review & quality gates | QA/review | HIGH | Low |
+| 4 | **[Implementation Guardian](aiep-implementation-guardian.agent.md)** | Safe coding & refactoring | Implementation | HIGH | Medium |
+| 5 | **[Senior Backend Engineer](aiep-senior-staff-backend.agent.md)** | API design & services | Backend | HIGH | Medium |
+| 6 | **[Senior Frontend Engineer](aiep-senior-staff-frontend.agent.md)** | React/TS UI & state | Frontend | HIGH | Medium |
 | 7 | **[Senior UI/UX Engineer](aiep-senior-staff-ui-ux.agent.md)** | Interaction & design | UX/Design | MEDIUM | Low–Med |
-| 8 | **[Senior SRE Engineer](aiep-senior-staff-sre.agent.md)** | Reliability & observability | Ops/SRE | MEDIUM–HIGH | Medium–Prem |
+| 8 | **[Senior SRE Engineer](aiep-senior-staff-sre.agent.md)** | Reliability & observability | Ops/SRE | HIGH | Low |
+| 9 | **[Senior AI/LLM Engineer](aiep-senior-staff-ai-llm.agent.md)** | LLM systems & model integration | AI/LLM | HIGH | High |
+| 10 | **[Senior Architect](aiep-senior-staff-architect.agent.md)** | System design & ADR direction | Architecture | HIGH | Low |
+| 11 | **[Senior DevOps Engineer](aiep-senior-staff-devops.agent.md)** | Delivery pipeline & infrastructure | DevOps | HIGH | Medium |
 
 ---
 
 ## How Routing Works
 
 1. **Router receives request** with domain, risk level, and budget tier
-2. **Router scores all 8 candidates** using deterministic multi-factor rubric
+2. **Router scores all eligible specialists** using deterministic multi-factor rubric
 3. **Router selects primary specialist** with highest score
 4. **Specialist executes** the task (may invoke one peer if cross-domain blocker)
 5. **Verification gate** validates security, contracts, and test coverage
@@ -48,7 +51,7 @@ Requirements: [acceptance criteria]
 
 **Router will:**
 - Classify domain, risk, and budget
-- Score all 8 candidates
+- Score all eligible specialist candidates
 - Select best-fit specialist
 - Provide fallback chain if needed
 
@@ -125,6 +128,22 @@ Requirements: [acceptance criteria]
 - Release safety and rollout strategy
 - Reliability analysis (no file edits)
 
+**Senior AI/LLM:**
+- Prompt engineering and evaluation strategy
+- Model/provider selection and fallback patterns
+- RAG, embeddings, and retrieval-quality tuning
+- Inference cost, latency, and token optimization
+
+**Senior Architect:**
+- Service boundary and contract decisions
+- ADR preparation and trade-off analysis
+- Migration strategy and blast-radius evaluation
+
+**Senior DevOps:**
+- CI/CD, container, and release pipeline design
+- Environment parity and deployment safety checks
+- Infrastructure automation and rollback planning
+
 ---
 
 ## Agent Collaboration Rules
@@ -172,6 +191,9 @@ Pre-computed at routing time based on:
 | "Is this backend/API work?" | Yes | Senior Backend |
 | "Is this UX/interaction design?" | Yes | Senior UI/UX |
 | "Is this reliability/ops?" | Yes | Senior SRE |
+| "Is this AI/LLM integration?" | Yes | Senior AI/LLM |
+| "Is this architecture/system design?" | Yes | Senior Architect |
+| "Is this CI/CD or deployment work?" | Yes | Senior DevOps |
 | "Am I refactoring or cross-cutting?" | Yes | Implementation Guardian |
 | "I'm not sure which specialist" | — | Router (auto-select) |
 
@@ -261,6 +283,6 @@ Pre-computed at routing time based on:
 
 ---
 
-**Status:** Comprehensive agent orchestration catalog (8 specialists, deterministic routing, peer collaboration, fallback chains)
+**Status:** Comprehensive agent orchestration catalog (10 specialists, deterministic routing, peer collaboration, fallback chains)
 
 **Last updated:** 2026-05-09
