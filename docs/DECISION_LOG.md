@@ -159,6 +159,20 @@ Each entry follows the ADR (Architecture Decision Record) format. Full ADR docum
 
 ---
 
+## ADR-011: P0 Mitigation Baseline for Connector and Collaboration Runtime
+
+**Status:** Accepted  
+**Date:** 2026-05-24  
+**Decision:** Implement a deterministic mitigation baseline for P0 roadmap items in orchestration runtime using contract-first connector modules and collaboration runtime controls.
+
+**Context:** P0 execution lanes required immediate risk reduction and demonstrable progress before full production hardening could be completed.
+
+**Alternatives considered:** Keep P0 tasks in planning-only state, implement only docs-level commitments.
+
+**Rationale:** A code-level mitigation baseline enables test-gated progress now while preserving compatibility with later production hardening, rollout, and telemetry enhancements.
+
+---
+
 ## Adding New Decisions
 
 Use the ADR template at `.ai/templates/adr.md`. Record decisions here as summary entries once approved. Full ADR documents live in `.ai/architecture/adrs/`.

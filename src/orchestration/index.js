@@ -110,3 +110,24 @@ export { executeTaskGraph } from "./multi-agent-engine.js";
 export { validateCapabilityRegistry, findCandidates, canHandleRisk } from "./capability-registry.js";
 export { TraceCollector } from "./tracer.js";
 export { LearningLoop } from "./learning-loop.js";
+export {
+	CONNECTOR_CONTRACT_VERSION,
+	validateConnectorDefinition,
+	createConnectorDefinition
+} from "./connectors/connector-contract.js";
+export { ConnectorRegistry } from "./connectors/connector-registry.js";
+export { createConnectorPolicyEngine } from "./connectors/connector-policy-engine.js";
+export { BUILTIN_CONNECTORS } from "./connectors/builtin-connectors.js";
+export { ConnectorSandbox } from "./connectors/connector-sandbox.js";
+export {
+	COLLABORATION_PROTOCOL_VERSION,
+	COLLABORATION_MESSAGE_TYPES,
+	validateCollaborationMessage,
+	createCollaborationMessage
+} from "./collaboration/collaboration-protocol.js";
+export { TaskLeaseManager } from "./collaboration/lease-manager.js";
+export { PeerNegotiationChannel } from "./collaboration/negotiation-channel.js";
+export { cancelWorkflowWithCompensation } from "./collaboration/cancellation-manager.js";
+export { DeadLetterQueue } from "./collaboration/dead-letter-queue.js";
+export { buildCollaborationHandoffGraph } from "./collaboration/collaboration-graph.js";
+export { enforceCollaborationGuardrails } from "./collaboration/collaboration-guardrails.js";
