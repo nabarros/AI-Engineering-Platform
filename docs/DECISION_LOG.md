@@ -173,6 +173,20 @@ Each entry follows the ADR (Architecture Decision Record) format. Full ADR docum
 
 ---
 
+## ADR-012: P1 and P2 Mitigation Baseline Rollout
+
+**Status:** Accepted  
+**Date:** 2026-05-24  
+**Decision:** Implement deterministic baseline mitigations for all P1 and P2 lanes across enterprise productization, token leverage, reliability, benchmarking, and docs/runtime contract automation.
+
+**Context:** The execution roadmap required immediate conversion of strategic backlog into testable runtime capabilities and automation primitives.
+
+**Alternatives considered:** Defer implementation to future sprints, partial implementation by lane.
+
+**Rationale:** Delivering complete baseline coverage with tests and report traceability reduces execution risk and creates a concrete foundation for staged hardening.
+
+---
+
 ## Adding New Decisions
 
 Use the ADR template at `.ai/templates/adr.md`. Record decisions here as summary entries once approved. Full ADR documents live in `.ai/architecture/adrs/`.

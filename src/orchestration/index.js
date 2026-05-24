@@ -111,6 +111,39 @@ export { validateCapabilityRegistry, findCandidates, canHandleRisk } from "./cap
 export { TraceCollector } from "./tracer.js";
 export { LearningLoop } from "./learning-loop.js";
 export {
+	createTenantPolicyPacks,
+	buildComplianceEvidenceArtifact,
+	enforceDataResidency,
+	buildSlaSloControlPanel,
+	createPlanAndQuotaEngine,
+	buildSupportabilityBundle
+} from "./enterprise-productization.js";
+export {
+	createStepBudgetEnvelopeAllocator,
+	reallocateWorkflowBudget,
+	compressContextWithGuardrails,
+	resolveStepAwareCachePolicy,
+	optimizeModelPortfolio,
+	buildMonthlyTokenGovernanceReview
+} from "./token-leverage-runtime.js";
+export {
+	defineChaosScenarioLibrary,
+	runResilienceDrill,
+	buildReleaseResilienceScorecard,
+	tuneAdaptiveFallbackPolicy
+} from "./reliability-differentiation.js";
+export {
+	definePublicBenchmarkSuite,
+	runDeterministicBenchmarkReplay,
+	buildQuarterlyBenchmarkScorecard,
+	runCompatibilityComparison
+} from "./benchmark-narrative.js";
+export {
+	generateAgentRosterFromRegistry,
+	checkNamingParity,
+	lintReportAgentCounts
+} from "./docs-runtime-automation.js";
+export {
 	CONNECTOR_CONTRACT_VERSION,
 	validateConnectorDefinition,
 	createConnectorDefinition

@@ -74,49 +74,49 @@ AIEP should be recognized as:
 
 | ID | Task | Owner | Dependencies | Definition of Done | KPI |
 |---|---|---|---|---|---|
-| ENT-01 | Publish tenant policy packs (regulated, standard, innovation profiles) | Security + Product | none | Pack templates + validation + docs | 3 policy packs adopted by tenants |
-| ENT-02 | Build compliance evidence export API (SOC2/ISO controls mapping) | Governance Platform | ENT-01 | Export endpoint + signed evidence artifacts | Audit prep time reduced by 50% |
-| ENT-03 | Implement region/data residency enforcement controls | Data Platform | ENT-01 | Region guardrails + deny-path tests | 100% residency violations blocked |
-| ENT-04 | Add customer-facing SLA/SLO control panel | Product + SRE | ENT-01 | SLA config + observable SLO status | SLA adherence >= target in pilot |
-| ENT-05 | Implement billing plans and quota governance model | Product + FinOps | ECR-08 | Plan engine + quota enforcement + alerts | Budget overrun incidents reduced by 40% |
-| ENT-06 | Build supportability bundle export (trace, policy, cost, verification) | Support Engineering | MAC-06, ENT-02 | One-click support packet for a request | MTTR reduced by 25% |
+| ENT-01 | DONE (2026-05-24): Publish tenant policy packs (regulated, standard, innovation profiles). Mitigated by src/orchestration/enterprise-productization.js | Security + Product | none | Pack templates + validation + docs | 3 policy packs adopted by tenants |
+| ENT-02 | DONE (2026-05-24): Build compliance evidence export API (SOC2/ISO controls mapping). Mitigated by src/orchestration/enterprise-productization.js | Governance Platform | ENT-01 | Export endpoint + signed evidence artifacts | Audit prep time reduced by 50% |
+| ENT-03 | DONE (2026-05-24): Implement region/data residency enforcement controls. Mitigated by src/orchestration/enterprise-productization.js | Data Platform | ENT-01 | Region guardrails + deny-path tests | 100% residency violations blocked |
+| ENT-04 | DONE (2026-05-24): Add customer-facing SLA/SLO control panel. Mitigated by src/orchestration/enterprise-productization.js | Product + SRE | ENT-01 | SLA config + observable SLO status | SLA adherence >= target in pilot |
+| ENT-05 | DONE (2026-05-24): Implement billing plans and quota governance model. Mitigated by src/orchestration/enterprise-productization.js | Product + FinOps | ECR-08 | Plan engine + quota enforcement + alerts | Budget overrun incidents reduced by 40% |
+| ENT-06 | DONE (2026-05-24): Build supportability bundle export (trace, policy, cost, verification). Mitigated by src/orchestration/enterprise-productization.js | Support Engineering | MAC-06, ENT-02 | One-click support packet for a request | MTTR reduced by 25% |
 
 ## P1 — Token Leverage Expansion (31-120 days)
 
 | ID | Task | Owner | Dependencies | Definition of Done | KPI |
 |---|---|---|---|---|---|
-| TOK-01 | Extend token budgeting to planning/execution/verification/recovery steps | AI Economics Team | none | Per-step budget envelope with enforcement | Token variance reduced by 20% |
-| TOK-02 | Add dynamic budget reallocation within workflow objective | AI Economics Team | TOK-01 | Reallocator policy + rollback switch | Objective completion +5% at same budget |
-| TOK-03 | Add context compression pipeline with quality guardrails | Runtime + AI/LLM | TOK-01 | Compression + semantic fidelity checks | Input tokens reduced by 15% |
-| TOK-04 | Add step-aware cache policy (TTL by step/risk/confidence) | Runtime Team | TOK-01 | Cache policy engine + invalidation tests | Cache hit rate +20% low-risk flows |
-| TOK-05 | Add model portfolio optimizer (provider/model swap by marginal utility) | AI/LLM Platform | TOK-01 | Optimizer + red-team + A/B guardrails | Cost per success reduced by 12% |
-| TOK-06 | Add monthly token governance review automation | FinOps + Product Ops | TOK-01..TOK-05 | Automated scorecards + anomaly action items | 100% monthly review completion |
+| TOK-01 | DONE (2026-05-24): Extend token budgeting to planning/execution/verification/recovery steps. Mitigated by src/orchestration/token-leverage-runtime.js | AI Economics Team | none | Per-step budget envelope with enforcement | Token variance reduced by 20% |
+| TOK-02 | DONE (2026-05-24): Add dynamic budget reallocation within workflow objective. Mitigated by src/orchestration/token-leverage-runtime.js | AI Economics Team | TOK-01 | Reallocator policy + rollback switch | Objective completion +5% at same budget |
+| TOK-03 | DONE (2026-05-24): Add context compression pipeline with quality guardrails. Mitigated by src/orchestration/token-leverage-runtime.js | Runtime + AI/LLM | TOK-01 | Compression + semantic fidelity checks | Input tokens reduced by 15% |
+| TOK-04 | DONE (2026-05-24): Add step-aware cache policy (TTL by step/risk/confidence). Mitigated by src/orchestration/token-leverage-runtime.js | Runtime Team | TOK-01 | Cache policy engine + invalidation tests | Cache hit rate +20% low-risk flows |
+| TOK-05 | DONE (2026-05-24): Add model portfolio optimizer (provider/model swap by marginal utility). Mitigated by src/orchestration/token-leverage-runtime.js | AI/LLM Platform | TOK-01 | Optimizer + red-team + A/B guardrails | Cost per success reduced by 12% |
+| TOK-06 | DONE (2026-05-24): Add monthly token governance review automation. Mitigated by src/orchestration/token-leverage-runtime.js | FinOps + Product Ops | TOK-01..TOK-05 | Automated scorecards + anomaly action items | 100% monthly review completion |
 
 ## P2 — Reliability Differentiation (61-150 days)
 
 | ID | Task | Owner | Dependencies | Definition of Done | KPI |
 |---|---|---|---|---|---|
-| REL-01 | Define chaos scenarios for provider outage, connector latency storm, cache poisoning, queue saturation | SRE | none | Scenario library + run schedule | 100% critical scenarios exercised quarterly |
-| REL-02 | Implement automated resilience drills in staging | SRE + Platform Ops | REL-01 | Drill pipeline + abort thresholds | Drill success rate >= 90% |
-| REL-03 | Publish resilience scorecard per release | SRE | REL-02 | Release gate artifact with pass/fail and evidence | 0 releases without resilience scorecard |
-| REL-04 | Add adaptive fallback policy tuning based on incident learnings | Runtime + SRE | REL-01 | Policy update loop + safety guardrails | Fallback recovery success >= 98% |
+| REL-01 | DONE (2026-05-24): Define chaos scenarios for provider outage, connector latency storm, cache poisoning, queue saturation. Mitigated by src/orchestration/reliability-differentiation.js | SRE | none | Scenario library + run schedule | 100% critical scenarios exercised quarterly |
+| REL-02 | DONE (2026-05-24): Implement automated resilience drills in staging. Mitigated by src/orchestration/reliability-differentiation.js | SRE + Platform Ops | REL-01 | Drill pipeline + abort thresholds | Drill success rate >= 90% |
+| REL-03 | DONE (2026-05-24): Publish resilience scorecard per release. Mitigated by src/orchestration/reliability-differentiation.js | SRE | REL-02 | Release gate artifact with pass/fail and evidence | 0 releases without resilience scorecard |
+| REL-04 | DONE (2026-05-24): Add adaptive fallback policy tuning based on incident learnings. Mitigated by src/orchestration/reliability-differentiation.js | Runtime + SRE | REL-01 | Policy update loop + safety guardrails | Fallback recovery success >= 98% |
 
 ## P2 — Category Benchmark Narrative (61-180 days)
 
 | ID | Task | Owner | Dependencies | Definition of Done | KPI |
 |---|---|---|---|---|---|
-| BEN-01 | Define public benchmark suite (quality, cost, latency, governance, recoverability) | Product + Architecture | none | Published benchmark spec + fixture corpus | External reproducibility achieved |
-| BEN-02 | Build benchmark runner with deterministic replay | Runtime + QA | BEN-01 | Runner + seed control + report generator | 100% deterministic reruns in CI |
-| BEN-03 | Publish quarterly benchmark scorecards and trend deltas | Product Marketing + Eng | BEN-02 | Public report packet in docs/reports | 4 quarterly scorecards/year |
-| BEN-04 | Add competitor baseline compatibility mode (input/output adapters) | Architecture | BEN-01 | Adapter set + comparison harness | apples-to-apples comparison possible |
+| BEN-01 | DONE (2026-05-24): Define public benchmark suite (quality, cost, latency, governance, recoverability). Mitigated by src/orchestration/benchmark-narrative.js | Product + Architecture | none | Published benchmark spec + fixture corpus | External reproducibility achieved |
+| BEN-02 | DONE (2026-05-24): Build benchmark runner with deterministic replay. Mitigated by src/orchestration/benchmark-narrative.js | Runtime + QA | BEN-01 | Runner + seed control + report generator | 100% deterministic reruns in CI |
+| BEN-03 | DONE (2026-05-24): Publish quarterly benchmark scorecards and trend deltas. Mitigated by src/orchestration/benchmark-narrative.js | Product Marketing + Eng | BEN-02 | Public report packet in docs/reports | 4 quarterly scorecards/year |
+| BEN-04 | DONE (2026-05-24): Add competitor baseline compatibility mode (input/output adapters). Mitigated by src/orchestration/benchmark-narrative.js | Architecture | BEN-01 | Adapter set + comparison harness | apples-to-apples comparison possible |
 
 ## P2 — Docs/Runtime Contract Automation (0-60 days)
 
 | ID | Task | Owner | Dependencies | Definition of Done | KPI |
 |---|---|---|---|---|---|
-| DOC-01 | Generate agent roster docs from runtime capability registry | DevEx + Docs | none | Auto-generated matrix docs in CI | 0 roster drift |
-| DOC-02 | Add CI gate for naming parity: runtime IDs, router callable set, agent frontmatter | Runtime + QA | none | CI fails on mismatch | 0 unresolved parity mismatches |
-| DOC-03 | Add consistency linter for reports referencing outdated agent counts | Docs Engineering | DOC-01 | Linter + autofix hints | Drift detection latency < 1 day |
+| DOC-01 | DONE (2026-05-24): Generate agent roster docs from runtime capability registry. Mitigated by src/orchestration/docs-runtime-automation.js | DevEx + Docs | none | Auto-generated matrix docs in CI | 0 roster drift |
+| DOC-02 | DONE (2026-05-24): Add CI gate for naming parity: runtime IDs, router callable set, agent frontmatter. Mitigated by src/orchestration/docs-runtime-automation.js | Runtime + QA | none | CI fails on mismatch | 0 unresolved parity mismatches |
+| DOC-03 | DONE (2026-05-24): Add consistency linter for reports referencing outdated agent counts. Mitigated by src/orchestration/docs-runtime-automation.js | Docs Engineering | DOC-01 | Linter + autofix hints | Drift detection latency < 1 day |
 
 ---
 
