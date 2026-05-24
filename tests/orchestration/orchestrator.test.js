@@ -113,6 +113,57 @@ test("should create recovery plan and complete orchestration when verification f
   assert.ok(Array.isArray(result.orientedContext));
 });
 
+test("should keep a callable selected agent after local-context score reordering", async () => {
+  const orchestrator = new AgentOrchestrator({ capabilityRegistry: DEFAULT_CAPABILITY_REGISTRY });
+
+  const result = await orchestrator.processRequest({
+    requestId: "req-local-reorder-1",
+    task: {
+      domain: "backend",
+      risk: "MEDIUM",
+      description: "Implement backend API contract and validation"
+    },
+    budget: {
+      tokenBudgetTier: "MEDIUM",
+      latencyBudgetTier: "MEDIUM"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.92,
+      latencyMs: 120,
+      tokenUsage: 2600
+    },
+    localContext: {
+      isAvailable: true,
+      isHealthy: true,
+      services: {
+        orchestration: { healthy: true, latencyMs: 20 },
+        sharedState: { healthy: true, latencyMs: 18 },
+        weaviate: { healthy: true, latencyMs: 26 },
+        postgres: { healthy: true, latencyMs: 15 },
+        redis: { healthy: true, latencyMs: 10 }
+      },
+      enrichmentData: {
+        routerMemory: {
+          successRates: {
+            "AIEP Senior Staff Architect": 0.99,
+            "AIEP Senior Staff Backend Engineer": 0.8
+          }
+        },
+        capabilityRegistry: DEFAULT_CAPABILITY_REGISTRY
+      }
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.ok(typeof result.selectedAgent === "string" && result.selectedAgent.length > 0);
+  assert.equal(result.selectedAgent, result.routeScores[0].capabilityId);
+});
+
 test("should fail with SKILL_POLICY_BLOCKED when selected agent lacks required skills", async () => {
   const registry = [
     {

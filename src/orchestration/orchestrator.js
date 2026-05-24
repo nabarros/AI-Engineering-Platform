@@ -183,7 +183,8 @@ export class AgentOrchestrator {
 
     // Update selected to top candidate after re-sorting
     const selectedId = adjustedScores[0].capabilityId;
-    const selectedCapability = route.selected.id === selectedId ? route.selected : null;
+    const selectedCapability =
+      this.capabilityRegistry.find((capability) => capability.id === selectedId) || route.selected;
 
     return {
       ...route,

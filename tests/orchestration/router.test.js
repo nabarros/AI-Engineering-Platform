@@ -110,3 +110,11 @@ test("should classify explicit alias domain as normalized primary domain", () =>
 
   assert.equal(classification.primaryDomain, "ux");
 });
+
+test("should classify Azure DevOps and Ansible wording as devops domain", () => {
+  const classification = classifyTask({
+    description: "Create an Azure DevOps pipeline and Ansible playbook for Kubernetes rollout"
+  });
+
+  assert.equal(classification.primaryDomain, "devops");
+});
