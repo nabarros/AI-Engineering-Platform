@@ -11,6 +11,7 @@ export function buildQualityDashboard(executions) {
   const totalTokens = executions.reduce((sum, run) => sum + Number(run.tokenUsage || 0), 0);
   const compoundTasks = executions.filter((run) => run.isCompound === true).length;
   const clarificationsNeeded = executions.filter((run) => run.needsClarification === true).length;
+  const blockedDelegations = executions.filter((run) => run.delegationStatus === "blocked").length;
 
   const agentUsage = {};
   for (const run of executions) {
@@ -24,6 +25,12 @@ export function buildQualityDashboard(executions) {
     domainDistribution[domain] = (domainDistribution[domain] || 0) + 1;
   }
 
+  const delegationReasonDistribution = {};
+  for (const run of executions) {
+    const reasonCode = String(run.delegationReasonCode || "unknown");
+    delegationReasonDistribution[reasonCode] = (delegationReasonDistribution[reasonCode] || 0) + 1;
+  }
+
   return {
     totalRuns: total,
     firstPassSuccessRate: ratio(firstPassSuccesses, total),
@@ -32,8 +39,10 @@ export function buildQualityDashboard(executions) {
     avgTokenUsage: total ? Number((totalTokens / total).toFixed(2)) : 0,
     compoundTaskRate: ratio(compoundTasks, total),
     clarificationRate: ratio(clarificationsNeeded, total),
+    blockedDelegationRate: ratio(blockedDelegations, total),
     agentUsage,
-    domainDistribution
+    domainDistribution,
+    delegationReasonDistribution
   };
 }
 

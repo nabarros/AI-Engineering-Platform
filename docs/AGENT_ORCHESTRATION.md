@@ -13,7 +13,7 @@ load_when: understanding agent roles, routing decisions, collaboration patterns
 
 ## Quick Reference: Agent Roster
 
-All 8 routing-system agents in AIEP (Router + 7 specialists), with their primary domain, risk ceiling, and typical use case.
+All 11 routing-system agents in AIEP (Router + 10 specialists), with their primary domain, risk ceiling, and typical use case.
 
 | # | Agent | Domain | Risk Ceiling | Token Tier | When to Use |
 |---|---|---|---|---|---|
@@ -25,6 +25,9 @@ All 8 routing-system agents in AIEP (Router + 7 specialists), with their primary
 | 6 | **Senior Frontend** | React/TS UI | MEDIUM–HIGH | Medium–Prem | Component design, state, rendering, accessibility |
 | 7 | **Senior UI/UX** | Interaction Design | MEDIUM | Low–Med | User journeys, interaction quality, design systems |
 | 8 | **Senior SRE** | Reliability & Ops | MEDIUM–HIGH | Medium–Prem | Observability, incident readiness, SLI/SLO, release safety |
+| 9 | **Senior AI/LLM** | LLM systems & model integration | MEDIUM–HIGH | High | Prompting, RAG, embeddings, inference quality/cost |
+| 10 | **Senior Architect** | System architecture | MEDIUM–HIGH | Low–Med | Service boundaries, ADRs, architecture trade-offs |
+| 11 | **Senior DevOps** | Delivery & infrastructure | MEDIUM–HIGH | Medium | CI/CD, deployment safety, infra automation |
 
 ---
 

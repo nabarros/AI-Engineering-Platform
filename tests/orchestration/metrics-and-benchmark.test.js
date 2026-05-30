@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  buildQualityDashboard,
   buildWeeklyCostQualityScorecard,
   buildSubsetTokenImpactReport,
   buildSubsetTokenImpactDashboard
@@ -91,4 +92,42 @@ test("should build subset token impact dashboard summary from report", () => {
   assert.equal(dashboard.comparedTaskClassCount, 2);
   assert.equal(dashboard.topSavings.length, 2);
   assert.equal(dashboard.topSavings[0].taskClass, "feature");
+});
+
+test("should aggregate delegation reason frequency and blocked rate", () => {
+  const dashboard = buildQualityDashboard([
+    {
+      verificationPass: true,
+      fallbackUsed: false,
+      tokenUsage: 1000,
+      selectedAgent: "AIEP Senior Staff Backend Engineer",
+      primaryDomain: "backend",
+      delegationStatus: "delegated",
+      delegationReasonCode: "delegation_succeeded"
+    },
+    {
+      verificationPass: false,
+      fallbackUsed: false,
+      tokenUsage: 300,
+      selectedAgent: null,
+      primaryDomain: "general",
+      delegationStatus: "blocked",
+      delegationReasonCode: "route_needs_clarification"
+    },
+    {
+      verificationPass: false,
+      fallbackUsed: false,
+      tokenUsage: 250,
+      selectedAgent: null,
+      primaryDomain: "backend",
+      delegationStatus: "blocked",
+      delegationReasonCode: "policy_blocked"
+    }
+  ]);
+
+  assert.equal(dashboard.totalRuns, 3);
+  assert.equal(dashboard.blockedDelegationRate, 0.6667);
+  assert.equal(dashboard.delegationReasonDistribution.delegation_succeeded, 1);
+  assert.equal(dashboard.delegationReasonDistribution.route_needs_clarification, 1);
+  assert.equal(dashboard.delegationReasonDistribution.policy_blocked, 1);
 });

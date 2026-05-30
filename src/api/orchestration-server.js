@@ -181,6 +181,12 @@ export function createOrchestrationServer(options = {}) {
         verificationPass: result.verification?.pass === true,
         fallbackUsed: Array.isArray(result.fallbackChain) && result.fallbackChain.length > 0,
         tokenUsage: Number(requestPayload.executionEvidence?.tokenUsage || 0),
+        selectedAgent: result.selectedSpecialist || null,
+        primaryDomain: result.classification?.primaryDomain || String(requestPayload.task?.domain || "unknown").toLowerCase(),
+        isCompound: result.classification?.isCompound === true,
+        needsClarification: result.needsClarification === true,
+        delegationStatus: result.delegation?.status || (result.ok ? "delegated" : "blocked"),
+        delegationReasonCode: result.delegation?.reasonCode || (result.ok ? "delegation_succeeded" : String(result.error || "unknown").toLowerCase()),
         subsetApplied: result.error !== "SKILL_POLICY_BLOCKED",
         subsetViolation: result.error === "SKILL_POLICY_BLOCKED"
       });

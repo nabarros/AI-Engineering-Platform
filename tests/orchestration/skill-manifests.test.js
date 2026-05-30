@@ -168,3 +168,25 @@ test("should provide actionable preflight dry-run denial messages", () => {
   assert.ok(dryRun.blockedReasonCodes.length > 0);
   assert.ok(dryRun.messages.some((message) => message.includes("SKILL_")));
 });
+
+test("should avoid low-risk security requirement on generic secure wording", () => {
+  const required = inferRequiredSkillsFromTask({
+    domain: "backend",
+    risk: "LOW",
+    description: "Implement backend feature with secure logging and tests"
+  });
+
+  assert.ok(required.includes("backend"));
+  assert.ok(required.includes("testing"));
+  assert.ok(!required.includes("security"));
+});
+
+test("should keep security requirement when explicit security intent is present", () => {
+  const required = inferRequiredSkillsFromTask({
+    domain: "backend",
+    risk: "LOW",
+    description: "Implement backend feature and run security audit for vulnerabilities"
+  });
+
+  assert.ok(required.includes("security"));
+});

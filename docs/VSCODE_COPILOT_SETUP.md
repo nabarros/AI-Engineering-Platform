@@ -186,6 +186,13 @@ Use this quick check to confirm full functionality:
 2. Provide explicit acceptance criteria.
 3. If multi-domain, specify dominant domain.
 
+Common non-delegation statuses and fixes:
+
+1. `ROUTE_NEEDS_CLARIFICATION`: Add dominant domain, expected output, and risk level.
+2. `POLICY_BLOCKED`: For HIGH/CRITICAL tasks, retry with explicit confirmation.
+3. `SKILL_POLICY_BLOCKED`: Re-scope to a compatible specialist domain or narrow required skills.
+4. `NO_ELIGIBLE_AGENT`: Provide more specific domain context or reduce constraints.
+
 ### Hooks are not enforced
 
 1. Confirm `.github/hooks/aiep-guardrails.json` exists.

@@ -63,6 +63,17 @@ function toCompactFindingsContext(findings) {
     .join(", ");
 }
 
+function buildDelegationStatus({ status, reasonCode, message, userAction = null, selectedAgent = null, attemptedAgents = [] }) {
+  return {
+    status,
+    reasonCode,
+    message,
+    userAction,
+    selectedAgent,
+    attemptedAgents
+  };
+}
+
 export class AgentOrchestrator {
   constructor({
     capabilityRegistry,
@@ -220,10 +231,20 @@ export class AgentOrchestrator {
     if (!policy.allowed) {
       assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.FAILED);
       lifecycleState = ORCHESTRATION_STATES.FAILED;
+      const requiresConfirmation = policy.violations.some((violation) => violation.code === "MISSING_CONFIRMATION");
       return {
         ok: false,
         error: "POLICY_BLOCKED",
         policy,
+        delegation: buildDelegationStatus({
+          status: "blocked",
+          reasonCode: "policy_blocked",
+          message: "Delegation blocked by policy guardrails.",
+          userAction: requiresConfirmation
+            ? "Confirm the high-risk operation and retry with confirmation=true."
+            : "Revise the request to remove forbidden operations and retry.",
+          attemptedAgents: []
+        }),
         lifecycleState,
         classification,
         relationshipShadowSummary: this.relationshipShadowTracker.summary(),
@@ -371,6 +392,39 @@ export class AgentOrchestrator {
         ok: false,
         error: "NO_ELIGIBLE_AGENT",
         route,
+        delegation: buildDelegationStatus({
+          status: "blocked",
+          reasonCode: "no_eligible_agent",
+          message: "No specialist satisfied domain and risk constraints.",
+          userAction: "Provide more specific domain details or reduce risk/constraints for this request.",
+          attemptedAgents: []
+        }),
+        lifecycleState,
+        classification,
+        relationshipShadowSummary: this.relationshipShadowTracker.summary(),
+        trace: tracer.summary()
+      };
+    }
+
+    if (route.needsClarification && Number(route.routingConfidence || 0) < 0.7) {
+      assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.FAILED);
+      lifecycleState = ORCHESTRATION_STATES.FAILED;
+      tracer.addEvent("route.clarification.required", {
+        routingConfidence: route.routingConfidence,
+        scoreGap: route.scoreGap,
+        topCandidates: route.scores.slice(0, 3)
+      });
+      return {
+        ok: false,
+        error: "ROUTE_NEEDS_CLARIFICATION",
+        route,
+        delegation: buildDelegationStatus({
+          status: "clarification_required",
+          reasonCode: "low_confidence",
+          message: "Routing confidence is too low for safe automatic delegation.",
+          userAction: "Clarify the dominant domain, expected outcome, and risk level, then retry.",
+          attemptedAgents: route.scores.slice(0, 3).map((score) => score.capabilityId)
+        }),
         lifecycleState,
         classification,
         relationshipShadowSummary: this.relationshipShadowTracker.summary(),
@@ -388,20 +442,8 @@ export class AgentOrchestrator {
       needsClarification: route.needsClarification
     });
 
-    const relationshipShadow = evaluateRelationshipShadow({
-      task,
-      selectedSpecialist: route.selected.id
-    });
-    this.relationshipShadowTracker.record(relationshipShadow);
-    tracer.addEvent("relationship.shadow.evaluated", relationshipShadow);
-
-    this.memory.indexRepositoryMetadata(`agent:${route.selected.id}`, {
-      specialistId: route.selected.id,
-      domain: String(task.domain || "general").toLowerCase(),
-      summary: `Selected ${route.selected.id} for ${String(task.domain || "general").toLowerCase()} tasks.`
-    });
-
-    const subsetDryRun = runSkillSubsetDryRun({
+    const attemptedAgents = [route.selected.id];
+    let subsetDryRun = runSkillSubsetDryRun({
       agentId: route.selected.id,
       task,
       exceptionRegistry: this.exceptionRegistry,
@@ -414,6 +456,45 @@ export class AgentOrchestrator {
       blockedReasonCodes: subsetDryRun.blockedReasonCodes,
       exceptionAllowedSkills: subsetDryRun.policy.exceptionAllowedSkills
     });
+
+    // If the top specialist fails preflight, attempt deterministic fallback re-route
+    // before failing the request. This keeps delegation resilient without violating policy.
+    if (!subsetDryRun.allowed) {
+      for (const fallbackAgentId of route.fallbackChain) {
+        const fallbackCapability = this.capabilityRegistry.find((capability) => capability.id === fallbackAgentId);
+        if (!fallbackCapability) {
+          continue;
+        }
+
+        attemptedAgents.push(fallbackAgentId);
+        const fallbackDryRun = runSkillSubsetDryRun({
+          agentId: fallbackAgentId,
+          task,
+          exceptionRegistry: this.exceptionRegistry,
+          nowMs: Date.now()
+        });
+
+        tracer.addEvent("skill.preflight.checked", {
+          agentId: fallbackAgentId,
+          allowed: fallbackDryRun.allowed,
+          deniedSkills: fallbackDryRun.policy.deniedSkills,
+          blockedReasonCodes: fallbackDryRun.blockedReasonCodes,
+          exceptionAllowedSkills: fallbackDryRun.policy.exceptionAllowedSkills,
+          fallbackAttempt: true
+        });
+
+        if (fallbackDryRun.allowed) {
+          tracer.addEvent("route.fallback.preflight.reroute", {
+            fromAgent: route.selected.id,
+            toAgent: fallbackAgentId,
+            reason: "preflight_blocked"
+          });
+          route.selected = fallbackCapability;
+          subsetDryRun = fallbackDryRun;
+          break;
+        }
+      }
+    }
 
     if (!subsetDryRun.allowed) {
       const subsetViolationAlert = evaluateSubsetPolicyViolationAlert({
@@ -446,6 +527,14 @@ export class AgentOrchestrator {
           messages: subsetDryRun.messages
         },
         selectedAgent: route.selected.id,
+        delegation: buildDelegationStatus({
+          status: "blocked",
+          reasonCode: "skill_policy_blocked",
+          message: "Delegation blocked because required skills are outside the specialist allowlist.",
+          userAction: "Re-scope the request or choose a specialist with the required skill set.",
+          selectedAgent: route.selected.id,
+          attemptedAgents
+        }),
         alerts: subsetViolationAlert.triggered ? [subsetViolationAlert] : [],
         fallbackChain: route.fallbackChain,
         lifecycleState,
@@ -453,6 +542,19 @@ export class AgentOrchestrator {
         trace: tracer.summary()
       };
     }
+
+    const relationshipShadow = evaluateRelationshipShadow({
+      task,
+      selectedSpecialist: route.selected.id
+    });
+    this.relationshipShadowTracker.record(relationshipShadow);
+    tracer.addEvent("relationship.shadow.evaluated", relationshipShadow);
+
+    this.memory.indexRepositoryMetadata(`agent:${route.selected.id}`, {
+      specialistId: route.selected.id,
+      domain: String(task.domain || "general").toLowerCase(),
+      summary: `Selected ${route.selected.id} for ${String(task.domain || "general").toLowerCase()} tasks.`
+    });
 
     this.memory.write("session", `${requestId}:plan`, plan, { ttlMs: 30 * 60 * 1000 });
     this.memory.write("session", `${requestId}:classification`, classification, { ttlMs: 30 * 60 * 1000 });
@@ -658,6 +760,13 @@ export class AgentOrchestrator {
       responseCacheContextHash,
       spendAttribution,
       relationshipShadowSummary: this.relationshipShadowTracker.summary(),
+      delegation: buildDelegationStatus({
+        status: "delegated",
+        reasonCode: "delegation_succeeded",
+        message: "Task delegated to selected specialist.",
+        selectedAgent: route.selected.id,
+        attemptedAgents
+      }),
       lifecycleState,
       activeWeights,
       rollingMetrics: this.weightTuner ? this.weightTuner.getRollingMetrics() : null,

@@ -360,3 +360,242 @@ test("should emit subset violation paging alert in production environment", asyn
   assert.equal(result.alerts[0].page, true);
   assert.equal(result.alerts[0].severity, "critical");
 });
+
+test("should re-route to fallback specialist when primary preflight is blocked", async () => {
+  const registry = [
+    {
+      id: "AIEP Context Planner",
+      domains: ["general", "planning", "risk", "strategy", "backend"],
+      maxRisk: "HIGH",
+      tokenCostTier: "LOW",
+      latencyTier: "LOW",
+      qualityScore: 0.99,
+      supportsVerificationGate: true,
+      supportsMemoryWrites: false,
+      metadata: {
+        ownerTeam: "plan",
+        skillScopes: ["planning", "risk"]
+      }
+    },
+    {
+      id: "AIEP Senior Staff Backend Engineer",
+      domains: ["backend", "general"],
+      maxRisk: "HIGH",
+      tokenCostTier: "MEDIUM",
+      latencyTier: "MEDIUM",
+      qualityScore: 0.94,
+      supportsVerificationGate: true,
+      supportsMemoryWrites: true,
+      metadata: {
+        ownerTeam: "be",
+        skillScopes: ["api", "backend", "testing"]
+      }
+    }
+  ];
+  const orchestrator = new AgentOrchestrator({ capabilityRegistry: registry });
+
+  const result = await orchestrator.processRequest({
+    requestId: "req-preflight-fallback-001",
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Implement backend feature with tests"
+    },
+    budget: {
+      tokenBudgetTier: "LOW",
+      latencyBudgetTier: "LOW"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.91,
+      latencyMs: 110,
+      tokenUsage: 1400
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.selectedAgent, "AIEP Senior Staff Backend Engineer");
+  assert.ok(Array.isArray(result.delegation.attemptedAgents));
+  assert.equal(result.delegation.attemptedAgents[0], "AIEP Context Planner");
+  assert.equal(result.delegation.attemptedAgents[1], "AIEP Senior Staff Backend Engineer");
+});
+
+test("should return clarification-required when routing confidence is too low", async () => {
+  const registry = [
+    {
+      id: "AIEP Ambiguous Generalist",
+      domains: ["general"],
+      maxRisk: "HIGH",
+      tokenCostTier: "HIGH",
+      latencyTier: "HIGH",
+      qualityScore: 0.4,
+      supportsVerificationGate: true,
+      supportsMemoryWrites: false,
+      metadata: {
+        ownerTeam: "gen",
+        skillScopes: ["testing"]
+      }
+    }
+  ];
+  const orchestrator = new AgentOrchestrator({ capabilityRegistry: registry });
+
+  const result = await orchestrator.processRequest({
+    requestId: "req-clarification-001",
+    task: {
+      domain: "unknown-domain",
+      risk: "LOW",
+      description: "Need help"
+    },
+    budget: {
+      tokenBudgetTier: "LOW",
+      latencyBudgetTier: "LOW"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.95
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.error, "ROUTE_NEEDS_CLARIFICATION");
+  assert.equal(result.delegation.status, "clarification_required");
+  assert.equal(result.lifecycleState, ORCHESTRATION_STATES.FAILED);
+});
+
+test("should support multi-turn progression from delegated to blocked and back to delegated", async () => {
+  const registry = [
+    {
+      id: "AIEP Senior Staff Backend Engineer",
+      domains: ["backend"],
+      maxRisk: "HIGH",
+      tokenCostTier: "MEDIUM",
+      latencyTier: "MEDIUM",
+      qualityScore: 0.95,
+      supportsVerificationGate: true,
+      supportsMemoryWrites: true,
+      metadata: {
+        ownerTeam: "be",
+        skillScopes: ["backend", "api", "testing"]
+      }
+    },
+    {
+      id: "AIEP Ambiguous Generalist A",
+      domains: ["general"],
+      maxRisk: "HIGH",
+      tokenCostTier: "HIGH",
+      latencyTier: "HIGH",
+      qualityScore: 0.1,
+      supportsVerificationGate: true,
+      supportsMemoryWrites: false,
+      metadata: {
+        ownerTeam: "gen-a",
+        skillScopes: ["testing"]
+      }
+    },
+    {
+      id: "AIEP Ambiguous Generalist B",
+      domains: ["general"],
+      maxRisk: "HIGH",
+      tokenCostTier: "HIGH",
+      latencyTier: "HIGH",
+      qualityScore: 0.08,
+      supportsVerificationGate: true,
+      supportsMemoryWrites: false,
+      metadata: {
+        ownerTeam: "gen-b",
+        skillScopes: ["testing"]
+      }
+    }
+  ];
+
+  const orchestrator = new AgentOrchestrator({ capabilityRegistry: registry });
+
+  const turn1 = await orchestrator.processRequest({
+    requestId: "multi-turn-001",
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Implement backend endpoint and tests"
+    },
+    budget: {
+      tokenBudgetTier: "LOW",
+      latencyBudgetTier: "LOW"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.93,
+      latencyMs: 95,
+      tokenUsage: 1100
+    }
+  });
+
+  assert.equal(turn1.ok, true);
+  assert.equal(turn1.selectedAgent, "AIEP Senior Staff Backend Engineer");
+  assert.equal(turn1.delegation.status, "delegated");
+
+  const turn2 = await orchestrator.processRequest({
+    requestId: "multi-turn-002",
+    task: {
+      domain: "unknown-domain",
+      risk: "LOW",
+      description: "Need help"
+    },
+    budget: {
+      tokenBudgetTier: "LOW",
+      latencyBudgetTier: "LOW"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.92,
+      latencyMs: 90,
+      tokenUsage: 400
+    }
+  });
+
+  assert.equal(turn2.ok, false);
+  assert.equal(turn2.error, "ROUTE_NEEDS_CLARIFICATION");
+  assert.equal(turn2.delegation.status, "clarification_required");
+
+  const turn3 = await orchestrator.processRequest({
+    requestId: "multi-turn-003",
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Clarification: update backend handler with explicit validation"
+    },
+    budget: {
+      tokenBudgetTier: "LOW",
+      latencyBudgetTier: "LOW"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.94,
+      latencyMs: 98,
+      tokenUsage: 1200
+    }
+  });
+
+  assert.equal(turn3.ok, true);
+  assert.equal(turn3.selectedAgent, "AIEP Senior Staff Backend Engineer");
+  assert.equal(turn3.delegation.status, "delegated");
+});

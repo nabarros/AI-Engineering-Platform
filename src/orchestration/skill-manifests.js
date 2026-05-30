@@ -13,7 +13,6 @@ const TASK_KEYWORD_SKILL_MAP = Object.freeze([
   { keyword: "implement", skills: ["feature-development", "testing"] },
   { keyword: "review", skills: ["review", "testing"] },
   { keyword: "security", skills: ["security", "testing"] },
-  { keyword: "secure", skills: ["security", "testing"] },
   { keyword: "ui", skills: ["ui", "feature-development"] },
   { keyword: "frontend", skills: ["frontend", "ui"] },
   { keyword: "backend", skills: ["backend", "feature-development"] },
@@ -45,6 +44,25 @@ function dedupeSkills(skills) {
     }
   }
   return [...values].sort();
+}
+
+function hasExplicitSecurityIntent(text) {
+  const normalized = String(text || "").toLowerCase();
+  const strongSignals = [
+    "security",
+    "vulnerability",
+    "cve",
+    "owasp",
+    "auth",
+    "authorization",
+    "credential",
+    "token",
+    "encryption",
+    "secret",
+    "threat",
+    "audit"
+  ];
+  return strongSignals.some((signal) => normalized.includes(signal));
 }
 
 function buildLegacyMinimumManifests() {
@@ -244,10 +262,14 @@ export function inferRequiredSkillsFromTask(task, { risk, targetAgent } = {}) {
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
+  const explicitSecurityIntent = hasExplicitSecurityIntent(text);
 
   for (const rule of TASK_KEYWORD_SKILL_MAP) {
     if (text.includes(rule.keyword)) {
       for (const skill of rule.skills) {
+        if (skill === "security" && normalizedRisk === "LOW" && !explicitSecurityIntent) {
+          continue;
+        }
         required.add(skill);
       }
     }
