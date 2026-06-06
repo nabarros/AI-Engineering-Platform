@@ -173,13 +173,7 @@ export function createOrchestrationServer(options = {}) {
         budget,
         confirmation: input.confirmation === true,
         runtimeEnvironment,
-        executionEvidence: input.executionEvidence || {
-          testsPassed: false,
-          securityChecksPassed: false,
-          contractChecksPassed: false,
-          errorHandlingValidated: false,
-          qualityScore: 0
-        }
+        executionEvidence: input.executionEvidence || null
       };
 
       const result = await runtime.adapter.orchestrateRouting(requestPayload);

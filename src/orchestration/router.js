@@ -1,4 +1,7 @@
 import { findCandidates } from "./capability-registry.js";
+import { runSkillSubsetDryRun } from "./skill-manifests.js";
+
+export const COMPOUND_THRESHOLD = 0.35;
 
 const COST_WEIGHTS = Object.freeze({ LOW: 1, MEDIUM: 2, HIGH: 3 });
 const LATENCY_WEIGHTS = Object.freeze({ LOW: 1, MEDIUM: 2, HIGH: 3 });
@@ -220,14 +223,14 @@ export function classifyTask(task) {
     }
   }
 
-  const isCompound = allDomains.filter((d) => d.confidence >= 0.3).length > 1;
+  const isCompound = allDomains.filter((d) => d.confidence >= COMPOUND_THRESHOLD).length > 1;
   const primaryDomain = allDomains[0]?.domain || "general";
 
   return {
     primaryDomain,
     allDomains,
     isCompound,
-    domainCount: allDomains.filter((d) => d.confidence >= 0.3).length,
+    domainCount: allDomains.filter((d) => d.confidence >= COMPOUND_THRESHOLD).length,
     confidence: allDomains[0]?.confidence || 0
   };
 }
@@ -249,11 +252,26 @@ export function scoreCapability(capability, context) {
     latencyScore * weights.latency
   );
 
+  let selectionScore = totalScore;
+  let finalDomainScore = domainScore;
+  const preflight = runSkillSubsetDryRun({ agentId: capability.id, task });
+  if (!preflight.allowed) {
+    finalDomainScore = 0.05;
+    selectionScore = (
+      finalDomainScore * weights.domain +
+      qualityScore * weights.quality +
+      learningScore * weights.learning +
+      costScore * weights.cost +
+      latencyScore * weights.latency
+    );
+  }
+
   return {
     capabilityId: capability.id,
     totalScore: Number(totalScore.toFixed(4)),
+    selectionScore: Number(selectionScore.toFixed(4)),
     components: {
-      domainScore,
+      domainScore: finalDomainScore,
       qualityScore,
       learningScore,
       costScore,
@@ -301,7 +319,7 @@ export function routeTask({ task, registry, budget, learningStats = {}, scoringW
   const scores = candidates
     .map((capability) => ({ capability, score: scoreCapability(capability, { task: effectiveTask, budget: safeBudget, learningStats, scoringWeights }) }))
     .sort((a, b) => {
-      const scoreDiff = b.score.totalScore - a.score.totalScore;
+      const scoreDiff = b.score.selectionScore - a.score.selectionScore;
       if (Math.abs(scoreDiff) > 1e-6) return scoreDiff;
       return tieBreakCompare(a, b);
     });
@@ -343,7 +361,7 @@ export function routeCompoundTask({ task, registry, budget, learningStats = {}, 
     };
   }
 
-  const eligibleDomains = classification.allDomains.filter((d) => d.confidence >= 0.3);
+  const eligibleDomains = classification.allDomains.filter((d) => d.confidence >= COMPOUND_THRESHOLD);
 
   // Enforce agent cap: if too many domains are detected, keep the highest-confidence
   // ones and note that lower-confidence domains are folded into sequential execution.

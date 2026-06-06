@@ -225,6 +225,8 @@ export class RouterKnowledgeStore {
     this.circuitBreaker = new CircuitBreaker();
     this._schemaReady = false;
     this._schemaInitPromise = null;
+    this._memoryCache = null;
+    this._pendingWrites = [];
 
     ensureDirectory(this.localStorePath);
     this._ensureLocalStoreFile();
@@ -236,22 +238,43 @@ export class RouterKnowledgeStore {
   }
 
   _readLocalStore() {
+    if (this._memoryCache) {
+      return this._memoryCache;
+    }
     try {
       const raw = fs.readFileSync(this.localStorePath, "utf8");
       const parsed = JSON.parse(raw || "{}");
       if (!Array.isArray(parsed.records)) {
-        return { version: 1, records: [] };
+        this._memoryCache = { version: 1, records: [] };
+      } else {
+        this._memoryCache = parsed;
       }
-      return parsed;
+      return this._memoryCache;
     } catch {
-      return { version: 1, records: [] };
+      this._memoryCache = { version: 1, records: [] };
+      return this._memoryCache;
     }
   }
 
   _writeLocalStore(state) {
-    const tempPath = `${this.localStorePath}.tmp`;
-    fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), "utf8");
-    fs.renameSync(tempPath, this.localStorePath);
+    this._memoryCache = state;
+    const tempPath = `${this.localStorePath}.${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`;
+    const promise = fs.promises.writeFile(tempPath, JSON.stringify(state, null, 2), "utf8")
+      .then(() => fs.promises.rename(tempPath, this.localStorePath))
+      .catch((err) => {
+        console.error("[RouterKnowledgeStore] Async disk write failed:", err.message);
+      })
+      .finally(() => {
+        const idx = this._pendingWrites.indexOf(promise);
+        if (idx > -1) {
+          this._pendingWrites.splice(idx, 1);
+        }
+      });
+    this._pendingWrites.push(promise);
+  }
+
+  async flushPendingWrites() {
+    await Promise.all(this._pendingWrites);
   }
 
   _appendLocalRecord(record) {
@@ -551,47 +574,61 @@ export class RouterKnowledgeStore {
     const model = process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-20241022";
 
     try {
-      let best = null;
-      for (const candidate of shortlist) {
-        const response = await httpRequest("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          timeoutMs: 900,
-          headers: {
-            "x-api-key": apiKey,
-            "anthropic-version": "2023-06-01"
-          },
-          body: {
-            model,
-            max_tokens: 12,
-            temperature: 0,
-            messages: [
-              {
-                role: "user",
-                content: [
-                  {
-                    type: "text",
-                    text:
-                      "Return only a number between 0 and 1 for semantic similarity.\n" +
-                      `Query: ${query}\n` +
-                      `Candidate: ${candidate.record.promptText}\n` +
-                      `Summary: ${candidate.record.routingSummary || ""}`
-                  }
-                ]
-              }
-            ]
-          }
-        });
+      const candidatesPrompt = shortlist.map((candidate, idx) => {
+        return `Index ${idx}: Prompt: "${candidate.record.promptText}" | Summary: "${candidate.record.routingSummary || ""}"`;
+      }).join("\n");
 
-        if (response.status !== 200) continue;
-        const text = String(response.body?.content?.[0]?.text || "").trim();
-        const parsed = Number(text.replace(/[^0-9.]/g, ""));
-        if (!Number.isFinite(parsed)) continue;
+      const promptText = 
+        "Return a JSON array containing similarity scores between 0 and 1 for each of the following candidate entries relative to the query.\n" +
+        "You must return ONLY the JSON array of numbers, matching the candidate indices (e.g. [0.85, 0.42, 0.1]). Do not include any explanations, markdown syntax, or other characters.\n\n" +
+        `Query: "${query}"\n\n` +
+        "Candidates:\n" +
+        candidatesPrompt;
 
-        const mergedScore = Math.max(candidate.score, Math.min(parsed, 1));
-        if (!best || mergedScore > best.score) {
-          best = { record: candidate.record, score: mergedScore };
+      const response = await httpRequest("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        timeoutMs: 2000,
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01"
+        },
+        body: {
+          model,
+          max_tokens: 150,
+          temperature: 0,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: promptText
+                }
+              ]
+            }
+          ]
         }
-      }
+      });
+
+      if (response.status !== 200) return null;
+      const text = String(response.body?.content?.[0]?.text || "").trim();
+      const jsonStart = text.indexOf("[");
+      const jsonEnd = text.lastIndexOf("]");
+      if (jsonStart < 0 || jsonEnd < 0 || jsonEnd <= jsonStart) return null;
+      const scores = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+      if (!Array.isArray(scores)) return null;
+
+      let best = null;
+      shortlist.forEach((candidate, idx) => {
+        const scoreVal = Number(scores[idx]);
+        if (Number.isFinite(scoreVal)) {
+          const mergedScore = Math.max(candidate.score, Math.min(scoreVal, 1));
+          if (!best || mergedScore > best.score) {
+            best = { record: candidate.record, score: mergedScore };
+          }
+        }
+      });
+
       return best;
     } catch {
       return null;

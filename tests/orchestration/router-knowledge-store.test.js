@@ -33,11 +33,12 @@ test("should persist records locally without external providers", async () => {
       routingSummary: "Selected backend specialist for API implementation"
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await store.flushPendingWrites();
 
     const health = store.healthStatus();
     assert.strictEqual(health.localStore.records, 1);
   } finally {
+    await store.flushPendingWrites();
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
 });
@@ -56,7 +57,7 @@ test("should return lexical lookup hit from local store", async () => {
       routingSummary: "Backend data integrity and API orchestration"
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await store.flushPendingWrites();
 
     const hit = await store.lookup("Build backend API service with postgres transactions", {
       taskDomain: "backend"
@@ -66,6 +67,7 @@ test("should return lexical lookup hit from local store", async () => {
     assert.strictEqual(hit.source, "lexical");
     assert.strictEqual(hit.selectedAgent, "AIEP Senior Staff Backend Engineer");
   } finally {
+    await store.flushPendingWrites();
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
 });
@@ -84,7 +86,7 @@ test("should return null for unrelated lookup", async () => {
       routingSummary: "Backend-focused routing decision"
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await store.flushPendingWrites();
 
     const hit = await store.lookup("compose orchestral melody for cinematic strings", {
       taskDomain: "backend"
@@ -92,6 +94,7 @@ test("should return null for unrelated lookup", async () => {
 
     assert.strictEqual(hit, null);
   } finally {
+    await store.flushPendingWrites();
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
 });

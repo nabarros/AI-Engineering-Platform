@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { AgentOrchestrator, ORCHESTRATION_STATES, assertLifecycleTransition } from "../../src/orchestration/orchestrator.js";
 import { DEFAULT_CAPABILITY_REGISTRY } from "../../src/orchestration/default-capability-registry.js";
 import { createVerificationCache } from "../../src/orchestration/verification-cache.js";
+import { createSkillExceptionRegistry } from "../../src/orchestration/skill-exceptions.js";
 
 test("should orchestrate request, verify evidence, and produce trace", async () => {
   const orchestrator = new AgentOrchestrator({ capabilityRegistry: DEFAULT_CAPABILITY_REGISTRY });
@@ -364,7 +365,7 @@ test("should emit subset violation paging alert in production environment", asyn
 test("should re-route to fallback specialist when primary preflight is blocked", async () => {
   const registry = [
     {
-      id: "AIEP Context Planner",
+      id: "AIEP Test Context Planner",
       domains: ["general", "planning", "risk", "strategy", "backend"],
       maxRisk: "HIGH",
       tokenCostTier: "LOW",
@@ -378,7 +379,7 @@ test("should re-route to fallback specialist when primary preflight is blocked",
       }
     },
     {
-      id: "AIEP Senior Staff Backend Engineer",
+      id: "AIEP Test Backend Engineer",
       domains: ["backend", "general"],
       maxRisk: "HIGH",
       tokenCostTier: "MEDIUM",
@@ -392,7 +393,35 @@ test("should re-route to fallback specialist when primary preflight is blocked",
       }
     }
   ];
-  const orchestrator = new AgentOrchestrator({ capabilityRegistry: registry });
+
+  const exceptionRegistry = createSkillExceptionRegistry();
+  const expiresAt = Date.now() + 60_000;
+  exceptionRegistry.grant({
+    agentId: "AIEP Test Backend Engineer",
+    skill: "backend",
+    reason: "Temporary backend testing",
+    approver: "staff-engineer",
+    expiresAt
+  });
+  exceptionRegistry.grant({
+    agentId: "AIEP Test Backend Engineer",
+    skill: "feature-development",
+    reason: "Temporary backend testing",
+    approver: "staff-engineer",
+    expiresAt
+  });
+  exceptionRegistry.grant({
+    agentId: "AIEP Test Backend Engineer",
+    skill: "testing",
+    reason: "Temporary backend testing",
+    approver: "staff-engineer",
+    expiresAt
+  });
+
+  const orchestrator = new AgentOrchestrator({ 
+    capabilityRegistry: registry,
+    exceptionRegistry
+  });
 
   const result = await orchestrator.processRequest({
     requestId: "req-preflight-fallback-001",
@@ -418,10 +447,10 @@ test("should re-route to fallback specialist when primary preflight is blocked",
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.selectedAgent, "AIEP Senior Staff Backend Engineer");
+  assert.equal(result.selectedAgent, "AIEP Test Backend Engineer");
   assert.ok(Array.isArray(result.delegation.attemptedAgents));
-  assert.equal(result.delegation.attemptedAgents[0], "AIEP Context Planner");
-  assert.equal(result.delegation.attemptedAgents[1], "AIEP Senior Staff Backend Engineer");
+  assert.equal(result.delegation.attemptedAgents[0], "AIEP Test Context Planner");
+  assert.equal(result.delegation.attemptedAgents[1], "AIEP Test Backend Engineer");
 });
 
 test("should return clarification-required when routing confidence is too low", async () => {
@@ -740,3 +769,34 @@ test("should cache deterministic medium-risk verification results", async () => 
   assert.equal(second.ok, true);
   assert.ok(verificationCache.stats().hits >= 1);
 });
+
+test("should skip verification when executionEvidence is omitted (routing-only)", async () => {
+  const orchestrator = new AgentOrchestrator({
+    capabilityRegistry: DEFAULT_CAPABILITY_REGISTRY
+  });
+
+  const result = await orchestrator.processRequest({
+    requestId: "req-routing-only-001",
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Simple query without execution evidence"
+    },
+    budget: {
+      tokenBudgetTier: "MEDIUM",
+      latencyBudgetTier: "MEDIUM"
+    },
+    confirmation: true,
+    executionEvidence: null
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.verification.routingOnly, true);
+  assert.equal(result.premiumFallback.trigger, false);
+
+  // Verify that it did not record stats in learning loop
+  const snapshot = result.learningSnapshot;
+  const agentId = result.selectedAgent;
+  assert.equal(snapshot[agentId], undefined);
+});
+

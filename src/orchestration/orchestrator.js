@@ -119,7 +119,8 @@ function capTokenForecastToAllocation(tokenForecast, budgetDecision) {
   };
 }
 
-function isDeterministicEvidence(executionEvidence = {}) {
+function isDeterministicEvidence(executionEvidence) {
+  if (!executionEvidence) return false;
   return executionEvidence.testsPassed === true
     && executionEvidence.securityChecksPassed === true
     && executionEvidence.contractChecksPassed === true
@@ -127,6 +128,7 @@ function isDeterministicEvidence(executionEvidence = {}) {
 }
 
 function shouldCacheVerification(task, executionEvidence, route) {
+  if (!executionEvidence) return false;
   const risk = String(task?.risk || "MEDIUM").toUpperCase();
   if (risk === "LOW") return true;
 
@@ -661,11 +663,21 @@ export class AgentOrchestrator {
     };
     const responseCacheContextHash = buildContextHash(responseCacheContext);
 
+    const hasEvidence = !!executionEvidence;
     assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.VERIFYING);
     lifecycleState = ORCHESTRATION_STATES.VERIFYING;
     let verification = null;
 
-    if (cacheEligible && this.verificationCache) {
+    if (!hasEvidence) {
+      verification = {
+        pass: true,
+        findings: [],
+        gateResults: { blockingCount: 0, advisoryCount: 0, totalFindings: 0 },
+        routingOnly: true
+      };
+    }
+
+    if (hasEvidence && cacheEligible && this.verificationCache) {
       verification = this.verificationCache.get(cacheRequest);
       if (verification) {
         tracer.addEvent("verification.cache.hit", {
@@ -676,7 +688,7 @@ export class AgentOrchestrator {
       }
     }
 
-    if (!verification && cacheEligible && this.responseCache) {
+    if (hasEvidence && !verification && cacheEligible && this.responseCache) {
       verification = this.responseCache.get({
         policyVersion: modelTierDecision.policyVersion,
         contextHash: responseCacheContextHash
@@ -689,7 +701,7 @@ export class AgentOrchestrator {
       }
     }
 
-    if (!verification) {
+    if (hasEvidence && !verification) {
       verification = verifyExecution(executionEvidence);
       if (cacheEligible) {
         if (this.verificationCache) {
@@ -723,23 +735,25 @@ export class AgentOrchestrator {
       qualityScore: executionEvidence?.qualityScore ?? null
     });
 
-    this.learning.recordOutcome(route.selected.id, {
-      success: verification.pass,
-      latencyMs: executionEvidence?.latencyMs || 0,
-      tokenUsage: executionEvidence?.tokenUsage || 0
-    });
-
-    if (this.weightTuner) {
-      this.weightTuner.observe({
+    if (hasEvidence) {
+      this.learning.recordOutcome(route.selected.id, {
         success: verification.pass,
         latencyMs: executionEvidence?.latencyMs || 0,
         tokenUsage: executionEvidence?.tokenUsage || 0
       });
+
+      if (this.weightTuner) {
+        this.weightTuner.observe({
+          success: verification.pass,
+          latencyMs: executionEvidence?.latencyMs || 0,
+          tokenUsage: executionEvidence?.tokenUsage || 0
+        });
+      }
     }
 
     await this.persistState();
 
-    const qualityScore = typeof executionEvidence?.qualityScore === "number" ? executionEvidence.qualityScore : 0;
+    const qualityScore = (hasEvidence && typeof executionEvidence?.qualityScore === "number") ? executionEvidence.qualityScore : 1.0;
     const costQualityDecision = optimizeCostQuality({
       risk: task?.risk,
       qualityScore,
@@ -755,46 +769,50 @@ export class AgentOrchestrator {
       recommendedBudgetTier: costQualityDecision.recommendedTier || route.appliedBudget?.tokenBudgetTier || "MEDIUM"
     };
 
-    if (!verification.pass) {
-      premiumFallback.trigger = true;
-      premiumFallback.reason = "verification_failed";
-      premiumFallback.recommendedBudgetTier = "HIGH";
-    } else if (qualityScore < 0.85) {
-      premiumFallback.trigger = true;
-      premiumFallback.reason = "low_quality";
-      premiumFallback.recommendedBudgetTier = "MEDIUM";
-    } else if (costQualityDecision.escalationTriggered) {
-      premiumFallback.trigger = true;
-      premiumFallback.reason = "risk_escalation";
-      premiumFallback.recommendedBudgetTier = "HIGH";
+    if (hasEvidence) {
+      if (!verification.pass) {
+        premiumFallback.trigger = true;
+        premiumFallback.reason = "verification_failed";
+        premiumFallback.recommendedBudgetTier = "HIGH";
+      } else if (qualityScore < 0.85) {
+        premiumFallback.trigger = true;
+        premiumFallback.reason = "low_quality";
+        premiumFallback.recommendedBudgetTier = "MEDIUM";
+      } else if (costQualityDecision.escalationTriggered) {
+        premiumFallback.trigger = true;
+        premiumFallback.reason = "risk_escalation";
+        premiumFallback.recommendedBudgetTier = "HIGH";
+      }
     }
 
-    this.tokenForecaster.recordStepTelemetry({
-      stepType: "routing",
-      risk: task?.risk,
-      modelTier: costQualityDecision.recommendedTier,
-      objective: objectiveId,
-      tokens: Number(executionEvidence?.tokenUsage || adjustedTokenForecast.predictedTokens || 0)
-    });
+    if (hasEvidence) {
+      this.tokenForecaster.recordStepTelemetry({
+        stepType: "routing",
+        risk: task?.risk,
+        modelTier: costQualityDecision.recommendedTier,
+        objective: objectiveId,
+        tokens: Number(executionEvidence?.tokenUsage || adjustedTokenForecast.predictedTokens || 0)
+      });
 
-    this.tokenBudgetAllocator.recordUsage({
-      tier: budgetDecision.effectiveTier,
-      requestId,
-      workflowId,
-      objectiveId,
-      consumedTokens: Number(executionEvidence?.tokenUsage || 0)
-    });
+      this.tokenBudgetAllocator.recordUsage({
+        tier: budgetDecision.effectiveTier,
+        requestId,
+        workflowId,
+        objectiveId,
+        consumedTokens: Number(executionEvidence?.tokenUsage || 0)
+      });
 
-    const team = String(route.selected?.metadata?.ownerTeam || "unknown");
-    this.spendEvents.push({
-      team,
-      modelTier: costQualityDecision.recommendedTier,
-      tokenUsage: Number(executionEvidence?.tokenUsage || 0),
-      timestampMs: Date.now(),
-      objective: objectiveId
-    });
-    if (this.spendEvents.length > 500) {
-      this.spendEvents.shift();
+      const team = String(route.selected?.metadata?.ownerTeam || "unknown");
+      this.spendEvents.push({
+        team,
+        modelTier: costQualityDecision.recommendedTier,
+        tokenUsage: Number(executionEvidence?.tokenUsage || 0),
+        timestampMs: Date.now(),
+        objective: objectiveId
+      });
+      if (this.spendEvents.length > 500) {
+        this.spendEvents.shift();
+      }
     }
     const spendAttribution = buildSpendAttributionSnapshot(this.spendEvents);
 
