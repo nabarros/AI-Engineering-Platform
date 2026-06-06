@@ -16,16 +16,26 @@ function stableStringify(value) {
   return JSON.stringify(sortObject(value));
 }
 
+function normalizeDescription(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .slice(0, 180);
+}
+
 export function buildContextHash(context = {}) {
   const payload = {
     task: {
       domain: String(context?.task?.domain || "general").toLowerCase(),
       risk: String(context?.task?.risk || "MEDIUM").toUpperCase(),
-      description: String(context?.task?.description || "")
+      description: normalizeDescription(context?.task?.description)
     },
     selectedAgent: String(context?.selectedAgent || "unknown"),
     objectiveId: String(context?.objectiveId || "objective:default"),
-    workflowId: String(context?.workflowId || "workflow:default")
+    workflowId: String(context?.workflowId || "workflow:default"),
+    tokenBudgetTier: String(context?.tokenBudgetTier || "MEDIUM").toUpperCase(),
+    latencyBudgetTier: String(context?.latencyBudgetTier || "MEDIUM").toUpperCase()
   };
 
   return crypto.createHash("sha256").update(stableStringify(payload)).digest("hex");

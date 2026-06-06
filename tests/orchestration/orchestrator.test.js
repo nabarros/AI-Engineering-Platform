@@ -599,3 +599,144 @@ test("should support multi-turn progression from delegated to blocked and back t
   assert.equal(turn3.selectedAgent, "AIEP Senior Staff Backend Engineer");
   assert.equal(turn3.delegation.status, "delegated");
 });
+
+test("should enforce allocator downgrade over user-requested token tier by default", async () => {
+  const orchestrator = new AgentOrchestrator({
+    capabilityRegistry: DEFAULT_CAPABILITY_REGISTRY,
+    tokenBudgetAllocator: {
+      allocate() {
+        return {
+          allowed: true,
+          action: "DOWNGRADE_MODEL",
+          reasonCode: "WORKFLOW_LIMIT_EXCEEDED",
+          effectiveTier: "LOW",
+          allocatedTokens: 500,
+          remaining: {
+            request: 500,
+            workflow: 500,
+            objective: 500
+          }
+        };
+      },
+      recordUsage() {},
+      usageSnapshot() {
+        return {};
+      }
+    }
+  });
+
+  const result = await orchestrator.processRequest({
+    requestId: "req-economy-enforced-001",
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Implement lightweight backend validation updates"
+    },
+    budget: {
+      tokenBudgetTier: "HIGH",
+      latencyBudgetTier: "HIGH"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.93,
+      latencyMs: 110,
+      tokenUsage: 450
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.appliedBudget.tokenBudgetTier, "LOW");
+});
+
+test("should block execution when truncation action has zero allocated tokens", async () => {
+  const orchestrator = new AgentOrchestrator({
+    capabilityRegistry: DEFAULT_CAPABILITY_REGISTRY,
+    tokenBudgetAllocator: {
+      allocate() {
+        return {
+          allowed: true,
+          action: "TRUNCATE_CONTEXT",
+          reasonCode: "REQUEST_LIMIT_EXCEEDED",
+          effectiveTier: "LOW",
+          allocatedTokens: 0,
+          remaining: {
+            request: 0,
+            workflow: 0,
+            objective: 0
+          }
+        };
+      },
+      recordUsage() {},
+      usageSnapshot() {
+        return {};
+      }
+    }
+  });
+
+  const result = await orchestrator.processRequest({
+    requestId: "req-economy-block-001",
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Attempt execution when no tokens remain"
+    },
+    budget: {
+      tokenBudgetTier: "LOW",
+      latencyBudgetTier: "LOW"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.95,
+      latencyMs: 100,
+      tokenUsage: 300
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.error, "TOKEN_BUDGET_EXCEEDED");
+});
+
+test("should cache deterministic medium-risk verification results", async () => {
+  const verificationCache = createVerificationCache({ maxEntries: 10 });
+  const orchestrator = new AgentOrchestrator({
+    capabilityRegistry: DEFAULT_CAPABILITY_REGISTRY,
+    verificationCache
+  });
+
+  const payload = {
+    task: {
+      domain: "backend",
+      risk: "MEDIUM",
+      description: "Apply deterministic backend validation flow"
+    },
+    budget: {
+      tokenBudgetTier: "MEDIUM",
+      latencyBudgetTier: "LOW"
+    },
+    confirmation: true,
+    executionEvidence: {
+      testsPassed: true,
+      securityChecksPassed: true,
+      contractChecksPassed: true,
+      errorHandlingValidated: true,
+      qualityScore: 0.95,
+      latencyMs: 95,
+      tokenUsage: 1200
+    }
+  };
+
+  const first = await orchestrator.processRequest({ requestId: "req-medium-cache-1", ...payload });
+  const second = await orchestrator.processRequest({ requestId: "req-medium-cache-2", ...payload });
+
+  assert.equal(first.ok, true);
+  assert.equal(second.ok, true);
+  assert.ok(verificationCache.stats().hits >= 1);
+});

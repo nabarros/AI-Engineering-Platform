@@ -63,6 +63,87 @@ function toCompactFindingsContext(findings) {
     .join(", ");
 }
 
+const BUDGET_TIER_LEVELS = Object.freeze({ LOW: 1, MEDIUM: 2, HIGH: 3 });
+
+function normalizeBudgetTier(value, fallback = "MEDIUM") {
+  const tier = String(value || fallback).toUpperCase();
+  return Object.hasOwn(BUDGET_TIER_LEVELS, tier) ? tier : fallback;
+}
+
+function minBudgetTier(left, right) {
+  const normalizedLeft = normalizeBudgetTier(left);
+  const normalizedRight = normalizeBudgetTier(right);
+  return (BUDGET_TIER_LEVELS[normalizedLeft] || BUDGET_TIER_LEVELS.MEDIUM) <= (BUDGET_TIER_LEVELS[normalizedRight] || BUDGET_TIER_LEVELS.MEDIUM)
+    ? normalizedLeft
+    : normalizedRight;
+}
+
+function resolveRoutingBudget({ budget, budgetDecision, downgradeDecision }) {
+  const strategy = String(budget?.creditMode || budget?.budgetStrategy || "MAX_EFFICIENCY").toUpperCase();
+  const explicitTokenTier = normalizeBudgetTier(budget?.tokenBudgetTier || null, "LOW");
+  const allocatorTier = normalizeBudgetTier(budgetDecision?.effectiveTier || "LOW", "LOW");
+  const downgradeTier = normalizeBudgetTier(downgradeDecision?.recommendedTier || allocatorTier, allocatorTier);
+
+  let tokenBudgetTier = strategy === "QUALITY_FIRST"
+    ? explicitTokenTier
+    : minBudgetTier(explicitTokenTier, allocatorTier);
+
+  if (budgetDecision?.action === "DOWNGRADE_MODEL") {
+    tokenBudgetTier = minBudgetTier(tokenBudgetTier, allocatorTier);
+  }
+
+  if (downgradeDecision?.applied === true) {
+    tokenBudgetTier = minBudgetTier(tokenBudgetTier, downgradeTier);
+  }
+
+  return {
+    strategy,
+    tokenBudgetTier,
+    latencyBudgetTier: normalizeBudgetTier(budget?.latencyBudgetTier || "LOW", "LOW")
+  };
+}
+
+function capTokenForecastToAllocation(tokenForecast, budgetDecision) {
+  const action = String(budgetDecision?.action || "ALLOW").toUpperCase();
+  if (action !== "TRUNCATE_CONTEXT") {
+    return tokenForecast;
+  }
+
+  const cap = Math.max(0, Number(budgetDecision?.allocatedTokens) || 0);
+  const predictedTokens = Math.max(0, Number(tokenForecast?.predictedTokens) || 0);
+  return {
+    ...tokenForecast,
+    predictedTokens: Math.min(predictedTokens, cap),
+    allocationCap: cap,
+    source: `${String(tokenForecast?.source || "baseline")}:allocation_cap`
+  };
+}
+
+function isDeterministicEvidence(executionEvidence = {}) {
+  return executionEvidence.testsPassed === true
+    && executionEvidence.securityChecksPassed === true
+    && executionEvidence.contractChecksPassed === true
+    && executionEvidence.errorHandlingValidated === true;
+}
+
+function shouldCacheVerification(task, executionEvidence, route) {
+  const risk = String(task?.risk || "MEDIUM").toUpperCase();
+  if (risk === "LOW") return true;
+
+  if (risk === "MEDIUM") {
+    const qualityScore = Number(executionEvidence?.qualityScore || 0);
+    const tokenUsage = Number(executionEvidence?.tokenUsage || 0);
+    const routingConfidence = Number(route?.routingConfidence || 0);
+    return isDeterministicEvidence(executionEvidence)
+      && qualityScore >= 0.9
+      && routingConfidence >= 0.8
+      && tokenUsage > 0
+      && tokenUsage <= 1800;
+  }
+
+  return false;
+}
+
 function buildDelegationStatus({ status, reasonCode, message, userAction = null, selectedAgent = null, attemptedAgents = [] }) {
   return {
     status,
@@ -288,21 +369,22 @@ export class AgentOrchestrator {
       objectiveId,
       requestedTokens: tokenForecast.predictedTokens
     });
+    const adjustedTokenForecast = capTokenForecastToAllocation(tokenForecast, budgetDecision);
 
     tracer.addEvent("token.policy.evaluated", {
       modelTierDecision,
-      tokenForecast,
+      tokenForecast: adjustedTokenForecast,
       budgetDecision
     });
 
-    if (!budgetDecision.allowed) {
+    if (!budgetDecision.allowed || (budgetDecision.action === "TRUNCATE_CONTEXT" && Number(budgetDecision.allocatedTokens || 0) <= 0)) {
       assertLifecycleTransition(lifecycleState, ORCHESTRATION_STATES.FAILED);
       lifecycleState = ORCHESTRATION_STATES.FAILED;
       return {
         ok: false,
         error: "TOKEN_BUDGET_EXCEEDED",
         budgetDecision,
-        tokenForecast,
+        tokenForecast: adjustedTokenForecast,
         modelTierDecision,
         lifecycleState,
         classification,
@@ -323,15 +405,17 @@ export class AgentOrchestrator {
 
     let route;
     let compoundRoute = null;
-    // For routing, use the user's requested budget tier if provided
-    // The model tier decision is for token allocation, not agent selection
-    const routingBudget = budget?.tokenBudgetTier
-      ? budget.tokenBudgetTier  // User explicitly requested this tier
-      : (budgetDecision.effectiveTier || "MEDIUM");  // Fall back to budget decision
-    
+    const routingBudget = resolveRoutingBudget({
+      budget,
+      budgetDecision,
+      downgradeDecision
+    });
+
     const effectiveBudget = {
       ...(budget || {}),
-      tokenBudgetTier: routingBudget
+      tokenBudgetTier: routingBudget.tokenBudgetTier,
+      latencyBudgetTier: routingBudget.latencyBudgetTier,
+      budgetStrategyApplied: routingBudget.strategy
     };
 
     if (classification.isCompound) {
@@ -561,7 +645,7 @@ export class AgentOrchestrator {
     const effectiveDomain = task.domain || classification.primaryDomain;
     this.memory.write("patterns", `${effectiveDomain}:last-selected-agent`, { agentId: route.selected.id }, { ttlMs: 24 * 60 * 60 * 1000 });
 
-    const isLowRiskTask = String(task?.risk || "MEDIUM").toUpperCase() === "LOW";
+    const cacheEligible = shouldCacheVerification(task, executionEvidence, route);
     const cacheRequest = {
       task,
       selectedAgent: route.selected.id,
@@ -571,7 +655,9 @@ export class AgentOrchestrator {
       task,
       selectedAgent: route.selected.id,
       workflowId,
-      objectiveId
+      objectiveId,
+      tokenBudgetTier: effectiveBudget.tokenBudgetTier,
+      latencyBudgetTier: effectiveBudget.latencyBudgetTier
     };
     const responseCacheContextHash = buildContextHash(responseCacheContext);
 
@@ -579,17 +665,18 @@ export class AgentOrchestrator {
     lifecycleState = ORCHESTRATION_STATES.VERIFYING;
     let verification = null;
 
-    if (isLowRiskTask && this.verificationCache) {
+    if (cacheEligible && this.verificationCache) {
       verification = this.verificationCache.get(cacheRequest);
       if (verification) {
         tracer.addEvent("verification.cache.hit", {
           selectedAgent: route.selected.id,
-          risk: String(task?.risk || "LOW").toUpperCase()
+          risk: String(task?.risk || "LOW").toUpperCase(),
+          cachePolicy: "verification"
         });
       }
     }
 
-    if (!verification && isLowRiskTask && this.verificationCache) {
+    if (!verification && cacheEligible && this.responseCache) {
       verification = this.responseCache.get({
         policyVersion: modelTierDecision.policyVersion,
         contextHash: responseCacheContextHash
@@ -604,20 +691,26 @@ export class AgentOrchestrator {
 
     if (!verification) {
       verification = verifyExecution(executionEvidence);
-      if (isLowRiskTask && this.verificationCache) {
-        this.verificationCache.set(cacheRequest, verification);
-        tracer.addEvent("verification.cache.store", {
-          selectedAgent: route.selected.id,
-          risk: String(task?.risk || "LOW").toUpperCase()
-        });
-        this.responseCache.set({
-          policyVersion: modelTierDecision.policyVersion,
-          contextHash: responseCacheContextHash
-        }, verification);
-        tracer.addEvent("response.cache.store", {
-          policyVersion: modelTierDecision.policyVersion,
-          contextHash: responseCacheContextHash
-        });
+      if (cacheEligible) {
+        if (this.verificationCache) {
+          this.verificationCache.set(cacheRequest, verification);
+          tracer.addEvent("verification.cache.store", {
+            selectedAgent: route.selected.id,
+            risk: String(task?.risk || "LOW").toUpperCase(),
+            cachePolicy: "verification"
+          });
+        }
+
+        if (this.responseCache) {
+          this.responseCache.set({
+            policyVersion: modelTierDecision.policyVersion,
+            contextHash: responseCacheContextHash
+          }, verification);
+          tracer.addEvent("response.cache.store", {
+            policyVersion: modelTierDecision.policyVersion,
+            contextHash: responseCacheContextHash
+          });
+        }
       }
     }
 
@@ -652,7 +745,7 @@ export class AgentOrchestrator {
       qualityScore,
       verificationPass: verification.pass,
       currentTier: budgetDecision.effectiveTier,
-      predictedTokens: tokenForecast.predictedTokens,
+      predictedTokens: adjustedTokenForecast.predictedTokens,
       downgradeDecision
     });
 
@@ -681,7 +774,7 @@ export class AgentOrchestrator {
       risk: task?.risk,
       modelTier: costQualityDecision.recommendedTier,
       objective: objectiveId,
-      tokens: Number(executionEvidence?.tokenUsage || tokenForecast.predictedTokens || 0)
+      tokens: Number(executionEvidence?.tokenUsage || adjustedTokenForecast.predictedTokens || 0)
     });
 
     this.tokenBudgetAllocator.recordUsage({
@@ -735,7 +828,7 @@ export class AgentOrchestrator {
       appliedBudget: route.appliedBudget,
       budgetDecision,
       modelTierDecision,
-      tokenForecast,
+      tokenForecast: adjustedTokenForecast,
       downgradeDecision,
       costQualityDecision,
       routingConfidence: route.routingConfidence,

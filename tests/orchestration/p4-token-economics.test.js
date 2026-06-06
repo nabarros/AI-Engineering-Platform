@@ -148,6 +148,62 @@ test("should invalidate response cache by policy version and context hash", () =
   assert.equal(removedByContext, 1);
 });
 
+test("should canonicalize description spacing/casing in response cache context hash", () => {
+  const left = buildContextHash({
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "  Cache   This   Deterministic   Result "
+    },
+    selectedAgent: "AIEP Senior Staff Backend Engineer",
+    objectiveId: "objective:backend",
+    workflowId: "workflow:backend",
+    tokenBudgetTier: "LOW",
+    latencyBudgetTier: "LOW"
+  });
+
+  const right = buildContextHash({
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "cache this deterministic result"
+    },
+    selectedAgent: "AIEP Senior Staff Backend Engineer",
+    objectiveId: "objective:backend",
+    workflowId: "workflow:backend",
+    tokenBudgetTier: "LOW",
+    latencyBudgetTier: "LOW"
+  });
+
+  assert.equal(left, right);
+});
+
+test("should keep separate response cache hashes for different budget tiers", () => {
+  const lowTierHash = buildContextHash({
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Cacheable request"
+    },
+    selectedAgent: "AIEP Senior Staff Backend Engineer",
+    tokenBudgetTier: "LOW",
+    latencyBudgetTier: "LOW"
+  });
+
+  const mediumTierHash = buildContextHash({
+    task: {
+      domain: "backend",
+      risk: "LOW",
+      description: "Cacheable request"
+    },
+    selectedAgent: "AIEP Senior Staff Backend Engineer",
+    tokenBudgetTier: "MEDIUM",
+    latencyBudgetTier: "LOW"
+  });
+
+  assert.notEqual(lowTierHash, mediumTierHash);
+});
+
 test("should attribute spend by team and trigger anomaly alerts", () => {
   const base = Date.UTC(2026, 3, 1);
   const snapshot = buildSpendAttributionSnapshot([

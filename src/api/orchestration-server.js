@@ -141,13 +141,20 @@ export function createOrchestrationServer(options = {}) {
     }
 
     if (method === "POST" && url === "/orchestrate") {
-      if (!input || !input.task || !input.budget) {
+      if (!input || !input.task) {
         return sendJson(res, 400, {
           error: "Invalid request",
           code: "INVALID_PAYLOAD",
-          details: { required: ["task", "budget"] }
+          details: { required: ["task"] }
         });
       }
+
+      const budget = {
+        tokenBudgetTier: "LOW",
+        latencyBudgetTier: "LOW",
+        creditMode: "MAX_EFFICIENCY",
+        ...(input.budget || {})
+      };
 
       const idempotencyKey = String(req.headers["idempotency-key"] || "").trim();
       if (idempotencyKey) {
@@ -163,7 +170,7 @@ export function createOrchestrationServer(options = {}) {
       const requestPayload = {
         requestId: input.requestId || `api-${Date.now()}`,
         task: input.task,
-        budget: input.budget,
+        budget,
         confirmation: input.confirmation === true,
         runtimeEnvironment,
         executionEvidence: input.executionEvidence || {
