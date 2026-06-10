@@ -5,6 +5,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Environment Configuration
+.env
+.env.local
+.env.*
+
+
 # Runtime data and checkpoints
 data/jobs/
 data/memory/
