@@ -164,3 +164,6 @@ export { cancelWorkflowWithCompensation } from "./collaboration/cancellation-man
 export { DeadLetterQueue } from "./collaboration/dead-letter-queue.js";
 export { buildCollaborationHandoffGraph } from "./collaboration/collaboration-graph.js";
 export { enforceCollaborationGuardrails } from "./collaboration/collaboration-guardrails.js";
+export { MemoryService } from "./memory-service.js";
+export { WorkflowEngine } from "./workflow-engine.js";
+

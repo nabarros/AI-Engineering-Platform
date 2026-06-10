@@ -33,6 +33,7 @@ export function createRouterRuntimeAdapter(options = {}) {
   });
 
   return {
+    orchestrator,
     async orchestrateRouting(input) {
       let localContext = null;
       try {

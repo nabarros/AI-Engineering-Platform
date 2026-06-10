@@ -12,7 +12,8 @@ import {
   buildSubsetTokenImpactDashboard,
   buildSubsetTokenImpactReport,
   AdaptiveWeightTuner,
-  executeTaskGraph
+  executeTaskGraph,
+  WorkflowEngine
 } from "../orchestration/index.js";
 import { createAuthGuard, IdempotencyCache, SlidingWindowRateLimiter } from "./security-controls.js";
 import { getRouterKnowledgeStore } from "../services/router-knowledge-store.js";
@@ -78,6 +79,15 @@ export function createOrchestrationServer(options = {}) {
       weightTuner,
       executions: []
     };
+
+    const workflowEngine = new WorkflowEngine(runtime.adapter.orchestrator, {
+      jobsDir: path.join(__dirname, "..", "..", "data", "jobs", tenantId),
+      memoryDir: path.join(__dirname, "..", "..", "data", "memory", tenantId)
+    });
+    workflowEngine.start().catch(err => {
+      console.error(`[WorkflowEngine] Failed to start workflow engine for tenant ${tenantId}:`, err);
+    });
+    runtime.workflowEngine = workflowEngine;
 
     tenantRuntimes.set(tenantId, runtime);
     return runtime;
@@ -176,7 +186,22 @@ export function createOrchestrationServer(options = {}) {
         executionEvidence: input.executionEvidence || null
       };
 
-      const result = await runtime.adapter.orchestrateRouting(requestPayload);
+      const job = await runtime.workflowEngine.createJob(tenantId, requestPayload);
+      await runtime.workflowEngine.enqueueJob(job);
+
+      const completedJob = await runtime.workflowEngine.waitForJob(job.job_id, 5000);
+
+      if (completedJob.timeout) {
+        return sendJson(res, 202, {
+          status: "running",
+          jobId: job.job_id,
+          message: "Job is processing asynchronously",
+          meta: { tenantId }
+        });
+      }
+
+      const result = completedJob.checkpoint_data.result || { ok: false, error: completedJob.error };
+
       runtime.executions.push({
         taskClass: String(requestPayload.task?.taskClass || requestPayload.task?.class || requestPayload.task?.domain || requestPayload.task?.objective || "unspecified"),
         verificationPass: result.verification?.pass === true,
@@ -203,7 +228,7 @@ export function createOrchestrationServer(options = {}) {
 
       return sendJson(res, statusCode, {
         data: result,
-        meta: { idempotencyReplay: false, tenantId }
+        meta: { idempotencyReplay: false, tenantId, jobId: job.job_id }
       });
     }
 
@@ -272,6 +297,35 @@ export function createOrchestrationServer(options = {}) {
       return sendJson(res, 200, { data: store.healthStatus() });
     }
 
+    const pathname = String(url).split("?")[0];
+
+    // ── Workflow Jobs routes ──────────────────────────────────────────
+    if (method === "GET" && pathname === "/v1/jobs") {
+      const jobs = await runtime.workflowEngine.listJobs();
+      return sendJson(res, 200, { data: jobs });
+    }
+
+    if (method === "POST" && pathname.startsWith("/v1/jobs/") && pathname.endsWith("/resume")) {
+      const jobId = pathname.split("/")[3];
+      const job = await runtime.workflowEngine.getJob(jobId);
+      if (!job) {
+        return sendJson(res, 404, { error: `Job ${jobId} not found`, code: "JOB_NOT_FOUND" });
+      }
+      job.status = "pending";
+      job.error = null;
+      await runtime.workflowEngine.enqueueJob(job);
+      return sendJson(res, 202, { data: { resumed: true, jobId } });
+    }
+
+    if (method === "GET" && pathname.startsWith("/v1/jobs/")) {
+      const jobId = pathname.split("/")[3];
+      const job = await runtime.workflowEngine.getJob(jobId);
+      if (!job) {
+        return sendJson(res, 404, { error: `Job ${jobId} not found`, code: "JOB_NOT_FOUND" });
+      }
+      return sendJson(res, 200, { data: job });
+    }
+
     return sendJson(res, 404, {
       error: "Not found",
       code: "NOT_FOUND"
@@ -281,7 +335,16 @@ export function createOrchestrationServer(options = {}) {
   return {
     server,
     stateFilePath,
-    close: () => new Promise((resolve, reject) => {
+    close: () => new Promise(async (resolve, reject) => {
+      try {
+        for (const runtime of tenantRuntimes.values()) {
+          if (runtime.workflowEngine) {
+            await runtime.workflowEngine.stop();
+          }
+        }
+      } catch (err) {
+        console.error("[OrchestrationServer] Failed to stop workflow engines:", err);
+      }
       server.close((err) => {
         if (err) return reject(err);
         resolve();
